@@ -1,5 +1,5 @@
 import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
-import { deleteDoc, doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { auth } from "@/lib/firebase";
 import {
@@ -20,46 +20,53 @@ const entityApi = (entityName) => ({
       ...payload, user_email: email, status: payload.status || "invited",
       created_date: new Date().toISOString(), created_at: serverTimestamp(),
     };
-    await setDoc(doc(db, "memberships", id), invite);
-    await setDoc(doc(db, "invites", id), {
+    const batch = writeBatch(db);
+    batch.set(doc(db, "memberships", id), invite);
+    batch.set(doc(db, "invites", id), {
       email, company_id: payload.company_id, company_name: payload.company_name || "",
       role: payload.role || "attendant", status: "pending",
       invited_by: auth.currentUser?.uid || "", created_at: serverTimestamp(),
     });
+    await batch.commit();
     return { id, ...invite };
   },
   update: async (id, payload) => {
     if (entityName !== "Membership") return updateRecord(entityName, id, payload);
     const memberRef = doc(db, "memberships", id);
-    await updateDoc(memberRef, { ...payload, updated_at: serverTimestamp() });
-    const current = await (await import("firebase/firestore")).getDoc(memberRef);
-    const member = current.exists() ? current.data() : {};
+    const current = await getDoc(memberRef);
+    if (!current.exists()) throw new Error("Membro não encontrado.");
+    const member = current.data();
+    const timestamp = serverTimestamp();
+    const batch = writeBatch(db);
+    batch.update(memberRef, { ...payload, updated_at: timestamp });
     if (member.company_id && member.user_id) {
-      await updateDoc(doc(db, "companies", member.company_id, "members", member.user_id), {
-        ...payload, updated_at: serverTimestamp(),
+      batch.update(doc(db, "companies", member.company_id, "members", member.user_id), {
+        ...payload, updated_at: timestamp,
       });
     } else if (member.user_email) {
-      await updateDoc(doc(db, "invites", emailKey(member.user_email)), {
+      batch.update(doc(db, "invites", emailKey(member.user_email)), {
         ...(payload.role ? { role: payload.role } : {}),
         ...(payload.status ? { status: payload.status === "inactive" ? "inactive" : "pending" } : {}),
-        updated_at: serverTimestamp(),
+        updated_at: timestamp,
       });
     }
+    await batch.commit();
     return { id, ...member, ...payload };
   },
   delete: async (id) => {
     if (entityName !== "Membership") return deleteRecord(entityName, id);
     const memberRef = doc(db, "memberships", id);
-    const current = await (await import("firebase/firestore")).getDoc(memberRef);
-    if (current.exists()) {
-      const member = current.data();
-      if (member.company_id && member.user_id) {
-        await deleteDoc(doc(db, "companies", member.company_id, "members", member.user_id));
-      } else if (member.user_email) {
-        await deleteDoc(doc(db, "invites", emailKey(member.user_email)));
-      }
+    const current = await getDoc(memberRef);
+    if (!current.exists()) return;
+    const member = current.data();
+    const batch = writeBatch(db);
+    if (member.company_id && member.user_id) {
+      batch.delete(doc(db, "companies", member.company_id, "members", member.user_id));
+    } else if (member.user_email) {
+      batch.delete(doc(db, "invites", emailKey(member.user_email)));
     }
-    await deleteDoc(memberRef);
+    batch.delete(memberRef);
+    await batch.commit();
   },
   deleteMany: (filters = {}) => deleteRecords(entityName, filters),
   count: (filters = {}) => countRecords(entityName, filters),
