@@ -21,7 +21,7 @@ function Field({ label, value }) {
 
 export default function ClienteDetalhe() {
   const { id } = useParams();
-  const { can } = useTenant();
+  const { can, company } = useTenant();
   const [client, setClient] = useState(null);
   const [equipment, setEquipment] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -30,9 +30,9 @@ export default function ClienteDetalhe() {
 
   const load = async () => {
     const [clientRows, equipmentRows, orderRows] = await Promise.all([
-      paged("Client", { id }, { limit: 1 }),
-      paged("Equipment", { client_id: id }, { sort: "-created_date", limit: 100 }),
-      paged("ServiceOrder", { client_id: id }, { sort: "-created_date", limit: 100 }),
+      paged("Client", { id, company_id: company.id }, { limit: 1 }),
+      paged("Equipment", { company_id: company.id, client_id: id }, { sort: "-created_date", limit: 100 }),
+      paged("ServiceOrder", { company_id: company.id, client_id: id }, { sort: "-created_date", limit: 100 }),
     ]);
     setClient(clientRows[0] || null);
     setEquipment(equipmentRows);
@@ -42,7 +42,7 @@ export default function ClienteDetalhe() {
 
   useEffect(() => {
     load();
-  }, [id]);
+  }, [id, company?.id]);
 
   if (loading) {
     return (
