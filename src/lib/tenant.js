@@ -1,5 +1,5 @@
 import {
-  addDoc, collection, deleteDoc, doc, getCountFromServer, getDocs,
+  addDoc, collection, deleteDoc, doc, getCountFromServer, getDoc, getDocs,
   limit as firestoreLimit, orderBy, query, runTransaction, serverTimestamp,
   updateDoc, where,
 } from "firebase/firestore";
@@ -94,6 +94,17 @@ export async function paged(entityName, filters = {}, options = {}) {
   if (inFlight.has(cacheKey)) return inFlight.get(cacheKey);
 
   const task = (async () => {
+    if (Object.prototype.hasOwnProperty.call(filters || {}, "id")) {
+      const { id, ...otherFilters } = filters;
+      const snapshot = await getDoc(doc(db, collectionName(entityName), String(id)));
+      const rows = snapshot.exists() ? [normalizeSnapshot(snapshot)] : [];
+      const matched = rows.filter((row) =>
+        Object.entries(otherFilters).every(([field, condition]) => matchesLocal(row[field], condition))
+      );
+      readCache.set(cacheKey, { at: Date.now(), data: matched });
+      return matched;
+    }
+
     const constraints = [];
     const localFilters = [];
     for (const [field, condition] of Object.entries(filters || {})) {
