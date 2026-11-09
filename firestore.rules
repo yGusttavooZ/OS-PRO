@@ -178,7 +178,7 @@ service cloud.firestore {
       allow read: if isAdmin(companyId) || platformAdmin();
       allow create: if platformAdmin() || (signedIn() && existsAfter(memberPath(companyId, request.auth.uid))
         && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin');
-      allow update: if isAdmin(companyId) || platformAdmin();
+      allow update: if platformAdmin();
       allow delete: if false;
     }
 
@@ -228,7 +228,7 @@ service cloud.firestore {
           || (collectionName == 'transactions'
             && role(resource.data.company_id) == 'admin')
           || (collectionName == 'planRequests'
-            && (role(resource.data.company_id) == 'admin' || platformAdmin()))
+            && platformAdmin())
         );
       allow delete: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions', 'orderEvents'
