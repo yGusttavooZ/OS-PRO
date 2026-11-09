@@ -47,25 +47,32 @@ export default function Plataforma() {
   const [plans, setPlans] = useState([]);
   const [audit, setAudit] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [accountDialog, setAccountDialog] = useState({ open: false, company: null, account: null });
   const [planDialog, setPlanDialog] = useState({ open: false, plan: null });
 
   const load = async () => {
     setLoading(true);
-    const [companyRows, accountRows, memberRows, requestRows, planRows, auditRows] = await Promise.all([
-      paged("Company", {}, { sort: "-created_date", limit: 300 }),
-      paged("CompanyAccount", {}, { limit: 300 }),
-      paged("Membership", {}, { limit: 400 }),
-      paged("PlanRequest", {}, { sort: "-created_date", limit: 100 }),
-      paged("Plan", {}, { sort: "sort_order", limit: 50 }),
-      paged("AuditLog", {}, { sort: "-at", limit: 40 }),
-    ]);
-    setCompanies(companyRows);
-    setAccounts(accountRows);
-    setMembers(memberRows);
-    setRequests(requestRows);
-    setPlans(planRows);
-    setAudit(auditRows);
+    setLoadError("");
+    const tasks = [
+      ["Empresas (companies)", () => paged("Company", {}, { sort: "-created_date", limit: 300 })],
+      ["Assinaturas (companyAccounts)", () => paged("CompanyAccount", {}, { limit: 300 })],
+      ["Membros (memberships)", () => paged("Membership", {}, { limit: 400 })],
+      ["Solicitações (planRequests)", () => paged("PlanRequest", {}, { sort: "-created_date", limit: 100 })],
+      ["Planos (plans)", () => paged("Plan", {}, { sort: "sort_order", limit: 50 })],
+      ["Auditoria (auditLogs)", () => paged("AuditLog", {}, { sort: "-at", limit: 40 })],
+    ];
+    const results = await Promise.allSettled(tasks.map(([, run]) => run()));
+    const setters = [setCompanies, setAccounts, setMembers, setRequests, setPlans, setAudit];
+    const failures = [];
+    results.forEach((result, index) => {
+      if (result.status === "fulfilled") setters[index](result.value);
+      else failures.push(`${tasks[index][0]}: ${result.reason?.message || "permissão negada"}`);
+    });
+    if (failures.length) {
+      console.error("Falha ao carregar dados do painel da plataforma:", failures);
+      setLoadError(failures.join(" | "));
+    }
     setLoading(false);
   };
 
@@ -147,6 +154,12 @@ export default function Plataforma() {
             </Button>
           }
         />
+
+        {loadError && (
+          <div role="alert" className="mb-4 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+            Não foi possível carregar todos os dados: {loadError}
+          </div>
+        )}
 
         {loading ? (
           <div className="py-24 grid place-items-center text-muted-foreground"><Loader2 className="w-6 h-6 animate-spin" /></div>
