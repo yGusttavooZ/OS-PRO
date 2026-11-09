@@ -165,7 +165,11 @@ service cloud.firestore {
       allow read: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions',
         'orderEvents', 'auditLogs', 'counters', 'planRequests'
-      ] && sameCompanyRecord();
+      ] && sameCompanyRecord()
+        && (
+          !(collectionName in ['transactions', 'auditLogs', 'planRequests'])
+          || isAdmin(resource.data.company_id)
+        );
       allow create: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions',
         'orderEvents', 'auditLogs', 'planRequests'
