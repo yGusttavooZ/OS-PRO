@@ -69,24 +69,41 @@ export default function TeamSettings() {
   };
 
   const changeRole = async (member, role) => {
-    await base44.entities.Membership.update(member.id, { role });
-    invalidateTenantCache("Membership");
-    load();
+    setError("");
+    try {
+      await base44.entities.Membership.update(member.id, { role });
+      invalidateTenantCache("Membership");
+      await load();
+    } catch (err) {
+      setError(err?.message || "Não foi possível alterar o perfil do membro.");
+    }
   };
 
   const toggleStatus = async (member) => {
-    await base44.entities.Membership.update(member.id, {
-      status: member.status === "inactive" ? "active" : "inactive",
-    });
-    invalidateTenantCache("Membership");
-    load();
+    setError("");
+    const status = member.user_id
+      ? (member.status === "inactive" ? "active" : "inactive")
+      : (member.status === "inactive" ? "invited" : "inactive");
+    try {
+      await base44.entities.Membership.update(member.id, { status });
+      invalidateTenantCache("Membership");
+      await load();
+    } catch (err) {
+      setError(err?.message || "Não foi possível alterar a situação do membro.");
+    }
   };
 
   const remove = async (member) => {
     if (member.user_id === user?.id) return;
-    await base44.entities.Membership.delete(member.id);
-    invalidateTenantCache("Membership");
-    load();
+    if (!window.confirm(`Remover ${member.user_name || member.user_email} da equipe?`)) return;
+    setError("");
+    try {
+      await base44.entities.Membership.delete(member.id);
+      invalidateTenantCache("Membership");
+      await load();
+    } catch (err) {
+      setError(err?.message || "Não foi possível remover o membro.");
+    }
   };
 
   return (
@@ -124,6 +141,7 @@ export default function TeamSettings() {
         </div>
 
         {message && <p className="mt-3 text-sm text-primary">{message}</p>}
+        {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
         {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
 
         <div className="mt-4 rounded-xl bg-muted/60 p-3 text-[11px] text-muted-foreground space-y-1">
