@@ -49,7 +49,7 @@ export default function Equipamentos() {
     : equipment;
 
   const handleDelete = async (item) => {
-    const linked = await base44.entities.ServiceOrder.count({ equipment_id: item.id });
+    const linked = await base44.entities.ServiceOrder.count({ company_id: company.id, equipment_id: item.id });
     if (linked > 0) return;
     await base44.entities.Equipment.delete(item.id);
     invalidateTenantCache("Equipment");
