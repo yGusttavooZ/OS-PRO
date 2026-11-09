@@ -34,22 +34,29 @@ export default function Financeiro() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [error, setError] = useState("");
 
   const { from, to } = periodRange(period);
 
   const load = async () => {
     if (!company?.id) return;
     setLoading(true);
-    const [periodRows, historyRows] = await Promise.all([
-      paged("Transaction", {
-        company_id: company.id,
-        reference_date: { $gte: from.slice(0, 10), $lte: to.slice(0, 10) },
-      }, { sort: "-reference_date", limit: 400 }),
-      paged("Transaction", { company_id: company.id }, { sort: "-reference_date", limit: 400 }),
-    ]);
-    setRows(periodRows);
-    setChartRows(historyRows);
-    setLoading(false);
+    setError("");
+    try {
+      const [periodRows, historyRows] = await Promise.all([
+        paged("Transaction", {
+          company_id: company.id,
+          reference_date: { $gte: from.slice(0, 10), $lte: to.slice(0, 10) },
+        }, { sort: "-reference_date", limit: 400 }),
+        paged("Transaction", { company_id: company.id }, { sort: "-reference_date", limit: 400 }),
+      ]);
+      setRows(periodRows);
+      setChartRows(historyRows);
+    } catch (err) {
+      setError(err?.message || "Não foi possível carregar os lançamentos financeiros.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -102,18 +109,29 @@ export default function Financeiro() {
   }, [chartRows]);
 
   const confirm = async (row) => {
-    await base44.entities.Transaction.update(row.id, {
-      status: row.type === "income" ? "received" : "paid",
-      paid_date: new Date().toISOString().slice(0, 10),
-    });
-    invalidateTenantCache("Transaction");
-    load();
+    setError("");
+    try {
+      await base44.entities.Transaction.update(row.id, {
+        status: row.type === "income" ? "received" : "paid",
+        paid_date: new Date().toISOString().slice(0, 10),
+      });
+      invalidateTenantCache("Transaction");
+      await load();
+    } catch (err) {
+      setError(err?.message || "Não foi possível confirmar o lançamento.");
+    }
   };
 
   const remove = async (row) => {
-    await base44.entities.Transaction.delete(row.id);
-    invalidateTenantCache("Transaction");
-    load();
+    if (!window.confirm(`Excluir o lançamento "${row.description || "sem descrição"}"? Esta ação não pode ser desfeita.`)) return;
+    setError("");
+    try {
+      await base44.entities.Transaction.delete(row.id);
+      invalidateTenantCache("Transaction");
+      await load();
+    } catch (err) {
+      setError(err?.message || "Não foi possível excluir o lançamento.");
+    }
   };
 
   if (!can.finance) {
@@ -165,6 +183,12 @@ export default function Financeiro() {
           </>
         }
       />
+
+      {error && (
+        <div role="alert" className="mb-4 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
         {kpis.map((kpi) => (
