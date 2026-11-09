@@ -96,7 +96,7 @@ export default function CompanySettings() {
             </span>
           }
         />
-<div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0">
           <Label htmlFor="company-logo-url" className="field-label">URL pública do logotipo</Label>
           <div className="relative mt-1.5">
             <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
