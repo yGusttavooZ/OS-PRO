@@ -52,7 +52,7 @@ export default function OrdemForm() {
   useEffect(() => {
     if (!editing || !company?.id) return;
     (async () => {
-      const rows = await paged("ServiceOrder", { id }, { limit: 1 });
+      const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
       const order = rows[0];
       if (!order) {
         navigate("/ordens", { replace: true });
