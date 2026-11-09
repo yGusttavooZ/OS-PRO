@@ -3,7 +3,9 @@ import { Loader2, Save, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { base44 } from "@/api/base44Client";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "@/lib/firebase";
+import { updateCompany } from "@/lib/firestoreTenant";
 import { useTenant } from "@/lib/TenantContext";
 import CompanyLogo from "@/components/CompanyLogo";
 import { invalidateTenantCache } from "@/lib/tenant";
@@ -48,7 +50,7 @@ export default function CompanySettings() {
     setError("");
     setMessage("");
     try {
-      await base44.entities.Company.update(company.id, {
+      await updateCompany(company.id, {
         name: form.name,
         trade_name: form.trade_name,
         document: form.document,
@@ -79,8 +81,12 @@ export default function CompanySettings() {
     setUploading(true);
     setError("");
     try {
-      const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
-      await base44.entities.Company.update(company.id, { logo_url: file_uri });
+      if (!file.type.startsWith("image/")) throw new Error("Selecione um arquivo de imagem.");
+      if (file.size > 5 * 1024 * 1024) throw new Error("A imagem deve ter no máximo 5 MB.");
+      const logoRef = ref(storage, `companies/${company.id}/logo/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`);
+      await uploadBytes(logoRef, file, { contentType: file.type });
+      const logoUrl = await getDownloadURL(logoRef);
+      await updateCompany(company.id, { logo_url: logoUrl });
       invalidateTenantCache("Company");
       await refresh();
       setMessage("Logotipo atualizado.");
