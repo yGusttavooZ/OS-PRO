@@ -52,12 +52,12 @@ service cloud.firestore {
     }
 
     match /companies/{companyId} {
-      allow read: if isMember(companyId);
+      allow read: if isMember(companyId) || platformAdmin();
       allow create: if signedIn()
         && request.resource.data.owner_uid == request.auth.uid
         && existsAfter(memberPath(companyId, request.auth.uid))
         && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin';
-      allow update: if isAdmin(companyId)
+      allow update: if (isAdmin(companyId) || platformAdmin())
         && request.resource.data.owner_uid == resource.data.owner_uid
         && request.resource.data.company_id == resource.data.company_id;
       allow delete: if false;
@@ -144,6 +144,7 @@ service cloud.firestore {
     match /memberships/{membershipId} {
       allow read: if signedIn() && (
         membershipId == request.auth.uid
+        || platformAdmin()
         || (resource.data.company_id is string && isAdmin(resource.data.company_id))
       );
       allow create: if signedIn() && (
@@ -174,10 +175,10 @@ service cloud.firestore {
     }
 
     match /companyAccounts/{companyId} {
-      allow read: if isAdmin(companyId);
-      allow create: if signedIn() && existsAfter(memberPath(companyId, request.auth.uid))
-        && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin';
-      allow update: if isAdmin(companyId);
+      allow read: if isAdmin(companyId) || platformAdmin();
+      allow create: if platformAdmin() || (signedIn() && existsAfter(memberPath(companyId, request.auth.uid))
+        && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin');
+      allow update: if isAdmin(companyId) || platformAdmin();
       allow delete: if false;
     }
 
@@ -185,11 +186,9 @@ service cloud.firestore {
       allow read: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions',
         'orderEvents', 'auditLogs', 'counters', 'planRequests'
-      ] && sameCompanyRecord()
-        && (
-          !(collectionName in ['transactions', 'auditLogs', 'planRequests'])
-          || isAdmin(resource.data.company_id)
-        );
+      ] && (platformAdmin() || (sameCompanyRecord()
+        && (!(collectionName in ['transactions', 'auditLogs', 'planRequests'])
+          || isAdmin(resource.data.company_id))));
       allow create: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions',
         'orderEvents', 'auditLogs', 'planRequests'
@@ -229,7 +228,7 @@ service cloud.firestore {
           || (collectionName == 'transactions'
             && role(resource.data.company_id) == 'admin')
           || (collectionName == 'planRequests'
-            && role(resource.data.company_id) == 'admin')
+            && (role(resource.data.company_id) == 'admin' || platformAdmin()))
         );
       allow delete: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions', 'orderEvents'
