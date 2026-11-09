@@ -14,11 +14,20 @@ export default function OrdemImprimir() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!company?.id) return;
+    let active = true;
     (async () => {
-      const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
-      setOrder(rows[0] || null);
-      setLoading(false);
+      try {
+        const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
+        if (active) setOrder(rows[0] || null);
+      } catch (error) {
+        console.error("Falha ao carregar documento para impressão", error);
+        if (active) setOrder(null);
+      } finally {
+        if (active) setLoading(false);
+      }
     })();
+    return () => { active = false; };
   }, [id, company?.id]);
 
   useEffect(() => {
@@ -79,10 +88,12 @@ export default function OrdemImprimir() {
             />
             <div className="min-w-0">
               <h1 className="font-heading text-lg font-extrabold leading-tight">{company?.name}</h1>
+              {company?.trade_name && company.trade_name !== company.name && <p className="text-xs text-muted-foreground">{company.trade_name}</p>}
               {company?.document && <p className="text-xs text-muted-foreground">CNPJ/CPF: {formatDoc(company.document)}</p>}
               {address && <p className="text-xs text-muted-foreground">{address}</p>}
               <p className="text-xs text-muted-foreground">
                 {company?.phone && formatPhone(company.phone)}
+                {company?.whatsapp ? ` · WhatsApp: ${formatPhone(company.whatsapp)}` : ""}
                 {company?.email ? ` · ${company.email}` : ""}
               </p>
             </div>
