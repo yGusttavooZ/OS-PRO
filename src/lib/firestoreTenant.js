@@ -45,6 +45,7 @@ export async function acceptCompanyInvite({ user, invite }) {
   const legacyMemberRef = doc(db, "memberships", invite.id);
   const activeMemberRef = doc(db, "memberships", user.uid);
   const userRef = doc(db, "users", user.uid);
+  const membershipCreatedDate = new Date().toISOString();
 
   await runTransaction(db, async (transaction) => {
     const [inviteSnap, companySnap, userSnap, memberSnap, activeMemberSnap] = await Promise.all([
@@ -80,7 +81,7 @@ export async function acceptCompanyInvite({ user, invite }) {
       uid: user.uid, user_id: user.uid, user_email: emailKey(user.email),
       user_name: user.full_name || user.email, company_id: invite.company_id,
       company_name: companySnap.data().name || "", role, status: "active",
-      created_at: serverTimestamp(),
+      created_date: membershipCreatedDate, created_at: serverTimestamp(),
     });
     if (legacyMemberRef.id !== activeMemberRef.id) transaction.delete(legacyMemberRef);
     transaction.set(userRef, {
@@ -101,6 +102,7 @@ export async function createCompanyForUser({ user, form }) {
   const userRef = doc(db, "users", user.uid);
   const companyName = form.name.trim();
   const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+  const membershipCreatedDate = new Date().toISOString();
 
   const company = {
     name: companyName, legal_name: companyName, trade_name: companyName,
@@ -126,7 +128,8 @@ export async function createCompanyForUser({ user, form }) {
     transaction.set(doc(db, "memberships", user.uid), {
       uid: user.uid, user_id: user.uid, user_email: emailKey(user.email),
       user_name: user.full_name || user.email || "", company_id: companyRef.id,
-      company_name: companyName, role: "admin", status: "active", created_at: serverTimestamp(),
+      company_name: companyName, role: "admin", status: "active",
+      created_date: membershipCreatedDate, created_at: serverTimestamp(),
     });
     transaction.set(accountRef, {
       company_id: companyRef.id, company_name: companyName, status: "trial",
