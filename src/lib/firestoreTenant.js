@@ -2,7 +2,7 @@ import {
   collection, doc, getDoc, runTransaction, serverTimestamp, setDoc, updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { DEFAULT_WARRANTY } from "@/lib/tenant";
+const DEFAULT_WARRANTY = "A garantia cobre exclusivamente os serviços executados e as peças substituídas nesta ordem de serviço, pelo prazo indicado acima, contado da data de entrega do equipamento. Não estão cobertos danos por mau uso, quedas, oxidação, sobrecarga elétrica, violação por terceiros, vírus e arquivos pessoais. Os dados armazenados no equipamento são de responsabilidade do cliente, sendo recomendado backup prévio. Equipamentos não retirados em até 90 dias após a comunicação de conclusão poderão ser considerados abandonados, conforme o artigo 1.275 do Código Civil.";
 
 const emailKey = (email = "") => email.trim().toLowerCase();
 
