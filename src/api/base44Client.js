@@ -40,6 +40,12 @@ const entityApi = (entityName) => ({
       await updateDoc(doc(db, "companies", member.company_id, "members", member.user_id), {
         ...payload, updated_at: serverTimestamp(),
       });
+    } else if (member.user_email) {
+      await updateDoc(doc(db, "invites", emailKey(member.user_email)), {
+        ...(payload.role ? { role: payload.role } : {}),
+        ...(payload.status ? { status: payload.status === "inactive" ? "inactive" : "pending" } : {}),
+        updated_at: serverTimestamp(),
+      });
     }
     return { id, ...member, ...payload };
   },
@@ -51,6 +57,8 @@ const entityApi = (entityName) => ({
       const member = current.data();
       if (member.company_id && member.user_id) {
         await deleteDoc(doc(db, "companies", member.company_id, "members", member.user_id));
+      } else if (member.user_email) {
+        await deleteDoc(doc(db, "invites", emailKey(member.user_email)));
       }
     }
     await deleteDoc(memberRef);
