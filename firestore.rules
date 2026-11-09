@@ -83,7 +83,12 @@ service cloud.firestore {
 
       match /counters/{counterId} {
         allow read: if isMember(companyId);
-        allow create: if isMember(companyId)
+        // Permite criar o contador inicial na mesma transação que cria a empresa
+        // e ativa o primeiro membro administrador.
+        allow create: if signedIn()
+          && existsAfter(memberPath(companyId, request.auth.uid))
+          && getAfter(memberPath(companyId, request.auth.uid)).data.status == 'active'
+          && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin'
           && request.resource.data.key == 'doc'
           && request.resource.data.value is int
           && request.resource.data.value > 0;
