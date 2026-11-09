@@ -1,66 +1,45 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
-import { invalidateTenantCache, myCompanyId, paged } from "@/lib/tenant";
+import { loadTenantProfile } from "@/lib/firestoreTenant";
 import { TenantContext } from "@/lib/tenantContextObject";
 
-const EMPTY = { loading: true, company: null, account: null, membership: null };
+const EMPTY = { loading: true, company: null, account: null, membership: null, userProfile: null };
 
 export function TenantProvider({ children }) {
   const { user } = useAuth();
   const [state, setState] = useState(EMPTY);
 
   const refresh = useCallback(async () => {
-    const companyId = myCompanyId(user);
-    if (!user || !companyId) {
-      setState({ loading: false, company: null, account: null, membership: null });
+    if (!user?.uid) {
+      setState({ ...EMPTY, loading: false });
       return;
     }
     setState((prev) => ({ ...prev, loading: true }));
     try {
-      invalidateTenantCache("Company", "CompanyAccount", "Membership");
-      const [companies, accounts, memberships] = await Promise.all([
-        paged("Company", { id: companyId }),
-        paged("CompanyAccount", { company_id: companyId }),
-        paged("Membership", { company_id: companyId }),
-      ]);
-      const membership =
-        memberships.find((m) => m.user_id === user.id) ||
-        memberships.find((m) => (m.user_email || "").toLowerCase() === (user.email || "").toLowerCase()) ||
-        null;
-      setState({
-        loading: false,
-        company: companies[0] || null,
-        account: accounts[0] || null,
-        membership,
-      });
+      const data = await loadTenantProfile(user);
+      setState({ loading: false, ...data });
     } catch (error) {
-      console.error("Falha ao carregar a empresa", error);
-      setState({ loading: false, company: null, account: null, membership: null });
+      console.error("Falha ao carregar o ambiente da empresa", error);
+      setState({ ...EMPTY, loading: false });
     }
   }, [user]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const role = state.membership?.role || (user?.role === "admin" ? "admin" : null);
-
-  const value = useMemo(
-    () => ({
-      ...state,
-      user,
-      role,
-      isPlatformAdmin: user?.role === "admin",
-      can: {
-        manageTeam: role === "admin",
-        finance: role === "admin",
-        editRecords: role === "admin" || role === "attendant",
-        changeStatus: role === "admin" || role === "technician",
-      },
-      refresh,
-    }),
-    [state, user, role, refresh]
-  );
+  const role = state.membership?.role || state.userProfile?.company_role || null;
+  const value = useMemo(() => ({
+    ...state,
+    user,
+    role,
+    isPlatformAdmin: state.userProfile?.platform_role === "platform_admin",
+    can: {
+      manageTeam: role === "admin",
+      finance: role === "admin",
+      editRecords: role === "admin" || role === "attendant",
+      changeStatus: role === "admin" || role === "technician",
+    },
+    refresh,
+  }), [state, user, role, refresh]);
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>;
 }
