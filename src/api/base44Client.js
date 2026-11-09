@@ -1,9 +1,7 @@
 import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { deleteDoc, doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { auth } from "@/lib/firebase";
-import { storage } from "@/lib/firebase";
 import {
   countRecords, createRecord, deleteRecord, deleteRecords,
   paged, updateRecord,
@@ -89,11 +87,8 @@ const users = { inviteUser: async () => null };
 
 const integrations = {
   Core: {
-    UploadPrivateFile: async ({ file }) => {
-      const safeName = String(file?.name || "arquivo").replace(/[^a-zA-Z0-9._-]/g, "_");
-      const fileRef = ref(storage, `uploads/${auth.currentUser?.uid || "anonymous"}/${Date.now()}-${safeName}`);
-      await uploadBytes(fileRef, file, { contentType: file.type || "application/octet-stream" });
-      return { file_uri: await getDownloadURL(fileRef) };
+    UploadPrivateFile: async () => {
+      throw new Error("Envio de arquivos está desativado. Para logotipos, informe uma URL pública nas configurações da empresa.");
     },
     CreateFileSignedUrl: async ({ file_uri }) => ({ signed_url: file_uri }),
   },
