@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { auth } from '@/lib/firebase';
 import { useQuery } from '@tanstack/react-query';
 
 
@@ -11,7 +11,8 @@ export default function PageNotFound({}) {
         queryKey: ['user'],
         queryFn: async () => {
             try {
-                const user = await base44.auth.me();
+                const user = auth.currentUser;
+                if (!user) throw new Error('Usuário não autenticado.');
                 return { user, isAuthenticated: true };
             } catch (error) {
                 return { user: null, isAuthenticated: false };
