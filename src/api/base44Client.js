@@ -1,5 +1,7 @@
 import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { deleteDoc, doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { auth } from "@/lib/firebase";
 import { storage } from "@/lib/firebase";
 import {
@@ -7,11 +9,52 @@ import {
   paged, updateRecord,
 } from "@/lib/tenant";
 
+const emailKey = (value = "") => String(value).trim().toLowerCase();
+
 const entityApi = (entityName) => ({
   filter: (filters = {}, options = {}) => paged(entityName, filters, options),
-  create: (payload) => createRecord(entityName, payload),
-  update: (id, payload) => updateRecord(entityName, id, payload),
-  delete: (id) => deleteRecord(entityName, id),
+  create: async (payload) => {
+    if (entityName !== "Membership") return createRecord(entityName, payload);
+    const email = emailKey(payload.user_email || payload.email);
+    if (!email) throw new Error("Informe o e-mail do membro.");
+    const id = email;
+    const invite = {
+      ...payload, user_email: email, status: payload.status || "invited",
+      created_date: new Date().toISOString(), created_at: serverTimestamp(),
+    };
+    await setDoc(doc(db, "memberships", id), invite);
+    await setDoc(doc(db, "invites", id), {
+      email, company_id: payload.company_id, company_name: payload.company_name || "",
+      role: payload.role || "attendant", status: "pending",
+      invited_by: auth.currentUser?.uid || "", created_at: serverTimestamp(),
+    });
+    return { id, ...invite };
+  },
+  update: async (id, payload) => {
+    if (entityName !== "Membership") return updateRecord(entityName, id, payload);
+    const memberRef = doc(db, "memberships", id);
+    await updateDoc(memberRef, { ...payload, updated_at: serverTimestamp() });
+    const current = await (await import("firebase/firestore")).getDoc(memberRef);
+    const member = current.exists() ? current.data() : {};
+    if (member.company_id && member.user_id) {
+      await updateDoc(doc(db, "companies", member.company_id, "members", member.user_id), {
+        ...payload, updated_at: serverTimestamp(),
+      });
+    }
+    return { id, ...member, ...payload };
+  },
+  delete: async (id) => {
+    if (entityName !== "Membership") return deleteRecord(entityName, id);
+    const memberRef = doc(db, "memberships", id);
+    const current = await (await import("firebase/firestore")).getDoc(memberRef);
+    if (current.exists()) {
+      const member = current.data();
+      if (member.company_id && member.user_id) {
+        await deleteDoc(doc(db, "companies", member.company_id, "members", member.user_id));
+      }
+    }
+    await deleteDoc(memberRef);
+  },
   deleteMany: (filters = {}) => deleteRecords(entityName, filters),
   count: (filters = {}) => countRecords(entityName, filters),
 });
@@ -34,6 +77,8 @@ const authApi = {
   },
 };
 
+const users = { inviteUser: async () => null };
+
 const integrations = {
   Core: {
     UploadPrivateFile: async ({ file }) => {
@@ -46,4 +91,4 @@ const integrations = {
   },
 };
 
-export const base44 = { entities, auth: authApi, integrations };
+export const base44 = { entities, auth: authApi, users, integrations };
