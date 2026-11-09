@@ -193,6 +193,11 @@ service cloud.firestore {
               || (role(resource.data.company_id) == 'attendant'
                 && request.resource.data.status == resource.data.status)
               || (role(resource.data.company_id) == 'technician'
+                && request.resource.data.status in [
+                  'Orçamento', 'Aguardando aprovação', 'Aprovado',
+                  'Aguardando equipamento', 'Em execução', 'Aguardando peça',
+                  'Concluído', 'Aguardando retirada', 'Entregue', 'Cancelado'
+                ]
                 && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
                   'status', 'exit_at', 'exit_time', 'updated_date', 'updated_at'
                 ]))
