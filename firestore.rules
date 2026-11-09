@@ -42,7 +42,12 @@ service cloud.firestore {
         && !('platform_role' in request.resource.data);
       allow update: if signedIn() && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['full_name', 'photo_url', 'updated_at']);
+          .hasOnly(['full_name', 'photo_url', 'updated_at', 'company_id', 'company_name', 'company_role'])
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['company_id'])
+          || (request.resource.data.company_id is string
+            && existsAfter(memberPath(request.resource.data.company_id, uid)))
+        );
       allow delete: if false;
     }
 
@@ -78,10 +83,14 @@ service cloud.firestore {
 
       match /counters/{counterId} {
         allow read: if isMember(companyId);
-        allow create, update: if isMember(companyId)
+        allow create: if isMember(companyId)
           && request.resource.data.key == 'doc'
           && request.resource.data.value is int
-          && request.resource.data.value >= resource.data.value;
+          && request.resource.data.value > 0;
+        allow update: if isMember(companyId)
+          && request.resource.data.key == 'doc'
+          && request.resource.data.value is int
+          && request.resource.data.value > resource.data.value;
         allow delete: if false;
       }
 
@@ -94,9 +103,14 @@ service cloud.firestore {
 
     match /invites/{email} {
       allow read: if signedIn() && request.auth.token.email == resource.data.email;
-      allow create, update, delete: if signedIn()
+      allow create, update: if signedIn()
         && request.resource.data.company_id is string
         && isAdmin(request.resource.data.company_id);
+      allow delete: if signedIn() && (
+          (resource.data.company_id is string && isAdmin(resource.data.company_id))
+          || (resource.data.user_email == request.auth.token.email
+            && resource.data.status == 'invited')
+        );
     }
 
     match /memberships/{membershipId} {
