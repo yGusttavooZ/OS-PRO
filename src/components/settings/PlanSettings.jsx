@@ -60,7 +60,9 @@ export default function PlanSettings() {
         `Solicitação do plano ${plan.name} registrada. Nossa equipe entra em contato para concluir a assinatura.`
       );
       invalidateTenantCache("PlanRequest");
-      load();
+      await load();
+    } catch (err) {
+      setMessage(err?.message || "Não foi possível registrar a solicitação. Tente novamente.");
     } finally {
       setSending("");
     }
@@ -139,11 +141,11 @@ export default function PlanSettings() {
               <Button
                 className="mt-4 gap-2"
                 variant={isCurrent ? "outline" : "default"}
-                disabled={isCurrent || sending === plan.id}
+                disabled={isCurrent || Boolean(request) || Boolean(sending)}
                 onClick={() => requestPlan(plan)}
               >
                 {sending === plan.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                {isCurrent ? "Plano atual" : "Solicitar este plano"}
+                {isCurrent ? "Plano atual" : request ? "Solicitação em análise" : "Solicitar este plano"}
               </Button>
             </div>
           );
