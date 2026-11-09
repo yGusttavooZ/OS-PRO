@@ -36,14 +36,14 @@ export default function Clientes() {
 
   const handleDelete = async (client) => {
     setMessage("");
-    const orders = await base44.entities.ServiceOrder.count({ client_id: client.id });
+    const orders = await base44.entities.ServiceOrder.count({ company_id: company.id, client_id: client.id });
     if (orders > 0) {
       setMessage(
         `"${client.name}" possui ${orders} ordem(ns) vinculada(s) e não pode ser excluído. Edite o cadastro e mantenha o histórico.`
       );
       return;
     }
-    await base44.entities.Equipment.deleteMany({ client_id: client.id });
+    await base44.entities.Equipment.deleteMany({ company_id: company.id, client_id: client.id });
     await base44.entities.Client.delete(client.id);
     invalidateTenantCache("Client", "Equipment");
     load();
