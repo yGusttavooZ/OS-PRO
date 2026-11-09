@@ -170,14 +170,38 @@ service cloud.firestore {
         'serviceOrders', 'clients', 'equipment', 'transactions',
         'orderEvents', 'auditLogs', 'planRequests'
       ] && sameCompanyWrite()
-        && (role(request.resource.data.company_id) == 'admin'
-          || (collectionName != 'transactions' && role(request.resource.data.company_id) in ['attendant', 'technician']));
+        && (
+          (collectionName in ['clients', 'equipment', 'serviceOrders']
+            && role(request.resource.data.company_id) in ['admin', 'attendant'])
+          || (collectionName == 'transactions'
+            && role(request.resource.data.company_id) == 'admin')
+          || (collectionName in ['orderEvents', 'auditLogs']
+            && role(request.resource.data.company_id) in ['admin', 'attendant', 'technician'])
+          || (collectionName == 'planRequests'
+            && role(request.resource.data.company_id) == 'admin')
+        );
       allow update: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions', 'planRequests'
       ] && sameCompanyRecord() && sameCompanyWrite()
         && request.resource.data.company_id == resource.data.company_id
-        && (role(resource.data.company_id) == 'admin'
-          || (collectionName != 'transactions' && role(resource.data.company_id) in ['attendant', 'technician']));
+        && (
+          (collectionName in ['clients', 'equipment']
+            && role(resource.data.company_id) in ['admin', 'attendant'])
+          || (collectionName == 'serviceOrders'
+            && (
+              role(resource.data.company_id) == 'admin'
+              || (role(resource.data.company_id) == 'attendant'
+                && request.resource.data.status == resource.data.status)
+              || (role(resource.data.company_id) == 'technician'
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                  'status', 'exit_at', 'exit_time', 'updated_date', 'updated_at'
+                ]))
+            ))
+          || (collectionName == 'transactions'
+            && role(resource.data.company_id) == 'admin')
+          || (collectionName == 'planRequests'
+            && role(resource.data.company_id) == 'admin')
+        );
       allow delete: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions', 'orderEvents'
       ] && sameCompanyRecord() && isAdmin(resource.data.company_id);
