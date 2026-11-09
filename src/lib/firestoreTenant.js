@@ -42,6 +42,8 @@ export async function acceptCompanyInvite({ user, invite }) {
   const inviteRef = doc(db, "invites", invite.id);
   const companyRef = doc(db, "companies", invite.company_id);
   const memberRef = doc(db, "companies", invite.company_id, "members", user.uid);
+  const legacyMemberRef = doc(db, "memberships", invite.id);
+  const activeMemberRef = doc(db, "memberships", user.uid);
   const userRef = doc(db, "users", user.uid);
 
   await runTransaction(db, async (transaction) => {
@@ -62,6 +64,13 @@ export async function acceptCompanyInvite({ user, invite }) {
       uid: user.uid, email: user.email, name: user.full_name || user.email,
       role, status: "active", created_at: serverTimestamp(),
     });
+    transaction.set(activeMemberRef, {
+      uid: user.uid, user_id: user.uid, user_email: emailKey(user.email),
+      user_name: user.full_name || user.email, company_id: invite.company_id,
+      company_name: companySnap.data().name || "", role, status: "active",
+      created_at: serverTimestamp(),
+    });
+    if (legacyMemberRef.id !== activeMemberRef.id) transaction.delete(legacyMemberRef);
     transaction.set(userRef, {
       uid: user.uid, email: user.email, full_name: user.full_name || user.email,
       company_id: invite.company_id, company_name: companySnap.data().name || "",
@@ -101,6 +110,11 @@ export async function createCompanyForUser({ user, form }) {
     transaction.set(memberRef, {
       uid: user.uid, email: user.email || "", name: user.full_name || user.email || "",
       role: "admin", status: "active", created_at: serverTimestamp(),
+    });
+    transaction.set(doc(db, "memberships", user.uid), {
+      uid: user.uid, user_id: user.uid, user_email: emailKey(user.email),
+      user_name: user.full_name || user.email || "", company_id: companyRef.id,
+      company_name: companyName, role: "admin", status: "active", created_at: serverTimestamp(),
     });
     transaction.set(accountRef, {
       company_id: companyRef.id, company_name: companyName, status: "trial",
