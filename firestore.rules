@@ -97,10 +97,10 @@ service cloud.firestore {
           && request.resource.data.key == 'doc'
           && request.resource.data.value is int
           && request.resource.data.value > 0;
-        allow update: if isMember(companyId)
+        allow update: if isAdmin(companyId)
           && request.resource.data.key == 'doc'
           && request.resource.data.value is int
-          && request.resource.data.value > resource.data.value;
+          && request.resource.data.value > 0;
         allow delete: if false;
       }
 
