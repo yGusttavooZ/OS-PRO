@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+
 import { Image } from "@/components/ui/image";
 
 export function useCompanyLogo(fileUri) {
@@ -15,17 +15,7 @@ export function useCompanyLogo(fileUri) {
       setUrl(fileUri);
       return;
     }
-    (async () => {
-      try {
-        const { signed_url } = await base44.integrations.Core.CreateFileSignedUrl({
-          file_uri: fileUri,
-          expires_in: 3600,
-        });
-        if (alive) setUrl(signed_url || "");
-      } catch {
-        if (alive) setUrl("");
-      }
-    })();
+    setUrl(fileUri);
     return () => {
       alive = false;
     };
