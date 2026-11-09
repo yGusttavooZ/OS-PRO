@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isCompanyMember(companyId) {
+      return signedIn()
+        && firestore.exists(/databases/(default)/documents/companies/$(companyId)/members/$(request.auth.uid))
+        && firestore.get(/databases/(default)/documents/companies/$(companyId)/members/$(request.auth.uid)).data.status == 'active';
+    }
+
+    // Arquivos pessoais enviados pelo usuário autenticado.
+    match /uploads/{uid}/{fileName} {
+      allow read, write: if signedIn() && request.auth.uid == uid
+        && (request.resource == null
+          || (request.resource.size < 5 * 1024 * 1024
+            && request.resource.contentType.matches('image/.*')));
+    }
+
+    // Logotipos e arquivos da empresa, quando o app passar a usar este caminho.
+    match /companies/{companyId}/{allPaths=**} {
+      allow read: if isCompanyMember(companyId);
+      allow write: if isCompanyMember(companyId)
+        && firestore.get(/databases/(default)/documents/companies/$(companyId)/members/$(request.auth.uid)).data.role == 'admin'
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
