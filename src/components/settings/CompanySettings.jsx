@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import { Loader2, Save, Upload } from "lucide-react";
+import { Loader2, Save, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "@/lib/firebase";
 import { updateCompany } from "@/lib/firestoreTenant";
 import { useTenant } from "@/lib/TenantContext";
 import CompanyLogo from "@/components/CompanyLogo";
@@ -30,7 +28,6 @@ export default function CompanySettings() {
   const { company, refresh } = useTenant();
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -64,6 +61,7 @@ export default function CompanySettings() {
         city: form.city,
         state: form.state ? String(form.state).toUpperCase() : "",
         tech_responsible: form.tech_responsible,
+        logo_url: String(form.logo_url || "").trim(),
       });
       invalidateTenantCache("Company");
       await refresh();
@@ -72,28 +70,6 @@ export default function CompanySettings() {
       setError(err?.message || "Não foi possível salvar.");
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleLogo = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setError("");
-    try {
-      if (!file.type.startsWith("image/")) throw new Error("Selecione um arquivo de imagem.");
-      if (file.size > 5 * 1024 * 1024) throw new Error("A imagem deve ter no máximo 5 MB.");
-      const logoRef = ref(storage, `companies/${company.id}/logo/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`);
-      await uploadBytes(logoRef, file, { contentType: file.type });
-      const logoUrl = await getDownloadURL(logoRef);
-      await updateCompany(company.id, { logo_url: logoUrl });
-      invalidateTenantCache("Company");
-      await refresh();
-      setMessage("Logotipo atualizado.");
-    } catch (err) {
-      setError(err?.message || "Falha ao enviar o logotipo.");
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -120,13 +96,21 @@ export default function CompanySettings() {
             </span>
           }
         />
-        <label className="cursor-pointer">
-          <span className="inline-flex items-center gap-2 rounded-lg border border-input px-3 py-2 text-sm font-medium hover:bg-muted">
-            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            {uploading ? "Enviando..." : "Enviar logotipo"}
-          </span>
-          <input type="file" accept="image/*" className="hidden" onChange={handleLogo} disabled={uploading} />
-        </label>
+<div className="flex-1 min-w-0">
+          <Label htmlFor="company-logo-url" className="field-label">URL pública do logotipo</Label>
+          <div className="relative mt-1.5">
+            <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="company-logo-url"
+              type="url"
+              value={form.logo_url || ""}
+              onChange={(e) => set("logo_url", e.target.value)}
+              placeholder="https://exemplo.com/minha-logo.png"
+              className="pl-9"
+            />
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">Use um link público direto para a imagem. A alteração será salva junto com os dados da empresa.</p>
+        </div>
       </div>
 
       <div className="mt-5 grid sm:grid-cols-2 gap-4">
