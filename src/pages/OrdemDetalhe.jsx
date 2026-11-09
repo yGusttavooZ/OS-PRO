@@ -39,6 +39,7 @@ export default function OrdemDetalhe() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [status, setStatus] = useState("");
   const [note, setNote] = useState("");
   const [working, setWorking] = useState(false);
@@ -46,18 +47,36 @@ export default function OrdemDetalhe() {
   const [payOpen, setPayOpen] = useState(false);
 
   const load = useCallback(async () => {
-    const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
-    const found = rows[0];
-    if (!found) {
-      setNotFound(true);
+    if (!company?.id) return;
+    setLoading(true);
+    setLoadError("");
+    try {
+      const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
+      const found = rows[0];
+      if (!found) {
+        setOrder(null);
+        setNotFound(true);
+        return;
+      }
+
+      setNotFound(false);
+      setOrder(found);
+      setStatus(found.status);
+
+      try {
+        const history = await paged("OrderEvent", { company_id: company.id, order_id: id }, { sort: "-at", limit: 60 });
+        setEvents(history);
+      } catch (historyError) {
+        console.error("Falha ao carregar histórico da ordem", historyError);
+        setEvents([]);
+        setLoadError("A ordem foi carregada, mas não foi possível carregar o histórico.");
+      }
+    } catch (loadError) {
+      console.error("Falha ao carregar ordem de serviço", loadError);
+      setLoadError(loadError?.message || "Não foi possível carregar a ordem de serviço.");
+    } finally {
       setLoading(false);
-      return;
     }
-    setOrder(found);
-    setStatus(found.status);
-    const history = await paged("OrderEvent", { company_id: company.id, order_id: id }, { sort: "-at", limit: 60 });
-    setEvents(history);
-    setLoading(false);
   }, [id, company?.id]);
 
   useEffect(() => {
@@ -115,6 +134,19 @@ export default function OrdemDetalhe() {
     );
   }
 
+  if (loadError && !order) {
+    return (
+      <div className="py-20 text-center">
+        <p className="font-heading font-bold text-lg">Não foi possível carregar a ordem</p>
+        <p className="text-sm text-destructive mt-2">{loadError}</p>
+        <div className="mt-4 flex justify-center gap-2">
+          <Button variant="outline" onClick={load}>Tentar novamente</Button>
+          <Button asChild><Link to="/ordens">Voltar para a lista</Link></Button>
+        </div>
+      </div>
+    );
+  }
+
   if (notFound || !order) {
     return (
       <div className="py-20 text-center">
@@ -164,9 +196,9 @@ export default function OrdemDetalhe() {
         )}
       </div>
 
-      {error && (
+      {(loadError || error) && (
         <p className="mb-4 text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded-lg px-3 py-2">
-          {error}
+          {loadError || error}
         </p>
       )}
 
