@@ -103,9 +103,19 @@ service cloud.firestore {
 
     match /invites/{email} {
       allow read: if signedIn() && request.auth.token.email == resource.data.email;
-      allow create, update: if signedIn()
+      allow create: if signedIn()
         && request.resource.data.company_id is string
         && isAdmin(request.resource.data.company_id);
+      allow update: if signedIn() && (
+        (request.resource.data.company_id is string
+          && isAdmin(request.resource.data.company_id))
+        || (request.auth.token.email == resource.data.email
+          && resource.data.status == 'pending'
+          && request.resource.data.status == 'accepted'
+          && request.resource.data.accepted_by == request.auth.uid
+          && request.resource.data.company_id == resource.data.company_id
+          && request.resource.data.email == resource.data.email)
+      );
       allow delete: if signedIn() && (
           (resource.data.company_id is string && isAdmin(resource.data.company_id))
           || (resource.data.user_email == request.auth.token.email
