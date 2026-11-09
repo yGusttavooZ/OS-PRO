@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,13 +44,19 @@ export default function DocumentsSettings() {
 
       const existing = await base44.entities.ServiceOrder.count({ company_id: company.id });
       if (existing === 0) {
-        const rows = await base44.entities.Counter.filter({ company_id: company.id, key: "doc" });
-        const start = Number(form.doc_start_number) || 1;
-        if (rows[0]) await base44.entities.Counter.update(rows[0].id, { value: start + 1 });
-        else await base44.entities.Counter.create({ company_id: company.id, key: "doc", value: start + 1 });
+        const start = Math.max(1, Math.floor(Number(form.doc_start_number) || 1));
+        const counterRef = doc(db, "companies", company.id, "counters", "doc");
+        await runTransaction(db, async (transaction) => {
+          const counter = await transaction.get(counterRef);
+          if (counter.exists()) {
+            transaction.update(counterRef, { value: start, updated_at: serverTimestamp() });
+          } else {
+            transaction.set(counterRef, { key: "doc", value: start, updated_at: serverTimestamp() });
+          }
+        });
       }
 
-      invalidateTenantCache("Company", "Counter");
+      invalidateTenantCache("Company");
       await refresh();
       setMessage("Configurações de documento salvas.");
     } catch (err) {
