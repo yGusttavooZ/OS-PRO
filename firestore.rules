@@ -179,7 +179,7 @@ service cloud.firestore {
         && (role(resource.data.company_id) == 'admin'
           || (collectionName != 'transactions' && role(resource.data.company_id) in ['attendant', 'technician']));
       allow delete: if collectionName in [
-        'serviceOrders', 'clients', 'equipment', 'transactions'
+        'serviceOrders', 'clients', 'equipment', 'transactions', 'orderEvents'
       ] && sameCompanyRecord() && isAdmin(resource.data.company_id);
     }
 
