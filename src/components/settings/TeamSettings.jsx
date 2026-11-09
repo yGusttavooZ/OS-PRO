@@ -58,7 +58,7 @@ export default function TeamSettings() {
         status: "invited",
       });
       setForm({ name: "", email: "", role: "attendant" });
-      setMessage("Convite registrado. O acesso é liberado no primeiro login do convidado.");
+      setMessage("Convite registrado. O convidado deve entrar com este e-mail para aceitar o vínculo. O sistema não envia e-mail automaticamente.");
       invalidateTenantCache("Membership");
       load();
     } catch (err) {
@@ -177,7 +177,7 @@ export default function TeamSettings() {
                     </td>
                     <td className="px-5 py-3">
                       <Select value={member.role} onValueChange={(value) => changeRole(member, value)}>
-                        <SelectTrigger className="h-8 w-[150px] text-xs"><SelectValue /></SelectTrigger>
+                        <SelectTrigger disabled={member.user_id === user?.id} className="h-8 w-[150px] text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           {COMPANY_ROLES.map((role) => (
                             <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
@@ -187,8 +187,9 @@ export default function TeamSettings() {
                     </td>
                     <td className="px-5 py-3">
                       <button
+                        disabled={member.user_id === user?.id}
                         onClick={() => toggleStatus(member)}
-                        className={`text-[11px] font-semibold rounded-full px-2 py-0.5 ring-1 ring-inset ${
+                        className={`text-[11px] font-semibold rounded-full px-2 py-0.5 ring-1 ring-inset disabled:opacity-60 disabled:cursor-not-allowed ${
                           member.status === "active"
                             ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
                             : member.status === "invited"
