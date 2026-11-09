@@ -77,7 +77,12 @@ service cloud.firestore {
           || isAdmin(companyId)
         );
         allow update: if isAdmin(companyId)
-          && request.resource.data.uid == resource.data.uid;
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'role', 'status'
+          ])
+          && request.resource.data.role in ['admin', 'attendant', 'technician']
+          && request.resource.data.status in ['active', 'inactive'];
         allow delete: if isAdmin(companyId) && uid != request.auth.uid;
       }
 
@@ -112,20 +117,28 @@ service cloud.firestore {
         && request.resource.data.company_id is string
         && isAdmin(request.resource.data.company_id);
       allow update: if signedIn() && (
-        (request.resource.data.company_id is string
-          && isAdmin(request.resource.data.company_id))
+        (resource.data.company_id is string
+          && isAdmin(resource.data.company_id)
+          && request.resource.data.company_id == resource.data.company_id
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'role', 'status', 'updated_at'
+          ])
+          && request.resource.data.role in ['admin', 'attendant', 'technician']
+          && request.resource.data.status in ['pending', 'inactive'])
         || (request.auth.token.email == resource.data.email
           && resource.data.status == 'pending'
           && request.resource.data.status == 'accepted'
           && request.resource.data.accepted_by == request.auth.uid
           && request.resource.data.company_id == resource.data.company_id
-          && request.resource.data.email == resource.data.email)
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'status', 'accepted_by', 'accepted_at'
+          ]))
       );
-      allow delete: if signedIn() && (
-          (resource.data.company_id is string && isAdmin(resource.data.company_id))
-          || (resource.data.user_email == request.auth.token.email
-            && resource.data.status == 'invited')
-        );
+      allow delete: if signedIn()
+        && resource.data.company_id is string
+        && isAdmin(resource.data.company_id);
     }
 
     match /memberships/{membershipId} {
@@ -141,7 +154,14 @@ service cloud.firestore {
       );
       allow update: if signedIn() && resource.data.company_id is string
         && isAdmin(resource.data.company_id)
-        && request.resource.data.company_id == resource.data.company_id;
+        && request.resource.data.company_id == resource.data.company_id
+        && request.resource.data.user_id == resource.data.user_id
+        && request.resource.data.user_email == resource.data.user_email
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'role', 'status', 'updated_at'
+        ])
+        && request.resource.data.role in ['admin', 'attendant', 'technician']
+        && request.resource.data.status in ['active', 'inactive', 'invited'];
       allow delete: if signedIn() && (
         (resource.data.company_id is string && isAdmin(resource.data.company_id))
         || (resource.data.user_email == request.auth.token.email
