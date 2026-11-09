@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { paged } from "@/lib/tenant";
+import { useTenant } from "@/lib/TenantContext";
 
 const MANUAL = (value) => ({
   equipment_id: "",
@@ -15,15 +16,16 @@ const MANUAL = (value) => ({
 });
 
 export default function EquipmentPicker({ clientId, value, onChange }) {
+  const { company } = useTenant();
   const [equipment, setEquipment] = useState([]);
 
   useEffect(() => {
-    if (!clientId) {
+    if (!clientId || !company?.id) {
       setEquipment([]);
       return;
     }
-    paged("Equipment", { client_id: clientId }, { sort: "-created_date", limit: 100 }).then(setEquipment);
-  }, [clientId]);
+    paged("Equipment", { company_id: company.id, client_id: clientId }, { sort: "-created_date", limit: 100 }).then(setEquipment);
+  }, [clientId, company?.id]);
 
   const selectExisting = (id) => {
     if (id === "new") {
