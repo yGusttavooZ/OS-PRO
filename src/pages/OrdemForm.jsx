@@ -43,8 +43,8 @@ export default function OrdemForm() {
     if (!company) return;
     setForm((prev) => ({
       ...prev,
-      warranty_terms: prev.warranty_terms || company.warranty_terms || DEFAULT_WARRANTY,
-      warranty_days: Number(company.warranty_days) || 90,
+      warranty_terms: editing ? prev.warranty_terms : (company.warranty_terms || DEFAULT_WARRANTY),
+      warranty_days: editing ? prev.warranty_days : (Number(company.warranty_days) || 90),
       technician: prev.technician || user?.full_name || "",
     }));
   }, [company?.id]);
@@ -52,15 +52,20 @@ export default function OrdemForm() {
   useEffect(() => {
     if (!editing || !company?.id) return;
     (async () => {
-      const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
-      const order = rows[0];
-      if (!order) {
-        navigate("/ordens", { replace: true });
-        return;
+      try {
+        const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
+        const order = rows[0];
+        if (!order) {
+          navigate("/ordens", { replace: true });
+          return;
+        }
+        setForm({ ...EMPTY, ...order });
+        setItems(Array.isArray(order.items) && order.items.length ? order.items : []);
+      } catch (err) {
+        setError(err?.message || "Não foi possível carregar o documento.");
+      } finally {
+        setLoading(false);
       }
-      setForm({ ...EMPTY, ...order });
-      setItems(Array.isArray(order.items) && order.items.length ? order.items : []);
-      setLoading(false);
     })();
   }, [editing, id, company?.id, navigate]);
 
