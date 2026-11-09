@@ -46,7 +46,7 @@ export default function OrdemDetalhe() {
   const [payOpen, setPayOpen] = useState(false);
 
   const load = useCallback(async () => {
-    const rows = await paged("ServiceOrder", { id }, { limit: 1 });
+    const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
     const found = rows[0];
     if (!found) {
       setNotFound(true);
@@ -58,7 +58,7 @@ export default function OrdemDetalhe() {
     const history = await paged("OrderEvent", { order_id: id }, { sort: "-at", limit: 60 });
     setEvents(history);
     setLoading(false);
-  }, [id]);
+  }, [id, company?.id]);
 
   useEffect(() => {
     load();
@@ -352,7 +352,7 @@ export default function OrdemDetalhe() {
             {order.source_quote_id && <InfoRow label="Origem" value="Orçamento aprovado" />}
           </section>
 
-          {user?.role === "admin" && (
+          {can.manageTeam && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" className="w-full h-10 gap-2 text-destructive border-destructive/30 hover:bg-destructive/5">
