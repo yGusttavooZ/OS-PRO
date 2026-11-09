@@ -55,7 +55,7 @@ export default function OrdemDetalhe() {
     }
     setOrder(found);
     setStatus(found.status);
-    const history = await paged("OrderEvent", { order_id: id }, { sort: "-at", limit: 60 });
+    const history = await paged("OrderEvent", { company_id: company.id, order_id: id }, { sort: "-at", limit: 60 });
     setEvents(history);
     setLoading(false);
   }, [id, company?.id]);
@@ -102,7 +102,7 @@ export default function OrdemDetalhe() {
   };
 
   const handleDelete = async () => {
-    await base44.entities.OrderEvent.deleteMany({ order_id: order.id });
+    await base44.entities.OrderEvent.deleteMany({ company_id: company.id, order_id: order.id });
     await base44.entities.ServiceOrder.delete(order.id);
     navigate("/ordens");
   };
