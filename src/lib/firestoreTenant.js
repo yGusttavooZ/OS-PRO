@@ -47,11 +47,12 @@ export async function acceptCompanyInvite({ user, invite }) {
   const userRef = doc(db, "users", user.uid);
 
   await runTransaction(db, async (transaction) => {
-    const [inviteSnap, companySnap, userSnap, memberSnap] = await Promise.all([
+    const [inviteSnap, companySnap, userSnap, memberSnap, activeMemberSnap] = await Promise.all([
       transaction.get(inviteRef),
       transaction.get(companyRef),
       transaction.get(userRef),
       transaction.get(memberRef),
+      transaction.get(activeMemberRef),
     ]);
     if (!inviteSnap.exists() || inviteSnap.data().status !== "pending") {
       throw new Error("Este convite não está mais disponível.");
@@ -62,8 +63,8 @@ export async function acceptCompanyInvite({ user, invite }) {
         ? "Sua conta já está vinculada a esta empresa."
         : "Sua conta já está vinculada a outra empresa.");
     }
-    if (memberSnap.exists()) {
-      throw new Error("Você já possui um vínculo com esta empresa.");
+    if (memberSnap.exists() || activeMemberSnap.exists()) {
+      throw new Error("Esta conta já possui um vínculo de empresa.");
     }
     const currentInvite = inviteSnap.data();
     if (emailKey(currentInvite.email) !== emailKey(user.email)) {
