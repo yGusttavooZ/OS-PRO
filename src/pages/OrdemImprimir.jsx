@@ -15,11 +15,11 @@ export default function OrdemImprimir() {
 
   useEffect(() => {
     (async () => {
-      const rows = await paged("ServiceOrder", { id }, { limit: 1 });
+      const rows = await paged("ServiceOrder", { id, company_id: company.id }, { limit: 1 });
       setOrder(rows[0] || null);
       setLoading(false);
     })();
-  }, [id]);
+  }, [id, company?.id]);
 
   useEffect(() => {
     if (!order) return;
