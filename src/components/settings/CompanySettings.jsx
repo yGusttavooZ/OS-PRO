@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Loader2, Save, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Loader2, Save, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,6 +71,7 @@ function readImageFile(file) {
 export default function CompanySettings() {
   const { company, refresh } = useTenant();
   const [form, setForm] = useState({});
+  const logoInputRef = useRef(null);
   const [saving, setSaving] = useState(false);
   const [processingLogo, setProcessingLogo] = useState(false);
   const [message, setMessage] = useState("");
@@ -164,16 +165,26 @@ export default function CompanySettings() {
           }
         />
         <div className="flex-1 min-w-0">
-          <Label htmlFor="company-logo-file" className="field-label">Logotipo da empresa</Label>
           <div className="mt-1.5 flex flex-wrap items-center gap-2">
-            <Input
+            <input
+              ref={logoInputRef}
               id="company-logo-file"
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
               onChange={handleLogoChange}
               disabled={processingLogo || saving}
-              className="max-w-sm"
+              className="hidden"
             />
+            <Button
+              type="button"
+              variant="outline"
+              disabled={processingLogo || saving}
+              onClick={() => logoInputRef.current?.click()}
+              className="gap-2"
+            >
+              <Upload className="w-4 h-4" />
+              Logotipo
+            </Button>
             {hasLogo && (
               <Button
                 type="button"
@@ -191,9 +202,6 @@ export default function CompanySettings() {
               </Button>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Selecione PNG, JPG, WEBP ou GIF. Máximo de 5 MB; a imagem será otimizada antes de ser salva.
-          </p>
           {processingLogo && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Processando imagem...</p>}
         </div>
       </div>
