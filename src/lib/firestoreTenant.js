@@ -149,8 +149,11 @@ export async function createCompanyForUser({ user, form }) {
 }
 
 export async function updateCompany(companyId, fields) {
+  const safeFields = Object.fromEntries(
+    Object.entries(fields || {}).map(([key, value]) => [key, value === undefined ? "" : value]),
+  );
   await updateDoc(doc(db, "companies", companyId), {
-    ...fields, updated_at: serverTimestamp(),
+    ...safeFields, updated_at: serverTimestamp(),
   });
 }
 
