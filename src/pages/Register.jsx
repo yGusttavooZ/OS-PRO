@@ -13,6 +13,7 @@ const INPUT_CLASS = "h-12 rounded-xl border-border/70 bg-muted/40 pl-10 pr-11 te
 const PRIMARY_BUTTON = "cta-gradient h-12 w-full rounded-xl text-[13.5px] font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:brightness-110 active:scale-[0.99]";
 
 export default function Register() {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,7 +30,7 @@ export default function Register() {
     if (password.length < 6) return setError("A senha precisa ter pelo menos 6 caracteres.");
     setLoading(true);
     try {
-      await registerWithEmail(email, password);
+      await registerWithEmail(fullName, email, password);
       setEmailSent(true);
     } catch (err) {
       setError(err.code === "auth/email-already-in-use" ? "Este e-mail já possui uma conta." : err.message || "Não foi possível criar a conta.");
@@ -59,6 +60,7 @@ export default function Register() {
     <div className="relative mb-6"><div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/80" /></div><div className="relative flex justify-center"><span className="bg-card px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">ou</span></div></div>
     {error && <div className="mb-4 rounded-xl border border-destructive/20 bg-destructive/[0.07] px-3.5 py-2.5 text-[12.5px] font-medium text-destructive">{error}</div>}
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2"><Label htmlFor="fullName" className="text-[12.5px] font-semibold text-foreground/80">Nome completo</Label><div className="relative"><Input id="fullName" type="text" autoComplete="name" placeholder="Seu nome completo" value={fullName} onChange={(e) => setFullName(e.target.value)} className={INPUT_CLASS.replace("pl-10", "pl-4")} required /></div></div>
       <div className="space-y-2"><Label htmlFor="email" className="text-[12.5px] font-semibold text-foreground/80">E-mail de acesso</Label><div className="relative"><Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input id="email" type="email" autoComplete="email" autoFocus placeholder="voce@empresa.com.br" value={email} onChange={(e) => setEmail(e.target.value)} className={INPUT_CLASS} required /></div></div>
       <div className="space-y-2"><Label htmlFor="password" className="text-[12.5px] font-semibold text-foreground/80">Senha</Label><div className="relative"><Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input id="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className={INPUT_CLASS} required /><button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-1.5 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-muted-foreground hover:bg-muted" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div></div>
       <div className="space-y-2"><Label htmlFor="confirm" className="text-[12.5px] font-semibold text-foreground/80">Confirmar senha</Label><div className="relative"><Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input id="confirm" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={INPUT_CLASS} required /></div></div>
