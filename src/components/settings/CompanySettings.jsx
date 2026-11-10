@@ -148,7 +148,7 @@ export default function CompanySettings() {
           <h2 className="font-heading font-bold text-[15px]">Dados da empresa</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Aparecem no topo dos orçamentos e ordens de serviço.</p>
         </div>
-        <Button type="submit" disabled={saving || processingLogo} className="gap-2 h-10">
+        <Button type="button" onClick={handleSave} disabled={saving || processingLogo} className="gap-2 h-10">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saving ? "Salvando..." : "Salvar"}
         </Button>
