@@ -7,6 +7,7 @@ import {
   sendPasswordResetEmail,
   confirmPasswordReset,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
@@ -15,8 +16,9 @@ const actionCodeSettings = {
   handleCodeInApp: false,
 };
 
-export async function registerWithEmail(email, password) {
+export async function registerWithEmail(fullName, email, password) {
   const credential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+  await updateProfile(credential.user, { displayName: fullName.trim() });
   await sendEmailVerification(credential.user, actionCodeSettings);
   await signOut(auth);
   return credential.user;
