@@ -53,8 +53,10 @@ export default function ClientDialog({ open, onOpenChange, client, onSaved }) {
     setError("");
     try {
       const payload = {
-        ...form,
-        state: form.state ? form.state.toUpperCase() : "",
+        ...Object.fromEntries(Object.keys(EMPTY).map((key) => [
+          key,
+          key === "state" ? (form[key] ? form[key].toUpperCase() : "") : (form[key] ?? ""),
+        ])),
         company_id: company.id,
         active: true,
         search_key: buildSearchKey(form.name, form.trade_name, form.document, form.phone, form.whatsapp, form.email),
@@ -62,7 +64,7 @@ export default function ClientDialog({ open, onOpenChange, client, onSaved }) {
       const saved = client?.id
         ? await base44.entities.Client.update(client.id, payload)
         : await base44.entities.Client.create(payload);
-      onSaved?.(saved);
+      await onSaved?.(saved);
       onOpenChange(false);
     } catch (err) {
       setError(err?.message || "Não foi possível salvar o cliente.");
