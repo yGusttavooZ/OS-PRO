@@ -26,21 +26,31 @@ export default function ClienteDetalhe() {
   const [equipment, setEquipment] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [editOpen, setEditOpen] = useState(false);
 
   const load = async () => {
-    const [clientRows, equipmentRows, orderRows] = await Promise.all([
-      paged("Client", { id, company_id: company.id }, { limit: 1 }),
-      paged("Equipment", { company_id: company.id, client_id: id }, { sort: "-created_date", limit: 100 }),
-      paged("ServiceOrder", { company_id: company.id, client_id: id }, { sort: "-created_date", limit: 100 }),
-    ]);
-    setClient(clientRows[0] || null);
-    setEquipment(equipmentRows);
-    setOrders(orderRows);
-    setLoading(false);
+    if (!id || !company?.id) return;
+    setLoading(true);
+    setError("");
+    try {
+      const [clientRows, equipmentRows, orderRows] = await Promise.all([
+        paged("Client", { id, company_id: company.id }, { limit: 1 }),
+        paged("Equipment", { company_id: company.id, client_id: id }, { sort: "-created_date", limit: 100 }),
+        paged("ServiceOrder", { company_id: company.id, client_id: id }, { sort: "-created_date", limit: 100 }),
+      ]);
+      setClient(clientRows[0] || null);
+      setEquipment(equipmentRows);
+      setOrders(orderRows);
+    } catch (err) {
+      setError(err?.message || "Não foi possível carregar os dados deste cliente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
+    if (!company?.id || !id) return;
     load();
   }, [id, company?.id]);
 
@@ -48,6 +58,19 @@ export default function ClienteDetalhe() {
     return (
       <div className="py-20 grid place-items-center text-muted-foreground">
         <Loader2 className="w-5 h-5 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-20 text-center">
+        <p className="font-semibold text-destructive">Não foi possível abrir o cadastro</p>
+        <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+        <div className="mt-4 flex justify-center gap-2">
+          <Button variant="outline" onClick={load}>Tentar novamente</Button>
+          <Button asChild><Link to="/clientes">Voltar para clientes</Link></Button>
+        </div>
       </div>
     );
   }
