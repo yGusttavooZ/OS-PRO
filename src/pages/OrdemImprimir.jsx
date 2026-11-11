@@ -209,9 +209,10 @@ export default function OrdemImprimir() {
         </section>
 
         <section className="py-6">
-          <p className="field-label mb-1">Termos de garantia</p>
+          <p className="field-label mb-1">Garantia: {Number(order.warranty_days) > 0 ? Number(order.warranty_days) : Number(company?.warranty_days) > 0 ? Number(company.warranty_days) : 90} dias</p>
+          <p className="field-label mb-1 mt-3">Termos de garantia</p>
           <p className="text-[11px] leading-relaxed text-muted-foreground whitespace-pre-line">
-            {order.warranty_terms || company?.warranty_terms || `Garantia de ${order.warranty_days || 0} dias sobre os serviços executados e peças substituídas.`}
+            {order.warranty_terms || company?.warranty_terms || "Garantia sobre os serviços executados e peças substituídas."}
           </p>
         </section>
 
