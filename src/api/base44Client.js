@@ -60,11 +60,22 @@ const entityApi = (entityName) => ({
     if (!current.exists()) return;
     const member = current.data();
     const batch = writeBatch(db);
+
     if (member.company_id && member.user_id) {
       batch.delete(doc(db, "companies", member.company_id, "members", member.user_id));
-    } else if (member.user_email) {
-      batch.delete(doc(db, "invites", emailKey(member.user_email)));
     }
+
+    if (member.user_email) {
+      const inviteRef = doc(db, "invites", emailKey(member.user_email));
+      const inviteSnapshot = await getDoc(inviteRef);
+      if (
+        inviteSnapshot.exists()
+        && inviteSnapshot.data().company_id === member.company_id
+      ) {
+        batch.delete(inviteRef);
+      }
+    }
+
     batch.delete(memberRef);
     await batch.commit();
   },
