@@ -16,17 +16,58 @@ const entityApi = (entityName) => ({
     const email = emailKey(payload.user_email || payload.email);
     if (!email) throw new Error("Informe o e-mail do membro.");
     const id = email;
-    const invite = {
-      ...payload, user_email: email, status: payload.status || "invited",
-      created_date: new Date().toISOString(), created_at: serverTimestamp(),
-    };
+    const memberRef = doc(db, "memberships", id);
+    const inviteRef = doc(db, "invites", id);
+    const [memberSnap, inviteSnap] = await Promise.all([
+      getDoc(memberRef),
+      getDoc(inviteRef),
+    ]);
+    const companyId = payload.company_id;
+    if (!companyId) throw new Error("Não foi possível identificar a empresa do convite.");
+
+    if (memberSnap.exists()) {
+      const existingMember = memberSnap.data();
+      if (existingMember.company_id !== companyId) {
+        throw new Error("Este e-mail já está vinculado a outra empresa.");
+      }
+      if (existingMember.status === "active") {
+        throw new Error("Este funcionário já possui acesso ativo a esta empresa.");
+      }
+    }
+
+    if (inviteSnap.exists() && inviteSnap.data().company_id !== companyId) {
+      throw new Error("Este e-mail já possui um convite registrado em outra empresa.");
+    }
+
+    const timestamp = serverTimestamp();
+    const role = payload.role || "attendant";
     const batch = writeBatch(db);
-    batch.set(doc(db, "memberships", id), invite);
-    batch.set(doc(db, "invites", id), {
-      email, company_id: payload.company_id, company_name: payload.company_name || "",
-      role: payload.role || "attendant", status: "pending",
-      invited_by: auth.currentUser?.uid || "", created_at: serverTimestamp(),
-    });
+    const invite = {
+      ...payload, user_email: email, status: "invited",
+      created_date: new Date().toISOString(), created_at: timestamp,
+    };
+
+    if (memberSnap.exists()) {
+      batch.update(memberRef, {
+        role, status: "invited", updated_at: timestamp,
+      });
+    } else {
+      batch.set(memberRef, invite);
+    }
+
+    if (inviteSnap.exists()) {
+      // Reabre um convite aceito anteriormente, sem substituir campos protegidos.
+      batch.update(inviteRef, {
+        role, status: "pending", updated_at: timestamp,
+      });
+    } else {
+      batch.set(inviteRef, {
+        email, company_id: companyId, company_name: payload.company_name || "",
+        role, status: "pending",
+        invited_by: auth.currentUser?.uid || "", created_at: timestamp,
+      });
+    }
+
     await batch.commit();
     return { id, ...invite };
   },
