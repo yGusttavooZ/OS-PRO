@@ -68,18 +68,21 @@ export async function acceptCompanyInvite({ user, invite }) {
     }
     if (!companySnap.exists()) throw new Error("A empresa do convite não foi encontrada.");
     const previousCompanyId = userSnap.exists() ? userSnap.data().company_id : "";
-    if (previousCompanyId === invite.company_id) {
-      throw new Error("Sua conta já está vinculada a esta empresa.");
-    }
-    if (previousCompanyId && previousCompanyId !== invite.company_id) {
+    if (previousCompanyId) {
       const previousMemberRef = doc(db, "companies", previousCompanyId, "members", user.uid);
-      const previousMemberSnap = await transaction.get(previousMemberRef);
+      const previousMemberSnap = previousCompanyId === invite.company_id
+        ? memberSnap
+        : await transaction.get(previousMemberRef);
       if (previousMemberSnap.exists() && previousMemberSnap.data().status === "active") {
+        if (previousCompanyId === invite.company_id) {
+          throw new Error("Sua conta já possui acesso ativo a esta empresa.");
+        }
         throw new Error("Sua conta ainda possui acesso ativo a outra empresa. Peça ao administrador anterior para remover o vínculo.");
       }
     }
-    if (memberSnap.exists() || activeMemberSnap.exists()) {
-      throw new Error("Esta conta já possui um vínculo de empresa.");
+    if ((memberSnap.exists() && memberSnap.data().status === "active")
+      || (activeMemberSnap.exists() && activeMemberSnap.data().status === "active")) {
+      throw new Error("Esta conta já possui um vínculo de empresa ativo.");
     }
     const currentInvite = inviteSnap.data();
     if (emailKey(currentInvite.email) !== emailKey(user.email)) {
