@@ -90,7 +90,7 @@ export default function Onboarding() {
     }
   };
 
-  if (accessRevoked) return <AccessRevoked />;
+  if (accessRevoked && !invite) return <AccessRevoked />;
 
   if (checkingInvite) {
     return (
