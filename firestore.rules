@@ -12,6 +12,13 @@ service cloud.firestore {
         && exists(memberPath(companyId, request.auth.uid))
         && get(memberPath(companyId, request.auth.uid)).data.status == 'active';
     }
+    function hasPendingInvite(companyId) {
+      return signedIn()
+        && request.auth.token.email is string
+        && exists(/databases/$(database)/documents/invites/$(request.auth.token.email))
+        && get(/databases/$(database)/documents/invites/$(request.auth.token.email)).data.company_id == companyId
+        && get(/databases/$(database)/documents/invites/$(request.auth.token.email)).data.status == 'pending';
+    }
     function role(companyId) {
       return isMember(companyId)
         ? get(memberPath(companyId, request.auth.uid)).data.role
@@ -52,7 +59,7 @@ service cloud.firestore {
     }
 
     match /companies/{companyId} {
-      allow read: if isMember(companyId) || platformAdmin();
+      allow read: if isMember(companyId) || platformAdmin() || hasPendingInvite(companyId);
       allow create: if signedIn()
         && request.resource.data.owner_uid == request.auth.uid
         && existsAfter(memberPath(companyId, request.auth.uid))
