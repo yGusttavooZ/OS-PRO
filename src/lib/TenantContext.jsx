@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { loadTenantProfile } from "@/lib/firestoreTenant";
 import { TenantContext } from "@/lib/tenantContextObject";
 
-const EMPTY = { loading: true, company: null, account: null, membership: null, userProfile: null };
+const EMPTY = { loading: true, company: null, account: null, membership: null, userProfile: null, accessRevoked: false };
 
 export function TenantProvider({ children }) {
   const { user } = useAuth();
