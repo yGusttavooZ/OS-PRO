@@ -11,18 +11,26 @@ export async function loadTenantProfile(user) {
   const profileSnap = await getDoc(doc(db, "users", user.uid));
   const userProfile = profileSnap.exists() ? { id: profileSnap.id, ...profileSnap.data() } : null;
   const companyId = userProfile?.company_id;
-  if (!companyId) return { userProfile, company: null, account: null, membership: null };
+  if (!companyId) return { userProfile, company: null, account: null, membership: null, accessRevoked: false };
 
-  const [companySnap, memberSnap, accountSnap] = await Promise.all([
+  // Check the user's own membership before reading company data. A removed
+  // employee can still authenticate, but must not be sent to company onboarding.
+  const memberSnap = await getDoc(doc(db, "companies", companyId, "members", user.uid));
+  if (!memberSnap.exists() || memberSnap.data().status !== "active") {
+    return { userProfile, company: null, account: null, membership: null, accessRevoked: true };
+  }
+
+  const [companySnap, accountSnap] = await Promise.all([
     getDoc(doc(db, "companies", companyId)),
-    getDoc(doc(db, "companies", companyId, "members", user.uid)),
     getDoc(doc(db, "companyAccounts", companyId)),
   ]);
+  const companyExists = companySnap.exists();
   return {
     userProfile,
-    company: companySnap.exists() ? { id: companySnap.id, ...companySnap.data() } : null,
+    company: companyExists ? { id: companySnap.id, ...companySnap.data() } : null,
     account: accountSnap.exists() ? { id: accountSnap.id, ...accountSnap.data() } : null,
-    membership: memberSnap.exists() ? { id: memberSnap.id, ...memberSnap.data() } : null,
+    membership: { id: memberSnap.id, ...memberSnap.data() },
+    accessRevoked: !companyExists,
   };
 }
 
