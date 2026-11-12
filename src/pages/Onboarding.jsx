@@ -4,6 +4,7 @@ import { Building2, Loader2, ShieldCheck, ArrowRight, CheckCircle2, MailCheck } 
 import { acceptCompanyInvite, createCompanyForUser, findPendingInvite, writeCompanyAudit } from "@/lib/firestoreTenant";
 import { useAuth } from "@/lib/AuthContext";
 import { useTenant } from "@/lib/TenantContext";
+import { AccessRevoked } from "@/components/RequireCompany";
 import { myCompanyId } from "@/lib/tenant";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,7 @@ const FIELDS = [
 export default function Onboarding() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { company, refresh } = useTenant();
+  const { company, refresh, accessRevoked } = useTenant();
   const [form, setForm] = useState({ name: "", document: "", phone: "", email: "", city: "", state: "", tech_responsible: "" });
   const [invite, setInvite] = useState(null);
   const [checkingInvite, setCheckingInvite] = useState(true);
@@ -51,7 +52,7 @@ export default function Onboarding() {
   }, [user?.email]);
 
   useEffect(() => {
-    if (company || myCompanyId(user)) navigate("/", { replace: true });
+    if (!accessRevoked && (company || myCompanyId(user))) navigate("/", { replace: true });
   }, [company, user, navigate]);
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
@@ -88,6 +89,8 @@ export default function Onboarding() {
       setSaving(false);
     }
   };
+
+  if (accessRevoked) return <AccessRevoked />;
 
   if (checkingInvite) {
     return (
