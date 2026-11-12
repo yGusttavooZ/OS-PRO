@@ -75,12 +75,18 @@ service cloud.firestore {
         );
         allow create: if signedIn() && (
           (request.auth.uid == uid
+            && request.resource.data.uid == uid
             && exists(/databases/$(database)/documents/invites/$(request.auth.token.email))
             && get(/databases/$(database)/documents/invites/$(request.auth.token.email)).data.company_id == companyId
-            && get(/databases/$(database)/documents/invites/$(request.auth.token.email)).data.status == 'pending')
+            && get(/databases/$(database)/documents/invites/$(request.auth.token.email)).data.status == 'pending'
+            && request.resource.data.role == get(/databases/$(database)/documents/invites/$(request.auth.token.email)).data.role
+            && request.resource.data.role in ['admin', 'attendant', 'technician']
+            && request.resource.data.status == 'active')
           || (request.auth.uid == uid
+            && request.resource.data.uid == uid
             && getAfter(/databases/$(database)/documents/companies/$(companyId)).data.owner_uid == uid
-            && request.resource.data.role == 'admin')
+            && request.resource.data.role == 'admin'
+            && request.resource.data.status == 'active')
           || isAdmin(companyId)
         );
         allow update: if isAdmin(companyId)
