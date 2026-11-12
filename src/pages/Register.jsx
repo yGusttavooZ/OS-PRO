@@ -23,7 +23,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const loginPath = employeeInvite ? "/login?returnTo=%2Fonboarding" : "/login" + (safeReturnTo() !== "/" ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "");
+  const loginPath = employeeInvite ? `/login?returnTo=%2Fonboarding&email=${encodeURIComponent(invitedEmail)}` : "/login" + (safeReturnTo() !== "/" ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,7 +70,7 @@ export default function Register() {
       <Button variant="outline" className="mb-6 h-12 w-full rounded-xl border-border/80 bg-card text-[13.5px] font-semibold shadow-sm transition-all hover:border-border hover:bg-muted/50" onClick={handleGoogle}><GoogleIcon className="mr-2.5 w-[18px] h-[18px]" /> Continuar com Google</Button>
       <div className="relative mb-6"><div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/80" /></div><div className="relative flex justify-center"><span className="bg-card px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">ou</span></div></div>
     </>}
-    {error && <div className="mb-4 rounded-xl border border-destructive/20 bg-destructive/[0.07] px-3.5 py-2.5 text-[12.5px] font-medium text-destructive">{error}</div>}
+    {error && <div className="mb-4 rounded-xl border border-destructive/20 bg-destructive/[0.07] px-3.5 py-2.5 text-[12.5px] font-medium text-destructive">{error}{employeeInvite && error === "Este e-mail já possui uma conta." && <Link to={loginPath} className="mt-2 block font-semibold underline">Entrar com a conta existente</Link>}</div>}
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2"><Label htmlFor="fullName" className="text-[12.5px] font-semibold text-foreground/80">Nome completo</Label><div className="relative"><Input id="fullName" type="text" autoComplete="name" placeholder="Seu nome completo" value={fullName} onChange={(e) => setFullName(e.target.value)} className={INPUT_CLASS.replace("pl-10", "pl-4")} required /></div></div>
       <div className="space-y-2"><Label htmlFor="email" className="text-[12.5px] font-semibold text-foreground/80">E-mail de acesso</Label><div className="relative"><Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input id="email" type="email" autoComplete="email" autoFocus placeholder="voce@empresa.com.br" value={email} onChange={(e) => setEmail(e.target.value)} readOnly={employeeInvite} className={INPUT_CLASS} required /></div></div>
