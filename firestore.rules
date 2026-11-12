@@ -182,7 +182,7 @@ service cloud.firestore {
     }
 
     match /companyAccounts/{companyId} {
-      allow read: if isAdmin(companyId) || platformAdmin();
+      allow read: if isMember(companyId) || platformAdmin();
       allow create: if platformAdmin() || (signedIn() && existsAfter(memberPath(companyId, request.auth.uid))
         && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin');
       allow update: if platformAdmin();
