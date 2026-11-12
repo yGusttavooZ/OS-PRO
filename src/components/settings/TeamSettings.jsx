@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, UserPlus, Trash2 } from "lucide-react";
+import { Loader2, UserPlus, Trash2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,13 +58,24 @@ export default function TeamSettings() {
         status: "invited",
       });
       setForm({ name: "", email: "", role: "attendant" });
-      setMessage("Convite registrado. O convidado deve entrar com este e-mail para aceitar o vínculo. O sistema não envia e-mail automaticamente.");
+      setMessage("Convite registrado. Copie o link na lista de convidados e envie ao funcionário. O sistema ainda não envia e-mails automaticamente.");
       invalidateTenantCache("Membership");
       load();
     } catch (err) {
       setError(err?.message || "Não foi possível convidar.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const copyInviteLink = async (member) => {
+    const link = `${window.location.origin}/register/employee?email=${encodeURIComponent((member.user_email || "").trim().toLowerCase())}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      setMessage(`Link de acesso copiado para ${member.user_email}. Envie-o ao funcionário.`);
+      setError("");
+    } catch {
+      setError("Não foi possível copiar o link. Verifique a permissão de área de transferência do navegador.");
     }
   };
 
@@ -199,6 +210,7 @@ export default function TeamSettings() {
                       >
                         {member.status === "active" ? "Ativo" : member.status === "invited" ? "Convidado" : "Inativo"}
                       </button>
+                      {member.status === "invited" && <Button type="button" variant="ghost" size="sm" className="ml-2 h-7 gap-1 px-2 text-[11px]" onClick={() => copyInviteLink(member)}><Copy className="h-3 w-3" /> Copiar link</Button>}
                     </td>
                     <td className="px-2 py-3 text-right">
                       {member.user_id !== user?.id && (
