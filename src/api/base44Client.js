@@ -18,22 +18,9 @@ const entityApi = (entityName) => ({
     const id = email;
     const memberRef = doc(db, "memberships", id);
     const inviteRef = doc(db, "invites", id);
-    const [memberSnap, inviteSnap] = await Promise.all([
-      getDoc(memberRef),
-      getDoc(inviteRef),
-    ]);
+    const inviteSnap = await getDoc(inviteRef);
     const companyId = payload.company_id;
     if (!companyId) throw new Error("Não foi possível identificar a empresa do convite.");
-
-    if (memberSnap.exists()) {
-      const existingMember = memberSnap.data();
-      if (existingMember.company_id !== companyId) {
-        throw new Error("Este e-mail já está vinculado a outra empresa.");
-      }
-      if (existingMember.status === "active") {
-        throw new Error("Este funcionário já possui acesso ativo a esta empresa.");
-      }
-    }
 
     if (inviteSnap.exists() && inviteSnap.data().company_id !== companyId) {
       throw new Error("Este e-mail já possui um convite registrado em outra empresa.");
@@ -47,13 +34,9 @@ const entityApi = (entityName) => ({
       created_date: new Date().toISOString(), created_at: timestamp,
     };
 
-    if (memberSnap.exists()) {
-      batch.update(memberRef, {
-        role, status: "invited", updated_at: timestamp,
-      });
-    } else {
-      batch.set(memberRef, invite);
-    }
+    // O vínculo anterior é removido junto com a exclusão do funcionário.
+    // Cria novamente o registro de convite para o e-mail.
+    batch.set(memberRef, invite);
 
     if (inviteSnap.exists()) {
       // Reabre um convite aceito anteriormente, sem substituir campos protegidos.
