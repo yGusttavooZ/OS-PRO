@@ -12,7 +12,7 @@ import { safeReturnTo } from "@/lib/authReturnTo";
 const INPUT_CLASS = "h-12 rounded-xl border-border/70 bg-muted/40 pl-10 pr-11 text-[13.5px] transition-all focus-visible:border-primary/40 focus-visible:bg-card focus-visible:ring-2 focus-visible:ring-primary/15";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => new URLSearchParams(window.location.search).get("email")?.trim() || "");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
