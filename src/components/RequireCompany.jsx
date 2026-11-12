@@ -15,7 +15,7 @@ export function FullScreenLoading({ label = "Carregando seu ambiente..." }) {
   );
 }
 
-function AccessRevoked() {
+export function AccessRevoked() {
   const { logout } = useAuth();
   return (
     <div className="min-h-screen grid place-items-center bg-background px-4">
@@ -39,9 +39,10 @@ function AccessRevoked() {
 }
 
 export default function RequireCompany({ children }) {
-  const { loading, company, account, membership } = useTenant();
+  const { loading, company, account, membership, accessRevoked } = useTenant();
 
   if (loading) return <FullScreenLoading />;
+  if (accessRevoked) return <AccessRevoked />;
   if (!company) return <Navigate to="/onboarding" replace />;
   if (account?.status === "suspended") return <SuspendedNotice company={company} />;
   if (!membership) return <AccessRevoked />;
