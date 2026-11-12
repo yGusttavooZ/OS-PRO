@@ -210,7 +210,7 @@ export default function TeamSettings() {
                       >
                         {member.status === "active" ? "Ativo" : member.status === "invited" ? "Convidado" : "Inativo"}
                       </button>
-                      {member.status === "invited" && <Button type="button" variant="ghost" size="sm" className="ml-2 h-7 gap-1 px-2 text-[11px]" onClick={() => copyInviteLink(member)}><Copy className="h-3 w-3" /> Copiar link</Button>}
+                      {member.status === "invited" && <Button type="button" variant="outline" size="sm" className="ml-2 h-8 gap-1.5 rounded-lg border-primary/25 bg-primary/5 px-3 text-xs font-semibold text-primary shadow-sm transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary" onClick={() => copyInviteLink(member)}><Copy className="h-3.5 w-3.5" /> Copiar convite</Button>}
                     </td>
                     <td className="px-2 py-3 text-right">
                       {member.user_id !== user?.id && (
