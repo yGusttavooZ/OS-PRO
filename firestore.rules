@@ -125,7 +125,11 @@ service cloud.firestore {
     }
 
     match /invites/{email} {
-      allow read: if signedIn() && request.auth.token.email == resource.data.email;
+      allow read: if signedIn() && (
+        request.auth.token.email == resource.data.email
+        || (resource.data.company_id is string && isAdmin(resource.data.company_id))
+        || platformAdmin()
+      );
       allow create: if signedIn()
         && request.resource.data.company_id is string
         && isAdmin(request.resource.data.company_id);
