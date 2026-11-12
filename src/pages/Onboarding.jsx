@@ -105,8 +105,8 @@ export default function Onboarding() {
           <div className="flex items-center gap-3">
             <div className="rounded-xl bg-slate-900 p-3 text-white"><Building2 className="h-6 w-6" /></div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Configurar empresa</h1>
-              <p className="text-sm text-slate-500">Falta pouco para começar a usar o OS-PRO.</p>
+              <h1 className="text-2xl font-bold text-slate-900">{invite ? "Acesso à equipe" : "Configurar empresa"}</h1>
+              <p className="text-sm text-slate-500">{invite ? "Confirme o convite para entrar na empresa." : "Falta pouco para começar a usar o OS-PRO."}</p>
             </div>
           </div>
           <Button type="button" variant="ghost" onClick={logout}>Sair</Button>
@@ -117,8 +117,8 @@ export default function Onboarding() {
             <div className="mb-4 flex items-center gap-3">
               <div className="rounded-full bg-blue-50 p-3 text-blue-700"><MailCheck className="h-6 w-6" /></div>
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Você recebeu um convite</h2>
-                <p className="text-sm text-slate-600">Há um convite de acesso a uma empresa associado ao seu e-mail.</p>
+                <h2 className="text-lg font-semibold text-slate-900">Convite para acessar uma empresa</h2>
+                <p className="text-sm text-slate-600">Sua conta de funcionário está pronta. Aceite o convite para entrar na equipe.</p>
               </div>
             </div>
             <p className="mb-5 text-sm text-slate-700">Empresa: <strong>{invite.company_name || "Empresa convidante"}</strong></p>
