@@ -4,7 +4,7 @@ import { loginWithEmail, loginWithGoogle } from "@/lib/authFirebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { safeReturnTo } from "@/lib/authReturnTo";
