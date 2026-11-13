@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { paged, ORDER_STATUSES } from "@/lib/tenant";
+import { paged } from "@/lib/tenant";
 import { brl, monthLabel, num, periodRange } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -20,18 +20,12 @@ const PERIODS = [
   { value: "year", label: "Este ano" },
 ];
 
-const STATUS_COLORS = {
-  "Orçamento": "bg-slate-400",
-  "Aguardando aprovação": "bg-amber-500",
-  "Aprovado": "bg-sky-500",
-  "Aguardando equipamento": "bg-cyan-500",
-  "Em execução": "bg-indigo-500",
-  "Aguardando peça": "bg-purple-500",
-  "Concluído": "bg-emerald-500",
-  "Aguardando retirada": "bg-teal-500",
-  "Entregue": "bg-green-600",
-  "Cancelado": "bg-rose-500",
-};
+const STATUS_DEFS = [
+  { label: "Em execução", color: "bg-indigo-500" },
+  { label: "Aguardando peça", color: "bg-purple-500" },
+  { label: "Aguardando aprovação", color: "bg-amber-500" },
+  { label: "Aguardando retirada", color: "bg-teal-500" },
+];
 
 export default function Dashboard() {
   const { user, company, account } = useTenant();
@@ -48,8 +42,8 @@ export default function Dashboard() {
       setLoading(true);
       try {
         const [orderRows, txRows, clientCount] = await Promise.all([
-          paged("ServiceOrder", { company_id: company.id }, { sort: "-created_date" }),
-          paged("Transaction", { company_id: company.id }, { sort: "-reference_date" }),
+          paged("ServiceOrder", { company_id: company.id }, { sort: "-created_date", limit: 300 }),
+          paged("Transaction", { company_id: company.id }, { sort: "-reference_date", limit: 300 }),
           base44.entities.Client.count({ company_id: company.id }),
         ]);
         if (!alive) return;
@@ -91,7 +85,7 @@ export default function Dashboard() {
       const amount = Number(tx.amount) || 0;
       if (tx.type === "income" && tx.status === "received" && ref >= from && ref <= to) revenue += amount;
       if (tx.type === "expense" && tx.status === "paid" && ref >= from && ref <= to) expenses += amount;
-      if (tx.type === "income" && tx.status === "pending" && ref >= from && ref <= to) pending += amount;
+      if (tx.type === "income" && tx.status === "pending") pending += amount;
     }
     return { revenue, expenses, balance: revenue - expenses, pending };
   }, [transactions, from, to]);
@@ -124,11 +118,7 @@ export default function Dashboard() {
   const statusRows = useMemo(() => {
     const map = {};
     for (const order of orders) map[order.status] = (map[order.status] || 0) + 1;
-    return ORDER_STATUSES.map((label) => ({
-      label,
-      color: STATUS_COLORS[label] || "bg-muted-foreground",
-      value: map[label] || 0,
-    }));
+    return STATUS_DEFS.map((def) => ({ ...def, value: map[def.label] || 0 })).filter((row) => row.value > 0);
   }, [orders]);
 
   const recent = orders.slice(0, 5);
@@ -153,7 +143,7 @@ export default function Dashboard() {
             <h1 className="mt-2 font-heading text-[27px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[33px]">
               Olá, {firstName}
             </h1>
-            <p className="mt-2 max-w-md text-[12.5px] leading-relaxed text-white/55">
+            <p className="mt-2 max-w-none text-[12.5px] leading-relaxed text-white/55 lg:whitespace-nowrap">
               Visão geral da operação — ordens em andamento, faturamento e status da bancada.
             </p>
 
@@ -189,7 +179,6 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <div className="mb-3 flex items-end justify-between gap-3 sm:mb-4"><div><h2 className="font-heading text-[14px] font-bold">Operação</h2><p className="mt-0.5 text-[11px] text-muted-foreground">Acompanhamento das ordens de serviço</p></div></div>
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label="Ordens no período" value={loading ? "—" : num(counts.total)} hint="Documentos emitidos" icon={FileText} delay={0} />
         <StatCard label="Aguardando aprovação" value={loading ? "—" : num(counts.awaiting)} hint="Orçamentos com o cliente" icon={Clock3} tone="warning" delay={60} />
@@ -197,8 +186,7 @@ export default function Dashboard() {
         <StatCard label="Entregues" value={loading ? "—" : num(counts.delivered)} hint="Finalizadas no período" icon={PackageCheck} tone="success" delay={180} />
       </div>
 
-      <div className="mb-3 mt-5 sm:mb-4 sm:mt-6"><h2 className="font-heading text-[14px] font-bold">Financeiro</h2><p className="mt-0.5 text-[11px] text-muted-foreground">Entradas, despesas e saldo conforme o período selecionado</p></div>
-      <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:mt-4 sm:gap-4 md:grid-cols-3">
         <div className="surface-hover rounded-2xl border border-border/70 bg-card p-5" style={{ boxShadow: "var(--shadow-soft)" }}>
           <div className="flex items-start justify-between gap-3">
             <p className="text-[10.5px] font-bold uppercase tracking-[0.13em] text-muted-foreground">Faturamento recebido</p>
@@ -237,13 +225,12 @@ export default function Dashboard() {
             {brl(money.balance)}
           </p>
           <p className="relative mt-2 text-[11.5px] text-white/50">
-            {money.pending > 0 ? `${brl(money.pending)} a receber no período` : "Entradas menos saídas"}
+            {money.pending > 0 ? `${brl(money.pending)} a receber` : "Entradas menos saídas"}
           </p>
         </div>
       </div>
 
-      <div className="mb-3 mt-5 sm:mb-4 sm:mt-6"><h2 className="font-heading text-[14px] font-bold">Acompanhamento</h2><p className="mt-0.5 text-[11px] text-muted-foreground">Evolução financeira e situação atual das ordens</p></div>
-      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:mt-4 sm:gap-4 lg:grid-cols-3">
         <div className="surface p-5 lg:col-span-2">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
