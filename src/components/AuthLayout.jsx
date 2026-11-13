@@ -33,7 +33,7 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen bg-background">
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-        <aside className="auth-panel relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-14">
+        <aside className="auth-panel relative hidden flex-col justify-start overflow-hidden p-10 text-white lg:flex xl:p-14">
           <div className="auth-grid pointer-events-none absolute inset-0" aria-hidden="true" />
           <div
             className="animate-float pointer-events-none absolute -right-24 top-24 h-[22rem] w-[22rem] rounded-full bg-[hsl(152_70%_45%_/_0.14)] blur-[110px]"
@@ -54,7 +54,7 @@ export default function AuthLayout({
             </span>
           </div>
 
-          <div className="relative max-w-lg animate-rise">
+          <div className="relative mt-16 max-w-lg animate-rise">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75 ring-1 ring-white/[0.14] backdrop-blur">
               <Sparkles className="h-3 w-3" /> Plataforma completa
             </span>
@@ -100,7 +100,7 @@ export default function AuthLayout({
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative mt-auto pt-10">
             <div className="grid grid-cols-3 gap-3">
               {METRICS.map((metric) => (
                 <div key={metric.label} className="rounded-2xl bg-white/[0.05] px-3.5 py-3 ring-1 ring-white/[0.09] backdrop-blur-sm">
