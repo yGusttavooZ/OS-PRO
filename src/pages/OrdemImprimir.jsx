@@ -176,20 +176,20 @@ export default function OrdemImprimir() {
         </section>
 
         <section className="os-bottom-grid">
-          <div className="os-warranty">
-            <div className="os-warranty-title">
-              <h2>Termos de garantia</h2>
-              <strong>{warrantyDays} dias</strong>
-            </div>
-            <p>{warrantyTerms}</p>
-          </div>
-
           <div className="os-totals">
             <div><span>Serviços</span><strong>{brl(order.services_total)}</strong></div>
             <div><span>Peças</span><strong>{brl(order.parts_total)}</strong></div>
             {Number(order.discount) > 0 && <div><span>Desconto</span><strong>− {brl(order.discount)}</strong></div>}
             {Number(order.surcharge) > 0 && <div><span>Acréscimo</span><strong>{brl(order.surcharge)}</strong></div>}
             <div className="os-grand-total"><span>Total</span><strong>{brl(order.total)}</strong></div>
+          </div>
+
+          <div className="os-warranty">
+            <div className="os-warranty-title">
+              <h2>Termos de garantia</h2>
+              <strong>{warrantyDays} dias</strong>
+            </div>
+            <p>{warrantyTerms}</p>
           </div>
         </section>
 
