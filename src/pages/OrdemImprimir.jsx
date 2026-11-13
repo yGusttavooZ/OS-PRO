@@ -244,9 +244,11 @@ export default function OrdemImprimir() {
         .os-sheet h2 { margin: 0 0 6px; color: hsl(var(--primary)); font-size: 9px; line-height: 1.25; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; }
         .os-panel p { margin: 2px 0; color: #596579; font-size: 10px; overflow-wrap: anywhere; }
         .os-panel .os-main-value { margin-bottom: 4px; color: #202938; font-size: 12px; font-weight: 700; }
-        .os-technical { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 13px 2px; border-bottom: 1px solid #e5e9f0; }
-        .os-tech-item { min-width: 0; padding: 10px 11px; border: 1px solid #e5e9f0; border-radius: 7px; background: #fafbfc; min-height: 76px; }
-        .os-tech-item p { margin: 0; color: #344054; font-size: 10px; line-height: 1.4; white-space: pre-line; overflow-wrap: anywhere; }
+        .os-technical { display: grid; grid-template-columns: 1fr; gap: 0; padding: 10px 2px; border-bottom: 1px solid #e5e9f0; }
+        .os-tech-item { display: flex; align-items: baseline; gap: 8px; min-width: 0; padding: 5px 8px; border-bottom: 1px solid #edf0f4; }
+        .os-tech-item:last-child { border-bottom: 0; }
+        .os-tech-item h2 { flex: 0 0 132px; margin: 0; }
+        .os-tech-item p { flex: 1; min-width: 0; margin: 0; color: #344054; font-size: 10px; line-height: 1.4; white-space: pre-line; overflow-wrap: anywhere; }
         .os-items-section { padding: 13px 0; border-bottom: 1px solid #e5e9f0; }
         .os-section-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
         .os-section-heading h2 { margin: 0; }
@@ -312,8 +314,9 @@ export default function OrdemImprimir() {
           .os-sheet h2 { margin-bottom: 2mm !important; font-size: 8pt !important; }
           .os-panel p, .os-tech-item p { font-size: 9pt !important; line-height: 1.35 !important; }
           .os-panel .os-main-value { font-size: 10.5pt !important; }
-          .os-technical { gap: 5mm !important; padding: 5mm 1mm !important; }
-          .os-tech-item { min-height: 19mm !important; padding: 2.5mm 3mm !important; }
+          .os-technical { gap: 0 !important; padding: 3mm 1mm !important; }
+          .os-tech-item { display: flex !important; align-items: baseline !important; gap: 3mm !important; min-height: 0 !important; padding: 2mm 3mm !important; }
+          .os-tech-item h2 { flex: 0 0 38mm !important; margin: 0 !important; }
           .os-tech-item p { font-size: 9pt !important; line-height: 1.35 !important; }
           .os-items-section { padding: 5mm 0 !important; }
           .os-section-heading { margin-bottom: 2.5mm !important; }
