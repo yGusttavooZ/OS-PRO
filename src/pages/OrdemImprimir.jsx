@@ -341,39 +341,6 @@ export default function OrdemImprimir() {
           .os-footer { margin-top: 2mm !important; padding-top: 3mm !important; font-size: 8pt !important; }
           .os-header, .os-two-columns, .os-technical, .os-items-section, .os-bottom-grid, .os-signatures, .os-footer { break-inside: avoid; }
           .os-items-table tr { break-inside: avoid; }
-          /* Ajuste fino para manter OS extensas em uma única folha A4 */
-          .os-sheet { min-height: 283mm !important; padding: 6mm 7mm 5mm !important; font-size: 9pt !important; line-height: 1.25 !important; }
-          .os-header { padding-bottom: 3mm !important; }
-          .os-company-info h1 { font-size: 13pt !important; }
-          .os-company-info p, .os-number > span:not(.os-kicker):not(.os-status) { font-size: 7.5pt !important; line-height: 1.2 !important; }
-          .os-number > strong { font-size: 19pt !important; }
-          .os-two-columns { gap: 3mm !important; padding: 3mm 0 !important; }
-          .os-panel { padding: 2.5mm 3mm !important; }
-          .os-sheet h2 { margin-bottom: 1mm !important; font-size: 7.5pt !important; }
-          .os-panel p { font-size: 7.5pt !important; line-height: 1.2 !important; }
-          .os-panel .os-main-value { font-size: 9pt !important; }
-          .os-technical { padding: 2mm 1mm !important; }
-          .os-tech-item { gap: 2mm !important; padding: 1.2mm 2mm !important; }
-          .os-tech-item h2 { flex: 0 0 36mm !important; font-size: 7.5pt !important; }
-          .os-tech-item p { font-size: 8pt !important; line-height: 1.2 !important; }
-          .os-items-section { padding: 3mm 0 !important; }
-          .os-section-heading { margin-bottom: 1.5mm !important; }
-          .os-items-table { font-size: 8pt !important; line-height: 1.2 !important; }
-          .os-items-table th { padding: 1.5mm 2mm !important; font-size: 7pt !important; }
-          .os-items-table td { padding: 1.5mm 2mm !important; line-height: 1.2 !important; }
-          .os-items-table td small { font-size: 7pt !important; }
-          .os-bottom-grid { gap: 2mm !important; padding: 3mm 0 2mm !important; }
-          .os-totals { gap: 1mm 2.5mm !important; }
-          .os-totals > div { font-size: 7.5pt !important; }
-          .os-totals .os-grand-total { padding: 1.5mm 2.5mm !important; font-size: 8.5pt !important; }
-          .os-totals .os-grand-total strong { font-size: 10pt !important; }
-          .os-warranty-title { margin-bottom: 1mm !important; }
-          .os-warranty-title strong { font-size: 7.5pt !important; }
-          .os-warranty p { font-size: 7.5pt !important; line-height: 1.25 !important; }
-          .os-signatures { gap: 14mm !important; padding: 6mm 4mm 3mm !important; }
-          .os-signatures > div { padding-top: 2mm !important; font-size: 7.5pt !important; }
-          .os-signature-name { font-size: 8pt !important; }
-          .os-footer { margin-top: 1mm !important; padding-top: 2mm !important; font-size: 7.5pt !important; }
         }
       `}</style>
     </div>
