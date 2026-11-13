@@ -58,10 +58,10 @@ export default function AuthLayout({
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75 ring-1 ring-white/[0.14] backdrop-blur">
               <Sparkles className="h-3 w-3" /> Plataforma completa
             </span>
-            <h2 className="mt-6 font-heading text-[34px] font-extrabold leading-[1.06] tracking-[-0.03em] xl:text-[42px]">
+            <h2 className="mt-6 min-h-[2.12em] font-heading text-[34px] font-extrabold leading-[1.06] tracking-[-0.03em] xl:text-[42px]">
               {panelTitle}
             </h2>
-            <p className="mt-4 max-w-md text-[13.5px] leading-relaxed text-white/60">{panelSubtitle}</p>
+            <p className="mt-4 min-h-[4.9em] max-w-md text-[13.5px] leading-relaxed text-white/60">{panelSubtitle}</p>
 
             <ul className="mt-8 grid gap-x-6 gap-y-3 sm:grid-cols-2">
               {BENEFITS.map((item) => (
