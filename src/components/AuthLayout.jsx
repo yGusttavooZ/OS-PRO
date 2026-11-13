@@ -33,7 +33,7 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen bg-background">
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-        <aside className="auth-panel relative hidden flex-col justify-start overflow-hidden p-10 text-white lg:flex xl:p-14">
+        <aside className="auth-panel relative hidden flex-col justify-start overflow-hidden p-8 text-white lg:flex xl:p-10">
           <div className="auth-grid pointer-events-none absolute inset-0" aria-hidden="true" />
           <div
             className="animate-float pointer-events-none absolute -right-24 top-24 h-[22rem] w-[22rem] rounded-full bg-[hsl(152_70%_45%_/_0.14)] blur-[110px]"
@@ -54,16 +54,16 @@ export default function AuthLayout({
             </span>
           </div>
 
-          <div className="relative mt-16 max-w-lg animate-rise">
+          <div className="relative mt-10 max-w-lg animate-rise">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75 ring-1 ring-white/[0.14] backdrop-blur">
               <Sparkles className="h-3 w-3" /> Plataforma completa
             </span>
-            <h2 className="mt-6 min-h-[2.12em] font-heading text-[34px] font-extrabold leading-[1.06] tracking-[-0.03em] xl:text-[42px]">
+            <h2 className="mt-4 min-h-[2.12em] font-heading text-[34px] font-extrabold leading-[1.06] tracking-[-0.03em] xl:text-[42px]">
               {panelTitle}
             </h2>
-            <p className="mt-4 min-h-[4.9em] max-w-md text-[13.5px] leading-relaxed text-white/60">{panelSubtitle}</p>
+            <p className="mt-3 min-h-[4.9em] max-w-md text-[13.5px] leading-relaxed text-white/60">{panelSubtitle}</p>
 
-            <ul className="mt-8 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+            <ul className="mt-6 grid gap-x-6 gap-y-3 sm:grid-cols-2">
               {BENEFITS.map((item) => (
                 <li key={item} className="flex items-start gap-2.5 text-[12.5px] leading-snug text-white/80">
                   <span className="mt-px grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[hsl(152_68%_50%_/_0.18)] text-[hsl(152_72%_72%)] ring-1 ring-white/10">
@@ -74,7 +74,7 @@ export default function AuthLayout({
               ))}
             </ul>
 
-            <div className="mt-9 rounded-2xl bg-white/[0.05] p-4 ring-1 ring-white/[0.09] backdrop-blur-sm">
+            <div className="mt-6 rounded-2xl bg-white/[0.05] p-4 ring-1 ring-white/[0.09] backdrop-blur-sm">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">Visão da operação</p>
                 <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[hsl(152_72%_72%)]">
@@ -100,7 +100,7 @@ export default function AuthLayout({
             </div>
           </div>
 
-          <div className="relative mt-auto pt-10">
+          <div className="relative mt-auto pt-6">
             <div className="grid grid-cols-3 gap-3">
               {METRICS.map((metric) => (
                 <div key={metric.label} className="rounded-2xl bg-white/[0.05] px-3.5 py-3 ring-1 ring-white/[0.09] backdrop-blur-sm">
@@ -109,7 +109,7 @@ export default function AuthLayout({
                 </div>
               ))}
             </div>
-            <p className="mt-5 flex items-center gap-2 text-[11px] text-white/40">
+            <p className="mt-3 flex items-center gap-2 text-[11px] text-white/40">
               <ShieldCheck className="h-3.5 w-3.5" /> Seus dados ficam visíveis apenas para a sua equipe
             </p>
           </div>
