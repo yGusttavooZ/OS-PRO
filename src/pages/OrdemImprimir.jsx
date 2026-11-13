@@ -275,7 +275,7 @@ export default function OrdemImprimir() {
         .os-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 9mm 12px 5mm; margin-top: 0; }
         .os-signatures > div { display: flex; flex-direction: column; align-items: center; min-width: 0; padding-top: 7px; border-top: 1px solid #aeb6c2; color: #7a8494; font-size: 9px; text-align: center; }
         .os-signature-name { max-width: 100%; margin-bottom: 2px; color: #344054; font-size: 10px; font-weight: 700; overflow-wrap: anywhere; }
-        .os-footer { margin-top: 2px; padding-top: 8px; border-top: 1px solid #e5e9f0; color: #8992a2; font-size: 9px; text-align: center; overflow-wrap: anywhere; }
+        .os-footer { margin-top: 0; padding-top: 3px; border-top: 1px solid #e5e9f0; color: #8992a2; font-size: 9px; text-align: center; overflow-wrap: anywhere; }
         @media (max-width: 600px) {
           .os-sheet { padding: 22px 18px; border-radius: 0; }
           .os-header { align-items: flex-start; gap: 10px; }
@@ -338,7 +338,7 @@ export default function OrdemImprimir() {
           .os-signatures { gap: 16mm !important; padding: 9mm 4mm 5mm !important; margin-top: 0 !important; }
           .os-signatures > div { padding-top: 2.5mm !important; font-size: 8pt !important; }
           .os-signature-name { font-size: 9pt !important; }
-          .os-footer { margin-top: 2mm !important; padding-top: 3mm !important; font-size: 8pt !important; }
+          .os-footer { margin-top: 0 !important; padding-top: 1mm !important; font-size: 8pt !important; }
           .os-header, .os-two-columns, .os-technical, .os-items-section, .os-bottom-grid, .os-signatures, .os-footer { break-inside: avoid; }
           .os-items-table tr { break-inside: avoid; }
         }
