@@ -95,11 +95,12 @@ export default function OrdemImprimir() {
                 {company?.trade_name && company.trade_name !== company.name && <p className="mt-0.5 text-xs text-muted-foreground">{company.trade_name}</p>}
                 {company?.document && <InfoLine>CNPJ/CPF: {formatDoc(company.document)}</InfoLine>}
                 {address && <InfoLine>{address}</InfoLine>}
-                {(company?.phone || company?.whatsapp || company?.email) && (
+                {(company?.phone || company?.whatsapp) && (
                   <InfoLine>
-                    {[company?.phone && formatPhone(company.phone), company?.whatsapp && `WhatsApp: ${formatPhone(company.whatsapp)}`, company?.email].filter(Boolean).join(" · ")}
+                    {[company?.phone && formatPhone(company.phone), company?.whatsapp && `WhatsApp: ${formatPhone(company.whatsapp)}`].filter(Boolean).join(" · ")}
                   </InfoLine>
                 )}
+                {company?.email && <InfoLine>{company.email}</InfoLine>}
               </div>
             </div>
             <div className="flex shrink-0 items-center justify-between gap-4 rounded-xl bg-muted/60 px-4 py-3 sm:min-w-[205px] sm:flex-col sm:items-end sm:bg-transparent sm:px-0 sm:py-0">
