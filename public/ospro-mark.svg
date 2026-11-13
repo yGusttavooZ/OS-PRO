@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="metal" x1="24" y1="20" x2="83" y2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#fff"/><stop offset="1" stop-color="#9ba5a8"/></linearGradient>
+    <linearGradient id="green" x1="20" y1="104" x2="112" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#00bd55"/><stop offset=".55" stop-color="#42f078"/><stop offset="1" stop-color="#a2ff75"/></linearGradient>
+  </defs>
+  <path d="M54 8h18l4 10 10 4 9-5 13 13-5 9 4 10 10 4v18l-10 4-4 10 5 9-13 13-9-5-10 4-4 10H54l-4-10-10-4-9 5-13-13 5-9-4-10-10-4V53l10-4 4-10-5-9 13-13 9 5 10-4 4-10Z" stroke="url(#metal)" stroke-width="5" stroke-linejoin="round"/>
+  <rect x="34" y="39" width="62" height="48" rx="6" stroke="url(#metal)" stroke-width="5"/>
+  <path d="M55 96h20m-10-9v9" stroke="url(#metal)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M69 52a12 12 0 0 0-15 15L44 77a5 5 0 0 0 7 7l10-10a12 12 0 0 0 15-15l-8 8-7-7 8-8Z" fill="url(#metal)"/>
+  <path d="M12 91c12 25 48 30 77 12 18-11 31-29 32-46" stroke="url(#green)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M120 57c-1-20-18-34-39-34" stroke="url(#green)" stroke-width="6" stroke-linecap="round"/>
+</svg>
