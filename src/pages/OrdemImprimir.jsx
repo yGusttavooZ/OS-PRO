@@ -222,13 +222,23 @@ export default function OrdemImprimir() {
       </article>
 
       <style>{`
-        @page { size: A4; margin: 12mm; }
+        @page { size: A4; margin: 8mm; }
         @media print {
           html, body { background: #fff !important; }
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none !important; }
-          article { width: 100%; max-width: none !important; }
-          section, header, footer, table, tr { break-inside: avoid; }
+          article {
+            width: 122%;
+            max-width: none !important;
+            zoom: 0.82;
+            border: 0 !important;
+            box-shadow: none !important;
+          }
+          article > header { padding-top: 14px !important; padding-bottom: 14px !important; }
+          article > div { padding-top: 14px !important; padding-bottom: 14px !important; }
+          article .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 12px !important; }
+          article section { break-inside: avoid; }
+          article header, article footer, article table, article tr { break-inside: avoid; }
         }
       `}</style>
     </div>
