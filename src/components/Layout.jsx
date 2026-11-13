@@ -14,6 +14,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import CompanyLogo from "@/components/CompanyLogo";
+import BrandMark from "@/components/BrandMark";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "technician", "attendant"] },
@@ -32,7 +33,7 @@ function Brand({ company, compact = false }) {
         className="h-9 w-9 rounded-xl object-contain ring-1 ring-white/20 bg-white/10"
         fallback={
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-white/25 to-white/[0.06] font-heading text-[11px] font-extrabold tracking-[0.08em] text-white ring-1 ring-white/20 backdrop-blur">
-            OS
+            <BrandMark className="h-7 w-7 text-white" />
           </span>
         }
       />
