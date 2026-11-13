@@ -128,15 +128,15 @@ export default function OrdemImprimir() {
 
         <section className="os-technical">
           <div className="os-tech-item">
-            <h2>Defeito relatado</h2>
+            <h2>Defeito relatado:</h2>
             <p>{order.reported_issue || "—"}</p>
           </div>
           <div className="os-tech-item">
-            <h2>Diagnóstico técnico</h2>
+            <h2>Diagnóstico técnico:</h2>
             <p>{order.diagnosis || "—"}</p>
           </div>
           <div className="os-tech-item">
-            <h2>Solução aplicada</h2>
+            <h2>Solução aplicada:</h2>
             <p>{order.solution || "—"}</p>
           </div>
         </section>
@@ -284,7 +284,7 @@ export default function OrdemImprimir() {
           .os-number > strong { font-size: 19px; }
           .os-two-columns { gap: 8px; }
           .os-panel { padding: 9px; }
-          .os-technical { gap: 9px; }
+          .os-technical { gap: 0; }
           .os-bottom-grid { grid-template-columns: 1fr; gap: 12px; }
         }
         @page { size: A4 portrait; margin: 9mm; }
@@ -312,7 +312,8 @@ export default function OrdemImprimir() {
           .os-two-columns { gap: 4mm !important; padding: 5mm 0 !important; }
           .os-panel { padding: 4mm !important; }
           .os-sheet h2 { margin-bottom: 2mm !important; font-size: 8pt !important; }
-          .os-panel p, .os-tech-item p { font-size: 9pt !important; line-height: 1.35 !important; }
+          .os-panel p, .os-tech-item h2 { flex: 0 0 39mm !important; margin: 0 !important; font-size: 8pt !important; }
+          .os-tech-item p { font-size: 9pt !important; line-height: 1.35 !important; }
           .os-panel .os-main-value { font-size: 10.5pt !important; }
           .os-technical { gap: 0 !important; padding: 3mm 1mm !important; }
           .os-tech-item { display: flex !important; align-items: baseline !important; gap: 3mm !important; min-height: 0 !important; padding: 2mm 3mm !important; }
