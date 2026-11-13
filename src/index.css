@@ -128,10 +128,31 @@
 
   /* ---------- Auth / marketing panel ---------- */
   .auth-panel {
+    isolation: isolate;
     background:
-      radial-gradient(115% 85% at 8% 0%, hsl(158 66% 26% / 0.9) 0%, transparent 55%),
-      radial-gradient(95% 75% at 100% 100%, hsl(174 72% 24% / 0.55) 0%, transparent 62%),
-      linear-gradient(168deg, hsl(166 44% 11%) 0%, hsl(168 46% 7.5%) 52%, hsl(168 40% 5.5%) 100%);
+      radial-gradient(70% 55% at 82% 38%, hsl(152 62% 30% / 0.28) 0%, transparent 72%),
+      radial-gradient(115% 85% at 8% 0%, hsl(158 66% 28% / 0.95) 0%, transparent 55%),
+      radial-gradient(95% 75% at 100% 100%, hsl(174 72% 26% / 0.62) 0%, transparent 62%),
+      linear-gradient(155deg, hsl(166 44% 12%) 0%, hsl(168 46% 7%) 58%, hsl(168 40% 5%) 100%);
+  }
+  .auth-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 35%, hsl(0 0% 100% / 0.035) 50%, transparent 65%);
+  }
+  .auth-float-card {
+    background: linear-gradient(145deg, hsl(0 0% 100% / 0.105), hsl(0 0% 100% / 0.045));
+    border: 1px solid hsl(0 0% 100% / 0.12);
+    box-shadow: 0 18px 42px -28px hsl(0 0% 0% / 0.8);
+    backdrop-filter: blur(12px);
+  }
+  .auth-card {
+    background: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(150 22% 98%) 100%);
+    border-color: hsl(156 16% 86%);
+    box-shadow: 0 2px 5px hsl(168 40% 10% / 0.035), 0 32px 80px -42px hsl(168 50% 12% / 0.28);
   }
 
   .auth-grid {
