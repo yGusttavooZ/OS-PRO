@@ -242,3 +242,62 @@
   .print-only { display: block !important; }
   body { background: #fff; }
 }
+
+
+/* ---------- OS-PRO auth refresh ---------- */
+.auth-screen {
+  --background: 168 45% 5%;
+  --foreground: 150 18% 96%;
+  --card: 168 35% 8%;
+  --card-foreground: 150 18% 96%;
+  --popover: 168 35% 8%;
+  --popover-foreground: 150 18% 96%;
+  --primary: 145 82% 52%;
+  --primary-foreground: 168 48% 6%;
+  --secondary: 168 24% 13%;
+  --secondary-foreground: 150 18% 96%;
+  --muted: 168 24% 13%;
+  --muted-foreground: 155 12% 68%;
+  --accent: 168 24% 14%;
+  --accent-foreground: 150 18% 96%;
+  --border: 168 18% 22%;
+  --input: 168 18% 22%;
+  --ring: 145 82% 52%;
+  background:
+    radial-gradient(70% 70% at 100% 0%, hsl(150 80% 22% / .18), transparent 70%),
+    linear-gradient(145deg, #07110f 0%, #03090d 58%, #061510 100%);
+}
+.auth-screen .auth-panel {
+  background:
+    radial-gradient(90% 75% at 0% 0%, hsl(145 75% 24% / .35), transparent 65%),
+    radial-gradient(80% 70% at 100% 100%, hsl(155 85% 25% / .22), transparent 65%),
+    linear-gradient(145deg, #071a16 0%, #06100f 55%, #03090d 100%);
+}
+.auth-screen .auth-card {
+  border-color: hsl(145 55% 45% / .42);
+  border-radius: 26px;
+  background: linear-gradient(155deg, hsl(168 35% 10% / .98), hsl(168 42% 6% / .98));
+  box-shadow: 0 24px 80px -38px #000, 0 0 45px hsl(145 80% 35% / .09);
+}
+.auth-screen .auth-main {
+  background:
+    radial-gradient(65% 55% at 100% 0%, hsl(145 80% 28% / .10), transparent 72%),
+    radial-gradient(55% 50% at 0% 100%, hsl(160 70% 20% / .10), transparent 75%);
+}
+.auth-screen input,
+.auth-screen select,
+.auth-screen textarea {
+  color: hsl(150 18% 96%);
+  background-color: hsl(168 25% 10% / .82);
+  border-color: hsl(168 18% 26%);
+}
+.auth-screen input::placeholder,
+.auth-screen textarea::placeholder {
+  color: hsl(155 10% 58%);
+}
+.auth-screen .brand-mark {
+  filter: drop-shadow(0 0 12px hsl(145 82% 52% / .22));
+}
+@media (max-width: 1023px) {
+  .auth-screen .auth-main { min-height: 100vh; }
+}
