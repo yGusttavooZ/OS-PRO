@@ -29,6 +29,7 @@ export default function AuthLayout({
   children,
   panelTitle = "Gestão completa da sua assistência técnica",
   panelSubtitle = "Ordens de serviço, orçamentos, clientes e financeiro em um só lugar — com os dados da sua empresa totalmente isolados.",
+  compact = false,
 }) {
   return (
     <div className="min-h-screen bg-background">
@@ -115,23 +116,23 @@ export default function AuthLayout({
           </div>
         </aside>
 
-        <main className="relative flex items-center justify-center px-5 py-10 sm:px-8">
+        <main className={`relative flex items-center justify-center px-5 sm:px-8 ${compact ? "py-3 lg:py-2" : "py-10"}`}>
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
             <div className="absolute -top-28 right-0 h-80 w-80 rounded-full bg-primary/[0.08] blur-[110px]" />
             <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-chart-3/[0.09] blur-[110px]" />
           </div>
 
-          <div className="relative w-full max-w-[430px] animate-rise">
-            <div className="mb-8 flex items-center justify-center gap-2.5 lg:hidden">
+          <div className={`relative w-full max-w-[430px] animate-rise ${compact ? "max-lg:py-2" : ""}`}>
+            <div className={`${compact ? "mb-4" : "mb-8"} flex items-center justify-center gap-2.5 lg:hidden`}>
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-chart-3 text-[11px] font-extrabold tracking-[0.1em] text-primary-foreground shadow-sm shadow-primary/25">
                 <BrandMark className="h-6 w-6 text-white" />
               </span>
               <span className="font-heading text-lg font-extrabold tracking-[-0.02em]">OS PRO</span>
             </div>
 
-            <div className="mb-7 text-center">
-              <span className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl border border-primary/15 bg-gradient-to-br from-accent to-card text-primary shadow-[0_10px_30px_-18px_hsl(var(--primary)/0.6)]">
-                <Icon className="h-[25px] w-[25px]" aria-hidden="true" />
+            <div className={`${compact ? "mb-3 lg:mb-4" : "mb-7"} text-center`}>
+              <span className={`${compact ? "mb-2 h-11 w-11 rounded-xl" : "mb-5 h-14 w-14 rounded-2xl"} inline-grid place-items-center border border-primary/15 bg-gradient-to-br from-accent to-card text-primary shadow-[0_10px_30px_-18px_hsl(var(--primary)/0.6)]`}>
+                <Icon className={compact ? "h-5 w-5" : "h-[25px] w-[25px]"} aria-hidden="true" />
               </span>
               <h1 className="font-heading text-[27px] font-extrabold tracking-[-0.03em] text-foreground sm:text-[31px]">
                 {title}
@@ -139,12 +140,12 @@ export default function AuthLayout({
               {subtitle && <p className="mx-auto mt-2 max-w-[330px] text-[13.5px] leading-relaxed text-muted-foreground">{subtitle}</p>}
             </div>
 
-            <div className="auth-card relative overflow-hidden rounded-[26px] border border-border/70 bg-card p-6 sm:p-8">
+            <div className={`auth-card relative overflow-hidden rounded-[26px] border border-border/70 bg-card ${compact ? "p-4 sm:p-5 lg:p-5" : "p-6 sm:p-8"}`}>
               <span className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" aria-hidden="true" />
               {children}
             </div>
 
-            {footer && <p className="mt-6 text-center text-[13px] text-muted-foreground">{footer}</p>}
+            {footer && <p className={`${compact ? "mt-3" : "mt-6"} text-center text-[13px] text-muted-foreground`}>{footer}</p>}
           </div>
         </main>
       </div>
