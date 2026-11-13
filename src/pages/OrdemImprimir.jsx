@@ -222,26 +222,36 @@ export default function OrdemImprimir() {
       </article>
 
       <style>{`
-        @page { size: A4 portrait; margin: 8mm; }
+        @page { size: A4 portrait; margin: 5mm; }
         @media print {
-          html, body { width: 100%; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+          html, body { width: 100% !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none !important; }
           article {
-            width: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-            overflow: visible !important;
-            border: 0 !important;
-            box-shadow: none !important;
-            zoom: 1 !important;
+            width: 100% !important; max-width: none !important; margin: 0 !important;
+            overflow: visible !important; border: 0 !important; box-shadow: none !important;
+            font-size: 9px !important; zoom: 0.92 !important;
           }
-          article > header { padding: 14px 20px !important; }
-          article > div { padding: 14px 20px !important; }
-          article .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 12px !important; }
-          article section { break-inside: auto; page-break-inside: auto; }
+          article > header { padding: 8px 12px !important; }
+          article > header img { width: 48px !important; height: 48px !important; }
+          article > header h1 { font-size: 16px !important; }
+          article > header p { font-size: 9px !important; }
+          article > div { padding: 8px 12px !important; }
+          article .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 8px !important; }
+          article section { break-inside: avoid; page-break-inside: avoid; }
+          article section .p-4 { padding: 7px !important; }
+          article section .p-3 { padding: 6px !important; }
+          article section .mb-3 { margin-bottom: 5px !important; }
+          article section .mt-4 { margin-top: 6px !important; }
+          article section .mt-3 { margin-top: 5px !important; }
+          article section .mt-2 { margin-top: 3px !important; }
+          article section .mt-1 { margin-top: 2px !important; }
+          article table th, article table td { padding: 4px 6px !important; }
+          article footer { padding: 6px 12px !important; }
+          article section:last-of-type { padding-top: 4px !important; gap: 18px !important; }
+          article section:last-of-type > div { padding-top: 18px !important; }
+          article p { line-height: 1.25 !important; orphans: 2; widows: 2; }
           article header, article footer, article table, article tr { break-inside: avoid; page-break-inside: avoid; }
-          article p { orphans: 2; widows: 2; }
         }
       `}</style>
     </div>
