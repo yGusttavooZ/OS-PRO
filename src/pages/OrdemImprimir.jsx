@@ -1,11 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Loader2, Printer } from "lucide-react";
+import { ArrowLeft, Loader2, Printer, UserRound, Laptop, ClipboardList, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/lib/TenantContext";
 import { paged } from "@/lib/tenant";
 import { brl, formatDoc, formatPhone, shortDate } from "@/lib/format";
 import CompanyLogo from "@/components/CompanyLogo";
+
+function SectionTitle({ icon: Icon, children }) {
+  return (
+    <div className="mb-3 flex items-center gap-2">
+      <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <h2 className="text-[11px] font-bold uppercase tracking-[0.13em] text-foreground">{children}</h2>
+    </div>
+  );
+}
+
+function InfoLine({ children }) {
+  if (!children) return null;
+  return <p className="mt-1 break-words text-[11px] leading-relaxed text-muted-foreground">{children}</p>;
+}
 
 export default function OrdemImprimir() {
   const { id } = useParams();
@@ -34,24 +50,18 @@ export default function OrdemImprimir() {
     if (!order) return;
     const previous = document.title;
     document.title = `${order.number_label} - ${company?.name || "Documento"}`;
-    return () => {
-      document.title = previous;
-    };
+    return () => { document.title = previous; };
   }, [order, company]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen grid place-items-center text-muted-foreground">
-        <Loader2 className="w-5 h-5 animate-spin" />
-      </div>
-    );
+    return <div className="grid min-h-screen place-items-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>;
   }
 
   if (!order) {
     return (
-      <div className="min-h-screen grid place-items-center text-center px-4">
+      <div className="grid min-h-screen place-items-center px-4 text-center">
         <div>
-          <p className="font-heading font-bold text-lg">Documento não encontrado</p>
+          <p className="font-heading text-lg font-bold">Documento não encontrado</p>
           <Button asChild className="mt-4"><Link to="/ordens">Voltar para a lista</Link></Button>
         </div>
       </div>
@@ -59,182 +69,167 @@ export default function OrdemImprimir() {
   }
 
   const items = Array.isArray(order.items) ? order.items : [];
-  const address = [company?.address, company?.address_number, company?.district, company?.city, company?.state]
-    .filter(Boolean)
-    .join(", ");
+  const address = [company?.address, company?.address_number, company?.district, company?.city, company?.state].filter(Boolean).join(", ");
+  const docType = order.doc_type === "orcamento" ? "Orçamento" : "Ordem de Serviço";
+  const warrantyDays = Number(order.warranty_days) > 0 ? Number(order.warranty_days) : Number(company?.warranty_days) > 0 ? Number(company.warranty_days) : 90;
+  const status = order.status || "Não informado";
 
   return (
-    <div className="min-h-screen bg-muted/40 py-6 print:bg-white print:py-0">
-      <div className="max-w-[820px] mx-auto mb-4 px-4 flex items-center justify-between no-print">
-        <Button asChild variant="ghost" className="gap-1.5">
-          <Link to={`/ordens/${order.id}`}><ArrowLeft className="w-4 h-4" /> Voltar</Link>
-        </Button>
-        <Button onClick={() => window.print()} className="gap-2">
-          <Printer className="w-4 h-4" /> Imprimir / Salvar PDF
-        </Button>
+    <div className="min-h-screen bg-muted/40 px-3 py-6 print:bg-white print:p-0 sm:px-5">
+      <div className="mx-auto mb-4 flex max-w-[850px] items-center justify-between no-print">
+        <Button asChild variant="ghost" className="gap-1.5"><Link to={`/ordens/${order.id}`}><ArrowLeft className="h-4 w-4" /> Voltar</Link></Button>
+        <Button onClick={() => window.print()} className="gap-2"><Printer className="h-4 w-4" /> Imprimir / Salvar PDF</Button>
       </div>
 
-      <article className="max-w-[820px] mx-auto bg-card text-card-foreground shadow-sm print:shadow-none border border-border print:border-0 px-8 sm:px-12 py-10 sm:py-12">
-        <header className="flex items-start justify-between gap-6 pb-6 border-b-2 border-primary">
-          <div className="flex items-start gap-3 min-w-0">
-            <CompanyLogo
-              company={company}
-              className="w-14 h-14 rounded-lg object-contain"
-              fallback={
-                <span className="w-14 h-14 rounded-lg bg-primary text-primary-foreground grid place-items-center font-heading font-extrabold">
-                  GO
-                </span>
-              }
-            />
-            <div className="min-w-0">
-              <h1 className="font-heading text-lg font-extrabold leading-tight">{company?.name}</h1>
-              {company?.trade_name && company.trade_name !== company.name && <p className="text-xs text-muted-foreground">{company.trade_name}</p>}
-              {company?.document && <p className="text-xs text-muted-foreground">CNPJ/CPF: {formatDoc(company.document)}</p>}
-              {address && <p className="text-xs text-muted-foreground">{address}</p>}
-              <p className="text-xs text-muted-foreground">
-                {company?.phone && formatPhone(company.phone)}
-                {company?.whatsapp ? ` · WhatsApp: ${formatPhone(company.whatsapp)}` : ""}
-                {company?.email ? ` · ${company.email}` : ""}
-              </p>
+      <article className="mx-auto max-w-[850px] overflow-hidden border border-border bg-card text-card-foreground shadow-sm print:max-w-none print:border-0 print:shadow-none">
+        <header className="border-b border-border px-6 py-7 sm:px-10">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 items-start gap-4">
+              <CompanyLogo
+                company={company}
+                className="h-[68px] w-[68px] shrink-0 rounded-xl object-contain"
+                fallback={<span className="grid h-[68px] w-[68px] shrink-0 place-items-center rounded-xl bg-primary text-lg font-extrabold text-primary-foreground">{(company?.name || "OS").slice(0, 2).toUpperCase()}</span>}
+              />
+              <div className="min-w-0 pt-1">
+                <h1 className="font-heading text-xl font-extrabold leading-tight tracking-tight">{company?.name || "Empresa"}</h1>
+                {company?.trade_name && company.trade_name !== company.name && <p className="mt-0.5 text-xs text-muted-foreground">{company.trade_name}</p>}
+                {company?.document && <InfoLine>CNPJ/CPF: {formatDoc(company.document)}</InfoLine>}
+                {address && <InfoLine>{address}</InfoLine>}
+                {(company?.phone || company?.whatsapp || company?.email) && (
+                  <InfoLine>
+                    {[company?.phone && formatPhone(company.phone), company?.whatsapp && `WhatsApp: ${formatPhone(company.whatsapp)}`, company?.email].filter(Boolean).join(" · ")}
+                  </InfoLine>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="text-right shrink-0">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-primary">
-              {order.doc_type === "orcamento" ? "Orçamento" : "Ordem de serviço"}
-            </p>
-            <p className="font-heading text-2xl font-extrabold leading-tight">{order.number_label}</p>
-            <p className="text-xs text-muted-foreground">Emitido em {shortDate(order.created_date)}</p>
-            <p className="text-xs font-semibold mt-1">Status: {order.status}</p>
+            <div className="flex shrink-0 items-center justify-between gap-4 rounded-xl bg-muted/60 px-4 py-3 sm:min-w-[205px] sm:flex-col sm:items-end sm:bg-transparent sm:px-0 sm:py-0">
+              <div className="sm:text-right">
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary">{docType}</p>
+                <p className="mt-1 font-heading text-[27px] font-extrabold leading-none tracking-tight">{order.number_label}</p>
+                <p className="mt-2 text-[11px] text-muted-foreground">Emitido em {shortDate(order.created_date)}</p>
+              </div>
+              <span className="inline-flex max-w-[150px] items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-semibold text-primary">{status}</span>
+            </div>
           </div>
         </header>
 
-        <section className="grid sm:grid-cols-2 gap-6 py-6 border-b border-border">
-          <div>
-            <p className="field-label mb-1">Cliente</p>
-            <p className="font-semibold">{order.client_name || "—"}</p>
-            {order.client_document && <p className="text-xs text-muted-foreground">Documento: {formatDoc(order.client_document)}</p>}
-            {order.client_phone && <p className="text-xs text-muted-foreground">Telefone: {formatPhone(order.client_phone)}</p>}
-            {order.client_email && <p className="text-xs text-muted-foreground">{order.client_email}</p>}
-            {order.client_address && <p className="text-xs text-muted-foreground">{order.client_address}</p>}
-          </div>
-          <div>
-            <p className="field-label mb-1">Equipamento</p>
-            <p className="font-semibold">{order.equipment_name || "—"}</p>
-            <p className="text-xs text-muted-foreground">
-              {[order.equipment_brand, order.equipment_model].filter(Boolean).join(" · ")}
-            </p>
-            {order.equipment_serial && <p className="text-xs text-muted-foreground">Série: {order.equipment_serial}</p>}
-            {order.equipment_accessories && <p className="text-xs text-muted-foreground">Acessórios: {order.equipment_accessories}</p>}
-            {order.equipment_condition && <p className="text-xs text-muted-foreground">Estado: {order.equipment_condition}</p>}
-          </div>
-        </section>
-
-        <section className="py-6 border-b border-border space-y-4">
-          <div>
-            <p className="field-label mb-1">Defeito relatado</p>
-            <p className="text-sm whitespace-pre-line">{order.reported_issue || "—"}</p>
-          </div>
-          {order.diagnosis && (
-            <div>
-              <p className="field-label mb-1">Diagnóstico técnico</p>
-              <p className="text-sm whitespace-pre-line">{order.diagnosis}</p>
+        <div className="space-y-6 px-6 py-6 sm:px-10 sm:py-8">
+          <section className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-border bg-muted/20 p-4">
+              <SectionTitle icon={UserRound}>Dados do cliente</SectionTitle>
+              <p className="text-sm font-bold">{order.client_name || "—"}</p>
+              {order.client_document && <InfoLine>Documento: {formatDoc(order.client_document)}</InfoLine>}
+              {order.client_phone && <InfoLine>Telefone: {formatPhone(order.client_phone)}</InfoLine>}
+              {order.client_email && <InfoLine>{order.client_email}</InfoLine>}
+              {order.client_address && <InfoLine>{order.client_address}</InfoLine>}
             </div>
-          )}
-          {order.solution && (
-            <div>
-              <p className="field-label mb-1">Solução aplicada</p>
-              <p className="text-sm whitespace-pre-line">{order.solution}</p>
+            <div className="rounded-xl border border-border bg-muted/20 p-4">
+              <SectionTitle icon={Laptop}>Equipamento</SectionTitle>
+              <p className="text-sm font-bold">{order.equipment_name || "—"}</p>
+              <InfoLine>{[order.equipment_brand, order.equipment_model].filter(Boolean).join(" · ") || "Marca/modelo não informado"}</InfoLine>
+              {order.equipment_serial && <InfoLine>Número de série: {order.equipment_serial}</InfoLine>}
+              {order.equipment_accessories && <InfoLine>Acessórios: {order.equipment_accessories}</InfoLine>}
+              {order.equipment_condition && <InfoLine>Estado de entrada: {order.equipment_condition}</InfoLine>}
             </div>
-          )}
-        </section>
+          </section>
 
-        <section className="py-6 border-b border-border">
-          <p className="field-label mb-3">Serviços e peças</p>
-          {items.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nenhum item lançado.</p>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-[10px] uppercase tracking-wide text-muted-foreground border-b border-border">
-                  <th className="py-1.5 font-semibold">Descrição</th>
-                  <th className="py-1.5 font-semibold text-center w-16">Qtd.</th>
-                  <th className="py-1.5 font-semibold text-right w-24">Unit.</th>
-                  <th className="py-1.5 font-semibold text-right w-28">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr key={index} className="border-b border-border/50 last:border-0">
-                    <td className="py-2">
-                      {item.description}
-                      <span className="ml-1 text-[10px] uppercase text-muted-foreground">
-                        ({item.kind === "part" ? "peça" : "serviço"})
-                      </span>
-                    </td>
-                    <td className="py-2 text-center tabular-nums">{item.qty}</td>
-                    <td className="py-2 text-right tabular-nums">{brl(item.unit_price)}</td>
-                    <td className="py-2 text-right tabular-nums">{brl((Number(item.qty) || 0) * (Number(item.unit_price) || 0))}</td>
+          <section>
+            <SectionTitle icon={ClipboardList}>Informações do atendimento</SectionTitle>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border border-border p-3">
+                <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Defeito relatado</p>
+                <p className="whitespace-pre-line text-xs leading-relaxed">{order.reported_issue || "Não informado"}</p>
+              </div>
+              <div className="rounded-lg border border-border p-3">
+                <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Diagnóstico técnico</p>
+                <p className="whitespace-pre-line text-xs leading-relaxed">{order.diagnosis || "Não informado"}</p>
+              </div>
+              <div className="rounded-lg border border-border p-3">
+                <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Solução aplicada</p>
+                <p className="whitespace-pre-line text-xs leading-relaxed">{order.solution || "Não informado"}</p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <SectionTitle icon={ClipboardList}>Serviços e peças</SectionTitle>
+            <div className="overflow-hidden rounded-xl border border-border">
+              <table className="w-full text-xs">
+                <thead className="bg-muted/60">
+                  <tr className="text-left text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                    <th className="px-3 py-3">Descrição</th>
+                    <th className="w-14 px-2 py-3 text-center">Qtd.</th>
+                    <th className="w-24 px-2 py-3 text-right">Unitário</th>
+                    <th className="w-24 px-3 py-3 text-right">Subtotal</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                </thead>
+                <tbody>
+                  {items.length === 0 ? (
+                    <tr><td colSpan={4} className="px-3 py-5 text-center text-muted-foreground">Nenhum serviço ou peça lançado nesta ordem.</td></tr>
+                  ) : items.map((item, index) => (
+                    <tr key={index} className="border-t border-border/70">
+                      <td className="px-3 py-3">
+                        <span className="font-medium">{item.description}</span>
+                        <span className="ml-2 text-[9px] uppercase text-muted-foreground">{item.kind === "part" ? "Peça" : "Serviço"}</span>
+                      </td>
+                      <td className="px-2 py-3 text-center tabular-nums">{item.qty}</td>
+                      <td className="px-2 py-3 text-right tabular-nums">{brl(item.unit_price)}</td>
+                      <td className="px-3 py-3 text-right font-semibold tabular-nums">{brl((Number(item.qty) || 0) * (Number(item.unit_price) || 0))}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          <div className="mt-4 ml-auto w-full sm:w-72 space-y-1.5 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Serviços</span>
-              <span className="tabular-nums">{brl(order.services_total)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Peças</span>
-              <span className="tabular-nums">{brl(order.parts_total)}</span>
-            </div>
-            {Number(order.discount) > 0 && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Desconto</span>
-                <span className="tabular-nums">- {brl(order.discount)}</span>
+            <div className="mt-4 flex justify-end">
+              <div className="w-full rounded-xl border border-border bg-muted/20 p-4 sm:w-[290px]">
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between gap-4"><span className="text-muted-foreground">Serviços</span><span className="tabular-nums">{brl(order.services_total)}</span></div>
+                  <div className="flex justify-between gap-4"><span className="text-muted-foreground">Peças</span><span className="tabular-nums">{brl(order.parts_total)}</span></div>
+                  {Number(order.discount) > 0 && <div className="flex justify-between gap-4"><span className="text-muted-foreground">Desconto</span><span className="tabular-nums">− {brl(order.discount)}</span></div>}
+                  {Number(order.surcharge) > 0 && <div className="flex justify-between gap-4"><span className="text-muted-foreground">Acréscimo</span><span className="tabular-nums">+ {brl(order.surcharge)}</span></div>}
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                  <span className="text-xs font-bold uppercase tracking-wider">Total</span>
+                  <span className="font-heading text-xl font-extrabold tabular-nums text-primary">{brl(order.total)}</span>
+                </div>
               </div>
-            )}
-            {Number(order.surcharge) > 0 && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Acréscimo</span>
-                <span className="tabular-nums">{brl(order.surcharge)}</span>
-              </div>
-            )}
-            <div className="flex justify-between pt-2 border-t border-border font-heading font-extrabold text-base">
-              <span>Total</span>
-              <span className="tabular-nums">{brl(order.total)}</span>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section className="py-6">
-          <p className="field-label mb-1">Garantia: {Number(order.warranty_days) > 0 ? Number(order.warranty_days) : Number(company?.warranty_days) > 0 ? Number(company.warranty_days) : 90} dias</p>
-          <p className="field-label mb-1 mt-3">Termos de garantia</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground whitespace-pre-line">
-            {order.warranty_terms || company?.warranty_terms || "Garantia sobre os serviços executados e peças substituídas."}
-          </p>
-        </section>
+          <section className="rounded-xl border border-border p-4">
+            <SectionTitle icon={ShieldCheck}>Garantia e condições</SectionTitle>
+            <p className="text-xs font-bold">Prazo de garantia: {warrantyDays} dias</p>
+            <p className="mt-2 whitespace-pre-line text-[10px] leading-[1.65] text-muted-foreground">{order.warranty_terms || company?.warranty_terms || "Garantia sobre os serviços executados e peças substituídas."}</p>
+          </section>
 
-        <section className="grid sm:grid-cols-2 gap-10 pt-10 pb-6">
-          <div className="text-center">
-            <div className="border-t border-foreground/40 pt-2 text-xs">
-              {order.client_name || "Cliente"}
-              <span className="block text-[10px] text-muted-foreground">Assinatura do cliente</span>
+          <section className="grid gap-10 px-2 pt-7 sm:grid-cols-2 sm:gap-14">
+            <div className="pt-8 text-center">
+              <div className="border-t border-foreground/40 pt-2 text-xs font-semibold">{order.client_name || "Cliente"}</div>
+              <p className="mt-1 text-[10px] text-muted-foreground">Assinatura do cliente</p>
             </div>
-          </div>
-          <div className="text-center">
-            <div className="border-t border-foreground/40 pt-2 text-xs">
-              {order.technician || company?.tech_responsible || "Responsável técnico"}
-              <span className="block text-[10px] text-muted-foreground">Responsável técnico</span>
+            <div className="pt-8 text-center">
+              <div className="border-t border-foreground/40 pt-2 text-xs font-semibold">{order.technician || company?.tech_responsible || "Responsável técnico"}</div>
+              <p className="mt-1 text-[10px] text-muted-foreground">Responsável técnico</p>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
 
-        <footer className="pt-4 border-t border-border text-[10px] text-muted-foreground text-center">
+        <footer className="border-t border-border bg-muted/20 px-6 py-4 text-center text-[9px] leading-relaxed text-muted-foreground sm:px-10 print:bg-white">
           {company?.doc_footer || `${company?.name || ""} · ${company?.phone ? formatPhone(company.phone) : ""}`}
         </footer>
       </article>
+
+      <style>{`
+        @page { size: A4; margin: 12mm; }
+        @media print {
+          html, body { background: #fff !important; }
+          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .no-print { display: none !important; }
+          article { width: 100%; max-width: none !important; }
+          section, header, footer, table, tr { break-inside: avoid; }
+        }
+      `}</style>
     </div>
   );
 }
