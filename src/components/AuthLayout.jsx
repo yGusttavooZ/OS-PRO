@@ -97,30 +97,6 @@ export default function AuthLayout({
                 ))}
               </div>
             </div>
-
-            <div className="auth-floating-row mt-4 grid grid-cols-2 gap-3">
-              <div className="auth-float-card rounded-2xl p-3.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/50">Ordem recente</span>
-                  <span className="rounded-full bg-[hsl(152_72%_50%_/_0.16)] px-2 py-1 text-[9px] font-semibold text-[hsl(152_72%_72%)]">Em andamento</span>
-                </div>
-                <div className="mt-3 flex items-end justify-between">
-                  <div><p className="font-heading text-lg font-extrabold text-white">#OS-0248</p><p className="mt-0.5 text-[10px] text-white/45">Notebook · Manutenção</p></div>
-                  <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/[0.07] text-[hsl(152_72%_68%)]"><ShieldCheck className="h-4 w-4" /></div>
-                </div>
-              </div>
-              <div className="auth-float-card rounded-2xl p-3.5">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/50">Resumo financeiro</span>
-                <p className="mt-3 font-heading text-lg font-extrabold text-white">Controle</p>
-                <div className="mt-2 flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_72%_58%)]" />
-                  <span className="text-[10px] text-white/55">Receitas e despesas</span>
-                </div>
-                <div className="mt-3 flex h-5 items-end gap-1">
-                  <span className="h-2 w-1/6 rounded-t bg-white/20" /><span className="h-3 w-1/6 rounded-t bg-white/25" /><span className="h-4 w-1/6 rounded-t bg-[hsl(152_62%_48%)]" /><span className="h-2.5 w-1/6 rounded-t bg-white/25" /><span className="h-5 w-1/6 rounded-t bg-[hsl(152_62%_55%)]" /><span className="h-4 w-1/6 rounded-t bg-[hsl(172_62%_55%)]" />
-                </div>
-              </div>
-            </div>
           </div>
 
           <div className="relative">
