@@ -45,9 +45,7 @@ export default function Login() {
 
   return (
     <AuthLayout
-      icon={LogIn}
-      title="Acesse seu espaço de trabalho"
-      subtitle="Entre para gerenciar suas ordens de serviço, clientes e sua assistência técnica."
+      cardTitle="Bem-vindo"
       panelTitle="Bem-vindo de volta ao seu painel"
       panelSubtitle="Retome suas ordens de serviço, orçamentos e lançamentos financeiros exatamente de onde parou."
       footer={<>Ainda não tem conta? <Link to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")} className="font-semibold text-primary underline-offset-4 hover:underline">Cadastrar minha empresa</Link></>}
