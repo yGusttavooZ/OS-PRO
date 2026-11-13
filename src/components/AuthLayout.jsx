@@ -47,7 +47,7 @@ export default function AuthLayout({
             </span>
             <div className="leading-tight">
               <p className="font-heading text-[17px] font-extrabold tracking-[-0.02em]">OS PRO</p>
-              <p className="text-[9.5px] uppercase tracking-[0.3em] text-white/40">Assistência técnica</p>
+              <p className="text-[9.5px] uppercase tracking-[0.3em] text-white/40">Gestão de ordem de serviço</p>
             </div>
             <span className="ml-auto hidden items-center gap-1.5 rounded-full bg-white/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/70 ring-1 ring-white/15 xl:inline-flex">
               <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_72%_56%)]" /> Sistema online
