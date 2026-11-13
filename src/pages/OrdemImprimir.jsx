@@ -105,28 +105,24 @@ export default function OrdemImprimir() {
         </header>
 
         <div className="os-two-columns">
-          <section className="os-panel os-inline-panel">
+          <section className="os-panel">
             <h2>Cliente</h2>
-            <div className="os-inline-fields">
-              <p className="os-main-value">{order.client_name || "—"}</p>
-              {order.client_document && <p>Documento: {formatDoc(order.client_document)}</p>}
-              {order.client_phone && <p>Telefone: {formatPhone(order.client_phone)}</p>}
-              {order.client_email && <p>{order.client_email}</p>}
-              {order.client_address && <p>Endereço: {order.client_address}</p>}
-            </div>
+            <p className="os-main-value">{order.client_name || "—"}</p>
+            {order.client_document && <p>Documento: {formatDoc(order.client_document)}</p>}
+            {order.client_phone && <p>Telefone: {formatPhone(order.client_phone)}</p>}
+            {order.client_email && <p>{order.client_email}</p>}
+            {order.client_address && <p>{order.client_address}</p>}
           </section>
 
-          <section className="os-panel os-inline-panel">
+          <section className="os-panel">
             <h2>Equipamento</h2>
-            <div className="os-inline-fields">
-              <p className="os-main-value">{order.equipment_name || "—"}</p>
-              {(order.equipment_brand || order.equipment_model) && (
-                <p>{[order.equipment_brand, order.equipment_model].filter(Boolean).join(" · ")}</p>
-              )}
-              {order.equipment_serial && <p>Série: {order.equipment_serial}</p>}
-              {order.equipment_accessories && <p>Acessórios: {order.equipment_accessories}</p>}
-              {order.equipment_condition && <p>Estado: {order.equipment_condition}</p>}
-            </div>
+            <p className="os-main-value">{order.equipment_name || "—"}</p>
+            {(order.equipment_brand || order.equipment_model) && (
+              <p>{[order.equipment_brand, order.equipment_model].filter(Boolean).join(" · ")}</p>
+            )}
+            {order.equipment_serial && <p>Série: {order.equipment_serial}</p>}
+            {order.equipment_accessories && <p>Acessórios: {order.equipment_accessories}</p>}
+            {order.equipment_condition && <p>Estado: {order.equipment_condition}</p>}
           </section>
         </div>
 
@@ -243,13 +239,8 @@ export default function OrdemImprimir() {
         .os-number > strong { color: #172033; font-size: 23px; line-height: 1.1; letter-spacing: -.04em; }
         .os-number > span:not(.os-kicker):not(.os-status) { color: #667085; font-size: 10px; }
         .os-status { margin-top: 3px; padding: 3px 9px; border-radius: 99px; background: hsl(var(--primary) / .10); color: hsl(var(--primary)); font-size: 9px; font-weight: 700; }
-        .os-two-columns { display: grid; grid-template-columns: 1fr; gap: 7px; padding: 12px 0; border-bottom: 1px solid #e5e9f0; }
-        .os-panel { min-width: 0; padding: 8px 11px; border: 1px solid #e5e9f0; border-radius: 8px; background: #fafbfc; }
-        .os-inline-panel { display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: baseline; gap: 10px; }
-        .os-inline-panel h2 { margin: 0; }
-        .os-inline-fields { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 15px; row-gap: 3px; min-width: 0; }
-        .os-inline-fields p { margin: 0; }
-        .os-inline-fields .os-main-value { margin: 0; }
+        .os-two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid #e5e9f0; }
+        .os-panel { min-width: 0; padding: 11px 13px; border: 1px solid #e5e9f0; border-radius: 8px; background: #fafbfc; }
         .os-sheet h2 { margin: 0 0 6px; color: hsl(var(--primary)); font-size: 9px; line-height: 1.25; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; }
         .os-panel p { margin: 2px 0; color: #596579; font-size: 10px; overflow-wrap: anywhere; }
         .os-panel .os-main-value { margin-bottom: 4px; color: #202938; font-size: 12px; font-weight: 700; }
@@ -289,10 +280,8 @@ export default function OrdemImprimir() {
           .os-logo { width: 40px; height: 40px; flex-basis: 40px; }
           .os-company-info h1 { font-size: 14px; }
           .os-number > strong { font-size: 19px; }
-          .os-two-columns { gap: 7px; }
+          .os-two-columns { gap: 8px; }
           .os-panel { padding: 9px; }
-          .os-inline-panel { grid-template-columns: 72px minmax(0, 1fr); gap: 8px; }
-          .os-inline-fields { column-gap: 9px; }
           .os-technical { gap: 9px; }
           .os-bottom-grid { grid-template-columns: 1fr; gap: 12px; }
         }
@@ -318,12 +307,8 @@ export default function OrdemImprimir() {
           .os-number > strong { font-size: 22pt !important; }
           .os-kicker { font-size: 8pt !important; }
           .os-status { font-size: 8pt !important; padding: 1.5mm 3mm !important; }
-          .os-two-columns { gap: 2mm !important; padding: 3mm 0 !important; }
-          .os-panel { padding: 2.5mm 3mm !important; }
-          .os-inline-panel { grid-template-columns: 22mm minmax(0, 1fr) !important; gap: 3mm !important; }
-          .os-inline-fields { column-gap: 4mm !important; row-gap: 1mm !important; }
-          .os-inline-fields p { font-size: 8.5pt !important; line-height: 1.25 !important; }
-          .os-inline-fields .os-main-value { font-size: 9.5pt !important; }
+          .os-two-columns { gap: 4mm !important; padding: 5mm 0 !important; }
+          .os-panel { padding: 4mm !important; }
           .os-sheet h2 { margin-bottom: 2mm !important; font-size: 8pt !important; }
           .os-panel p, .os-tech-item p { font-size: 9pt !important; line-height: 1.35 !important; }
           .os-panel .os-main-value { font-size: 10.5pt !important; }
