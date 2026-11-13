@@ -261,17 +261,17 @@ export default function OrdemImprimir() {
         .os-items-table td small { display: inline-block; margin-left: 6px; color: #8992a2; font-size: 8px; text-transform: uppercase; }
         .os-center { text-align: center !important; white-space: nowrap; }
         .os-right { text-align: right !important; white-space: nowrap; }
-        .os-bottom-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(180px, .8fr); gap: 20px; align-items: start; padding: 13px 0 12px; margin-top: auto; }
+        .os-bottom-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-items: start; padding: 13px 0 12px; margin-top: auto; }
         .os-warranty { min-width: 0; }
         .os-warranty-title { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; }
         .os-warranty-title h2 { margin: 0; }
         .os-warranty-title strong { padding: 2px 7px; border-radius: 5px; background: #f0f3f8; color: #475467; font-size: 9px; }
         .os-warranty p { margin: 0; color: #667085; font-size: 9px; line-height: 1.45; white-space: pre-line; overflow-wrap: anywhere; }
-        .os-totals { display: grid; gap: 4px; }
-        .os-totals > div { display: flex; justify-content: space-between; gap: 12px; color: #667085; font-size: 10px; }
+        .os-totals { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; width: 100%; }
+        .os-totals > div { display: inline-flex; align-items: baseline; justify-content: flex-start; gap: 4px; color: #667085; font-size: 10px; white-space: nowrap; }
         .os-totals strong { color: #344054; font-weight: 600; }
-        .os-totals .os-grand-total { margin-top: 4px; padding: 8px 10px; border-radius: 7px; background: hsl(var(--primary) / .09); color: #172033; font-size: 12px; font-weight: 800; }
-        .os-totals .os-grand-total strong { color: hsl(var(--primary)); font-size: 15px; }
+        .os-totals .os-grand-total { margin: 0; padding: 5px 9px; border-radius: 6px; background: hsl(var(--primary) / .09); color: #172033; font-size: 11px; font-weight: 800; }
+        .os-totals .os-grand-total strong { color: hsl(var(--primary)); font-size: 13px; }
         .os-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 9mm 12px 5mm; margin-top: 0; }
         .os-signatures > div { display: flex; flex-direction: column; align-items: center; min-width: 0; padding-top: 7px; border-top: 1px solid #aeb6c2; color: #7a8494; font-size: 9px; text-align: center; }
         .os-signature-name { max-width: 100%; margin-bottom: 2px; color: #344054; font-size: 10px; font-weight: 700; overflow-wrap: anywhere; }
@@ -286,6 +286,7 @@ export default function OrdemImprimir() {
           .os-panel { padding: 9px; }
           .os-technical { gap: 0; }
           .os-bottom-grid { grid-template-columns: 1fr; gap: 12px; }
+          .os-totals { justify-content: flex-start; }
         }
         @page { size: A4 portrait; margin: 9mm; }
         @media print {
@@ -326,14 +327,14 @@ export default function OrdemImprimir() {
           .os-items-table th { padding: 2.5mm 3mm !important; font-size: 7.5pt !important; }
           .os-items-table td { padding: 2.5mm 3mm !important; }
           .os-items-table td small { font-size: 7.5pt !important; }
-          .os-bottom-grid { grid-template-columns: minmax(0, 1.35fr) minmax(48mm, .8fr) !important; gap: 6mm !important; padding: 5mm 0 !important; margin-top: auto !important; }
+           .os-bottom-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 3mm !important; padding: 5mm 0 !important; margin-top: auto !important; }
           .os-warranty-title { margin-bottom: 2mm !important; }
           .os-warranty-title strong { font-size: 8pt !important; padding: 1mm 2mm !important; }
           .os-warranty p { font-size: 8.5pt !important; line-height: 1.4 !important; }
-          .os-totals { gap: 1.8mm !important; }
-          .os-totals > div { font-size: 9pt !important; }
-          .os-totals .os-grand-total { margin-top: 2mm !important; padding: 3mm 3.5mm !important; font-size: 10pt !important; }
-          .os-totals .os-grand-total strong { font-size: 13pt !important; }
+           .os-totals { justify-content: space-between !important; gap: 2mm 4mm !important; }
+          .os-totals > div { font-size: 8.5pt !important; }
+          .os-totals .os-grand-total { margin: 0 !important; padding: 2mm 3mm !important; font-size: 9.5pt !important; }
+          .os-totals .os-grand-total strong { font-size: 11pt !important; }
           .os-signatures { gap: 16mm !important; padding: 9mm 4mm 5mm !important; margin-top: 0 !important; }
           .os-signatures > div { padding-top: 2.5mm !important; font-size: 8pt !important; }
           .os-signature-name { font-size: 9pt !important; }
