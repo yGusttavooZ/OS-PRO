@@ -4,7 +4,7 @@ import { loginWithEmail, loginWithGoogle } from "@/lib/authFirebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, LockKeyhole, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { safeReturnTo } from "@/lib/authReturnTo";
@@ -45,11 +45,23 @@ export default function Login() {
 
   return (
     <AuthLayout
-      cardTitle="Bem-vindo"
+      cardTitle={undefined}
       panelTitle="Bem-vindo de volta ao seu painel"
       panelSubtitle="Retome suas ordens de serviço, orçamentos e lançamentos financeiros exatamente de onde parou."
       footer={<>Ainda não tem conta? <Link to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")} className="font-semibold text-primary underline-offset-4 hover:underline">Cadastrar minha empresa</Link></>}
     >
+      <div className="mb-5">
+        <div className="flex items-center gap-3.5">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/15 via-primary/[0.08] to-chart-3/10 text-primary shadow-inner shadow-primary/10">
+            <LockKeyhole className="h-5 w-5" strokeWidth={1.8} />
+          </span>
+          <div className="min-w-0">
+            <h1 className="font-heading text-[22px] font-extrabold tracking-[-0.03em] text-foreground sm:text-[24px]">Bem-vindo de volta</h1>
+            <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">Acesse sua conta para continuar.</p>
+          </div>
+        </div>
+        <div className="mt-5 h-px bg-gradient-to-r from-primary/25 via-border to-transparent" />
+      </div>
       {error && <div className="mb-4 rounded-xl border border-destructive/20 bg-destructive/[0.07] px-3.5 py-2.5 text-[12.5px] font-medium text-destructive">{error}</div>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2"><Label htmlFor="email" className="text-[12.5px] font-semibold text-foreground/80">E-mail</Label><div className="relative"><Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input id="email" type="email" autoComplete="email" autoFocus placeholder="voce@empresa.com.br" value={email} onChange={(e) => setEmail(e.target.value)} className={INPUT_CLASS} required /></div></div>
