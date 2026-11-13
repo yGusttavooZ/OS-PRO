@@ -30,6 +30,7 @@ export default function AuthLayout({
   panelTitle = "Gestão completa da sua assistência técnica",
   panelSubtitle = "Ordens de serviço, orçamentos, clientes e financeiro em um só lugar — com os dados da sua empresa totalmente isolados.",
   compact = false,
+  cardTitle,
 }) {
   return (
     <div className="min-h-screen bg-background">
@@ -130,7 +131,7 @@ export default function AuthLayout({
               <span className="font-heading text-lg font-extrabold tracking-[-0.02em]">OS PRO</span>
             </div>
 
-            <div className={`${compact ? "mb-4 lg:mb-5" : "mb-7"} text-center`}>
+            {(title || subtitle) && <div className={`${compact ? "mb-4 lg:mb-5" : "mb-7"} text-center`}>
               <span className={`${compact ? "mb-3 h-12 w-12 rounded-2xl" : "mb-5 h-14 w-14 rounded-2xl"} inline-grid place-items-center border border-primary/15 bg-gradient-to-br from-accent to-card text-primary shadow-[0_10px_30px_-18px_hsl(var(--primary)/0.6)]`}>
                 <Icon className={compact ? "h-[22px] w-[22px]" : "h-[25px] w-[25px]"} aria-hidden="true" />
               </span>
@@ -138,10 +139,11 @@ export default function AuthLayout({
                 {title}
               </h1>
               {subtitle && <p className="mx-auto mt-2 max-w-[330px] text-[13.5px] leading-relaxed text-muted-foreground">{subtitle}</p>}
-            </div>
+            </div>}
 
             <div className={`auth-card relative overflow-hidden rounded-[26px] border border-border/70 bg-card ${compact ? "p-5 sm:p-6 lg:p-6" : "p-6 sm:p-8"}`}>
               <span className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" aria-hidden="true" />
+              {cardTitle && <h1 className="mb-5 text-center font-heading text-[27px] font-extrabold tracking-[-0.03em] text-foreground sm:text-[30px]">{cardTitle}</h1>}
               {children}
             </div>
 
