@@ -3,7 +3,8 @@ import {
   limit as firestoreLimit, orderBy, query, runTransaction, serverTimestamp,
   updateDoc, where,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export const ORDER_STATUSES = [
   "Orçamento", "Aguardando aprovação", "Aprovado", "Aguardando equipamento",
@@ -56,6 +57,17 @@ const COLLECTIONS = {
 const READ_TTL = 12000;
 const readCache = new Map();
 const inFlight = new Map();
+let cacheUserId = auth.currentUser?.uid || null;
+
+// Nunca reutilize dados lidos por uma conta após a troca de usuário.
+onAuthStateChanged(auth, (user) => {
+  const nextUserId = user?.uid || null;
+  if (nextUserId !== cacheUserId) {
+    cacheUserId = nextUserId;
+    readCache.clear();
+    inFlight.clear();
+  }
+});
 
 export function invalidateTenantCache(...entityNames) {
   for (const key of [...readCache.keys()]) {
@@ -88,7 +100,8 @@ function matchesLocal(value, condition) {
 }
 
 export async function paged(entityName, filters = {}, options = {}) {
-  const cacheKey = `${entityName}::${JSON.stringify(filters || {})}::${JSON.stringify(options || {})}`;
+  const userId = auth.currentUser?.uid || "anonymous";
+  const cacheKey = `${userId}::${entityName}::${JSON.stringify(filters || {})}::${JSON.stringify(options || {})}`;
   const cached = readCache.get(cacheKey);
   if (cached && Date.now() - cached.at < READ_TTL) return cached.data;
   if (inFlight.has(cacheKey)) return inFlight.get(cacheKey);
