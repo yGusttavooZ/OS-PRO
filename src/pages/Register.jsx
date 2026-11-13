@@ -66,10 +66,6 @@ export default function Register() {
   }
 
   return <AuthLayout compact={!employeeInvite} icon={employeeInvite ? UserRoundPlus : Building2} title={employeeInvite ? "Criar acesso de funcionário" : "Cadastre sua empresa"} subtitle={employeeInvite ? "Crie sua conta para entrar na empresa que enviou o convite." : "Crie sua conta e configure os dados iniciais da assistência técnica"} panelTitle={employeeInvite ? "Seu acesso à equipe começa aqui" : "Comece a usar o OS PRO em poucos minutos"} panelSubtitle={employeeInvite ? "Crie seu acesso individual. Após confirmar o e-mail, você poderá aceitar o convite e entrar na empresa." : "Crie a conta da sua empresa, informe os dados que aparecem nos documentos e comece no período de teste de 14 dias."} footer={<>Já tem uma conta? <Link to={loginPath} className="font-semibold text-primary underline-offset-4 hover:underline">Entrar</Link></>}>
-    {!employeeInvite && <>
-      <Button variant="outline" className="mb-4 h-12 w-full rounded-xl border-border/80 bg-card text-[13.5px] font-semibold shadow-sm transition-all hover:border-border hover:bg-muted/50" onClick={handleGoogle}><GoogleIcon className="mr-2.5 w-[18px] h-[18px]" /> Continuar com Google</Button>
-      <div className="relative mb-4"><div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/80" /></div><div className="relative flex justify-center"><span className="bg-card px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">ou</span></div></div>
-    </>}
     {error && <div className="mb-4 rounded-xl border border-destructive/20 bg-destructive/[0.07] px-3.5 py-2.5 text-[12.5px] font-medium text-destructive">{error}{employeeInvite && error === "Este e-mail já possui uma conta." && <Link to={loginPath} className="mt-2 block font-semibold underline">Entrar com a conta existente</Link>}</div>}
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="space-y-1.5"><Label htmlFor="fullName" className="text-[12.5px] font-semibold text-foreground/80">Nome completo</Label><div className="relative"><Input id="fullName" type="text" autoComplete="name" placeholder="Seu nome completo" value={fullName} onChange={(e) => setFullName(e.target.value)} className={INPUT_CLASS.replace("pl-10", "pl-4")} required /></div></div>
@@ -78,6 +74,10 @@ export default function Register() {
       <div className="space-y-1.5"><Label htmlFor="confirm" className="text-[12.5px] font-semibold text-foreground/80">Confirmar senha</Label><div className="relative"><Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input id="confirm" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={INPUT_CLASS} required /></div></div>
       <Button type="submit" className={PRIMARY_BUTTON} disabled={loading}>{loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Criando conta...</> : employeeInvite ? "Criar meu acesso" : "Criar conta e cadastrar empresa"}</Button>
     </form>
+    {!employeeInvite && <>
+      <div className="relative my-4"><div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/80" /></div><div className="relative flex justify-center"><span className="bg-card px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">ou</span></div></div>
+      <Button variant="outline" className="h-12 w-full rounded-xl border-border/80 bg-card text-[13.5px] font-semibold shadow-sm transition-all hover:border-border hover:bg-muted/50" onClick={handleGoogle}><GoogleIcon className="mr-2.5 w-[18px] h-[18px]" /> Continuar com Google</Button>
+    </>}
     <div className="mt-4 flex items-start gap-3 rounded-2xl border border-primary/10 bg-gradient-to-r from-primary/[0.045] to-chart-3/[0.04] px-4 py-3.5 shadow-sm"><ShieldCheck className="mt-px h-4 w-4 shrink-0 text-primary" /><p className="text-[11.5px] leading-relaxed text-muted-foreground">{employeeInvite ? "Depois de confirmar o e-mail, entre com esta conta para aceitar o convite. Você não precisa cadastrar uma empresa." : "Depois de confirmar o e-mail você informa os dados da empresa e entra direto no sistema."}</p></div>
   </AuthLayout>;
 }
