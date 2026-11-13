@@ -188,13 +188,37 @@ export default function Layout() {
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
           </div>
 
-          <button
-            className="relative hidden h-9 w-9 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:grid"
-            aria-label="Notificações"
-          >
-            <Bell className="h-[18px] w-[18px]" />
-            <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[hsl(38_92%_55%)] ring-2 ring-background" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="relative hidden h-9 w-9 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:grid"
+                aria-label="Abrir notificações"
+              >
+                <Bell className="h-[18px] w-[18px]" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={10} className="w-[min(360px,calc(100vw-2rem))] rounded-2xl border-border/80 p-0 shadow-xl">
+              <div className="flex items-center justify-between px-4 py-3.5">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Notificações</p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">Central de avisos do OS PRO</p>
+                </div>
+                <span className="rounded-full border border-border/70 bg-muted/60 px-2 py-1 text-[10px] font-medium text-muted-foreground">
+                  Em breve
+                </span>
+              </div>
+              <DropdownMenuSeparator />
+              <div className="flex flex-col items-center px-6 py-8 text-center">
+                <span className="mb-3 grid h-11 w-11 place-items-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
+                  <Bell className="h-5 w-5" />
+                </span>
+                <p className="text-[13px] font-semibold text-foreground">Nenhuma notificação por enquanto</p>
+                <p className="mt-1.5 max-w-[250px] text-[11.5px] leading-relaxed text-muted-foreground">
+                  A central está pronta. Os avisos automáticos do sistema serão conectados em uma próxima etapa.
+                </p>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
