@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, ShieldCheck, Sparkles, ArrowUpRight, Cog, Monitor, Wrench } from "lucide-react";
+import { Check, ShieldCheck, Sparkles, ArrowUpRight } from "lucide-react";
 
 const BENEFITS = [
   "Ordens de serviço numeradas",
@@ -20,16 +20,6 @@ const PREVIEW_ROWS = [
   { label: "Entregues", value: 12, width: "92%" },
 ];
 
-function BrandMark({ compact = false }) {
-  return (
-    <span className={`brand-mark relative grid shrink-0 place-items-center ${compact ? "h-11 w-11" : "h-14 w-14"}`} aria-hidden="true">
-      <Cog className="absolute inset-0 h-full w-full text-[hsl(145_82%_55%)]" strokeWidth={1.8} />
-      <Monitor className={`relative ${compact ? "h-6 w-6" : "h-8 w-8"} text-white`} strokeWidth={2.2} />
-      <Wrench className="absolute right-[5%] top-[3%] h-[38%] w-[38%] -rotate-12 text-[hsl(145_82%_55%)]" strokeWidth={2.8} />
-    </span>
-  );
-}
-
 export default function AuthLayout({
   icon: Icon,
   title,
@@ -40,7 +30,7 @@ export default function AuthLayout({
   panelSubtitle = "Ordens de serviço, orçamentos, clientes e financeiro em um só lugar — com os dados da sua empresa totalmente isolados.",
 }) {
   return (
-    <div className="auth-screen min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background">
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
         <aside className="auth-panel relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-14">
           <div className="auth-grid pointer-events-none absolute inset-0" aria-hidden="true" />
@@ -51,7 +41,9 @@ export default function AuthLayout({
           <div className="pointer-events-none absolute -bottom-28 -left-24 h-[20rem] w-[20rem] rounded-full bg-white/[0.06] blur-[110px]" aria-hidden="true" />
 
           <div className="relative flex items-center gap-3">
-            <BrandMark compact />
+            <span className="relative grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-white/30 to-white/5 font-heading text-[12px] font-extrabold tracking-[0.12em] ring-1 ring-white/25 backdrop-blur">
+              OS
+            </span>
             <div className="leading-tight">
               <p className="font-heading text-[17px] font-extrabold tracking-[-0.02em]">OS PRO</p>
               <p className="text-[9.5px] uppercase tracking-[0.3em] text-white/40">Assistência técnica</p>
@@ -122,7 +114,7 @@ export default function AuthLayout({
           </div>
         </aside>
 
-        <main className="auth-main relative flex items-center justify-center px-5 py-10 sm:px-8">
+        <main className="relative flex items-center justify-center px-5 py-10 sm:px-8">
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
             <div className="absolute -top-28 right-0 h-80 w-80 rounded-full bg-primary/[0.08] blur-[110px]" />
             <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-chart-3/[0.09] blur-[110px]" />
@@ -130,12 +122,16 @@ export default function AuthLayout({
 
           <div className="relative w-full max-w-[430px] animate-rise">
             <div className="mb-8 flex items-center justify-center gap-2.5 lg:hidden">
-              <BrandMark compact />
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-chart-3 text-[11px] font-extrabold tracking-[0.1em] text-primary-foreground shadow-sm shadow-primary/25">
+                OS
+              </span>
               <span className="font-heading text-lg font-extrabold tracking-[-0.02em]">OS PRO</span>
             </div>
 
             <div className="mb-7 text-center">
-              <div className="mb-4 flex justify-center"><BrandMark /></div>
+              <span className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl border border-primary/15 bg-gradient-to-br from-accent to-card text-primary shadow-[0_10px_30px_-18px_hsl(var(--primary)/0.6)]">
+                <Icon className="h-[25px] w-[25px]" aria-hidden="true" />
+              </span>
               <h1 className="font-heading text-[27px] font-extrabold tracking-[-0.03em] text-foreground sm:text-[31px]">
                 {title}
               </h1>
