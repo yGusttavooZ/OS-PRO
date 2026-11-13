@@ -127,33 +127,11 @@
   }
 
   /* ---------- Auth / marketing panel ---------- */
-  .auth-page {
-    --background: 222 35% 7%;
-    --foreground: 210 25% 96%;
-    --card: 222 30% 10%;
-    --card-foreground: 210 25% 96%;
-    --popover: 222 30% 10%;
-    --popover-foreground: 210 25% 96%;
-    --primary: 213 92% 62%;
-    --primary-foreground: 222 45% 8%;
-    --secondary: 220 24% 15%;
-    --secondary-foreground: 210 25% 96%;
-    --muted: 220 24% 14%;
-    --muted-foreground: 215 13% 67%;
-    --accent: 215 28% 17%;
-    --accent-foreground: 195 95% 78%;
-    --border: 218 20% 22%;
-    --input: 218 20% 22%;
-    --ring: 195 95% 62%;
-    --chart-2: 195 95% 62%;
-    --chart-3: 225 90% 66%;
-  }
-
   .auth-panel {
     background:
-      radial-gradient(115% 85% at 8% 0%, hsl(215 75% 24% / 0.72) 0%, transparent 56%),
-      radial-gradient(95% 75% at 100% 100%, hsl(190 80% 24% / 0.3) 0%, transparent 62%),
-      linear-gradient(155deg, hsl(224 42% 11%) 0%, hsl(225 44% 7%) 58%, hsl(222 48% 5%) 100%);
+      radial-gradient(115% 85% at 8% 0%, hsl(158 66% 26% / 0.9) 0%, transparent 55%),
+      radial-gradient(95% 75% at 100% 100%, hsl(174 72% 24% / 0.55) 0%, transparent 62%),
+      linear-gradient(168deg, hsl(166 44% 11%) 0%, hsl(168 46% 7.5%) 52%, hsl(168 40% 5.5%) 100%);
   }
 
   .auth-grid {
@@ -166,12 +144,9 @@
   }
 
   .auth-card {
-    background: linear-gradient(145deg, hsl(222 30% 11% / 0.98), hsl(222 32% 9% / 0.98));
-    border-color: hsl(218 24% 25% / 0.9);
     box-shadow:
-      0 1px 2px hsl(0 0% 0% / 0.25),
-      0 40px 90px -48px hsl(215 70% 3% / 0.9),
-      0 0 0 1px hsl(210 50% 70% / 0.025);
+      0 1px 2px hsl(168 40% 10% / 0.04),
+      0 40px 90px -48px hsl(168 40% 10% / 0.5);
   }
 
   /* ---------- App shell ---------- */
