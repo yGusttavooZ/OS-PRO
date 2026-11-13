@@ -41,8 +41,8 @@ export default function AuthLayout({
           <div className="pointer-events-none absolute -bottom-28 -left-24 h-[20rem] w-[20rem] rounded-full bg-white/[0.06] blur-[110px]" aria-hidden="true" />
 
           <div className="relative flex items-center gap-3">
-            <span className="relative grid h-11 w-11 place-items-center">
-              <img src="/ospro-mark.svg" alt="OS-PRO" className="h-12 w-12 object-contain" />
+            <span className="relative grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-white/30 to-white/5 font-heading text-[12px] font-extrabold tracking-[0.12em] ring-1 ring-white/25 backdrop-blur">
+              OS
             </span>
             <div className="leading-tight">
               <p className="font-heading text-[17px] font-extrabold tracking-[-0.02em]">OS PRO</p>
@@ -122,8 +122,8 @@ export default function AuthLayout({
 
           <div className="relative w-full max-w-[430px] animate-rise">
             <div className="mb-8 flex items-center justify-center gap-2.5 lg:hidden">
-              <span className="grid h-10 w-10 place-items-center">
-                <img src="/ospro-mark.svg" alt="OS-PRO" className="h-10 w-10 object-contain" />
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-chart-3 text-[11px] font-extrabold tracking-[0.1em] text-primary-foreground shadow-sm shadow-primary/25">
+                OS
               </span>
               <span className="font-heading text-lg font-extrabold tracking-[-0.02em]">OS PRO</span>
             </div>
