@@ -232,7 +232,17 @@ service cloud.firestore {
             && (
               role(resource.data.company_id) == 'admin'
               || (role(resource.data.company_id) == 'attendant'
-                && request.resource.data.status == resource.data.status)
+                && request.resource.data.status == resource.data.status
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                  'client_id', 'client_name', 'client_document', 'client_phone',
+                  'client_email', 'client_address', 'equipment_id', 'equipment_name',
+                  'equipment_brand', 'equipment_model', 'equipment_serial',
+                  'equipment_accessories', 'equipment_condition', 'reported_issue',
+                  'diagnosis', 'solution', 'items', 'services_total', 'parts_total',
+                  'discount', 'surcharge', 'total', 'technician', 'notes',
+                  'warranty_terms', 'warranty_days', 'search_key',
+                  'updated_date', 'updated_at'
+                ]))
               || (role(resource.data.company_id) == 'technician'
                 && request.resource.data.status in [
                   'Orçamento', 'Aguardando aprovação', 'Aprovado',
