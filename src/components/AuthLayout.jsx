@@ -9,9 +9,9 @@ const BENEFITS = [
 ];
 
 const METRICS = [
-  { value: "OS", label: "organizadas" },
+  { value: "OS", label: "numeradas" },
   { value: "PDF", label: "com sua marca" },
-  { value: "Gestão", label: "em um só lugar" },
+  { value: "14 dias", label: "de teste grátis" },
 ];
 
 const PREVIEW_ROWS = [
@@ -30,12 +30,12 @@ export default function AuthLayout({
   panelSubtitle = "Ordens de serviço, orçamentos, clientes e financeiro em um só lugar — com os dados da sua empresa totalmente isolados.",
 }) {
   return (
-    <div className="auth-page min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
         <aside className="auth-panel relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-14">
           <div className="auth-grid pointer-events-none absolute inset-0" aria-hidden="true" />
           <div
-            className="animate-float pointer-events-none absolute -right-24 top-24 h-[22rem] w-[22rem] rounded-full bg-[hsl(213_90%_58%_/_0.2)] blur-[110px]"
+            className="animate-float pointer-events-none absolute -right-24 top-24 h-[22rem] w-[22rem] rounded-full bg-[hsl(152_70%_45%_/_0.14)] blur-[110px]"
             aria-hidden="true"
           />
           <div className="pointer-events-none absolute -bottom-28 -left-24 h-[20rem] w-[20rem] rounded-full bg-white/[0.06] blur-[110px]" aria-hidden="true" />
@@ -49,7 +49,7 @@ export default function AuthLayout({
               <p className="text-[9.5px] uppercase tracking-[0.3em] text-white/40">Assistência técnica</p>
             </div>
             <span className="ml-auto hidden items-center gap-1.5 rounded-full bg-white/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/70 ring-1 ring-white/15 xl:inline-flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-[hsl(190_95%_60%)]" /> Sistema online
+              <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_72%_56%)]" /> Sistema online
             </span>
           </div>
 
@@ -65,7 +65,7 @@ export default function AuthLayout({
             <ul className="mt-8 grid gap-x-6 gap-y-3 sm:grid-cols-2">
               {BENEFITS.map((item) => (
                 <li key={item} className="flex items-start gap-2.5 text-[12.5px] leading-snug text-white/80">
-                  <span className="mt-px grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[hsl(210_90%_58%_/_0.2)] text-[hsl(195_95%_72%)] ring-1 ring-white/10">
+                  <span className="mt-px grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[hsl(152_68%_50%_/_0.18)] text-[hsl(152_72%_72%)] ring-1 ring-white/10">
                     <Check className="h-[10px] w-[10px]" strokeWidth={3} />
                   </span>
                   {item}
@@ -75,9 +75,9 @@ export default function AuthLayout({
 
             <div className="mt-9 rounded-2xl bg-white/[0.05] p-4 ring-1 ring-white/[0.09] backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">Prévia do painel</p>
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[hsl(195_95%_72%)]">
-                  demonstração <ArrowUpRight className="h-3 w-3" />
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">Visão da operação</p>
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[hsl(152_72%_72%)]">
+                  ao vivo <ArrowUpRight className="h-3 w-3" />
                 </span>
               </div>
               <div className="mt-4 space-y-3">
@@ -89,7 +89,7 @@ export default function AuthLayout({
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-[hsl(215_90%_58%)] to-[hsl(190_95%_62%)]"
+                        className="h-full rounded-full bg-gradient-to-r from-[hsl(152_72%_50%)] to-[hsl(174_72%_56%)]"
                         style={{ width: row.width }}
                       />
                     </div>
