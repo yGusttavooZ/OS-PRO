@@ -245,8 +245,8 @@ export default function OrdemImprimir() {
         .os-panel p { margin: 2px 0; color: #596579; font-size: 10px; overflow-wrap: anywhere; }
         .os-panel .os-main-value { margin-bottom: 4px; color: #202938; font-size: 12px; font-weight: 700; }
         .os-technical { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 13px 2px; border-bottom: 1px solid #e5e9f0; }
-        .os-tech-item { min-width: 0; }
-        .os-tech-item p { margin: 0; color: #344054; font-size: 10px; white-space: pre-line; overflow-wrap: anywhere; }
+        .os-tech-item { min-width: 0; padding: 10px 11px; border: 1px solid #e5e9f0; border-radius: 7px; background: #fafbfc; min-height: 76px; }
+        .os-tech-item p { margin: 0; color: #344054; font-size: 10px; line-height: 1.4; white-space: pre-line; overflow-wrap: anywhere; }
         .os-items-section { padding: 13px 0; border-bottom: 1px solid #e5e9f0; }
         .os-section-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
         .os-section-heading h2 { margin: 0; }
@@ -259,7 +259,7 @@ export default function OrdemImprimir() {
         .os-items-table td small { display: inline-block; margin-left: 6px; color: #8992a2; font-size: 8px; text-transform: uppercase; }
         .os-center { text-align: center !important; white-space: nowrap; }
         .os-right { text-align: right !important; white-space: nowrap; }
-        .os-bottom-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(180px, .8fr); gap: 20px; align-items: start; padding: 13px 0 12px; }
+        .os-bottom-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(180px, .8fr); gap: 20px; align-items: start; padding: 13px 0 12px; margin-top: auto; }
         .os-warranty { min-width: 0; }
         .os-warranty-title { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; }
         .os-warranty-title h2 { margin: 0; }
@@ -270,7 +270,7 @@ export default function OrdemImprimir() {
         .os-totals strong { color: #344054; font-weight: 600; }
         .os-totals .os-grand-total { margin-top: 4px; padding: 8px 10px; border-radius: 7px; background: hsl(var(--primary) / .09); color: #172033; font-size: 12px; font-weight: 800; }
         .os-totals .os-grand-total strong { color: hsl(var(--primary)); font-size: 15px; }
-        .os-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 17px 12px 12px; }
+        .os-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 9mm 12px 5mm; margin-top: 0; }
         .os-signatures > div { display: flex; flex-direction: column; align-items: center; min-width: 0; padding-top: 7px; border-top: 1px solid #aeb6c2; color: #7a8494; font-size: 9px; text-align: center; }
         .os-signature-name { max-width: 100%; margin-bottom: 2px; color: #344054; font-size: 10px; font-weight: 700; overflow-wrap: anywhere; }
         .os-footer { margin-top: 2px; padding-top: 8px; border-top: 1px solid #e5e9f0; color: #8992a2; font-size: 9px; text-align: center; overflow-wrap: anywhere; }
@@ -313,6 +313,8 @@ export default function OrdemImprimir() {
           .os-panel p, .os-tech-item p { font-size: 9pt !important; line-height: 1.35 !important; }
           .os-panel .os-main-value { font-size: 10.5pt !important; }
           .os-technical { gap: 5mm !important; padding: 5mm 1mm !important; }
+          .os-tech-item { min-height: 19mm !important; padding: 2.5mm 3mm !important; }
+          .os-tech-item p { font-size: 9pt !important; line-height: 1.35 !important; }
           .os-items-section { padding: 5mm 0 !important; }
           .os-section-heading { margin-bottom: 2.5mm !important; }
           .os-empty-items { padding: 3mm 4mm !important; font-size: 9pt !important; }
@@ -320,7 +322,7 @@ export default function OrdemImprimir() {
           .os-items-table th { padding: 2.5mm 3mm !important; font-size: 7.5pt !important; }
           .os-items-table td { padding: 2.5mm 3mm !important; }
           .os-items-table td small { font-size: 7.5pt !important; }
-          .os-bottom-grid { grid-template-columns: minmax(0, 1.35fr) minmax(48mm, .8fr) !important; gap: 6mm !important; padding: 5mm 0 !important; }
+          .os-bottom-grid { grid-template-columns: minmax(0, 1.35fr) minmax(48mm, .8fr) !important; gap: 6mm !important; padding: 5mm 0 !important; margin-top: auto !important; }
           .os-warranty-title { margin-bottom: 2mm !important; }
           .os-warranty-title strong { font-size: 8pt !important; padding: 1mm 2mm !important; }
           .os-warranty p { font-size: 8.5pt !important; line-height: 1.4 !important; }
@@ -328,7 +330,7 @@ export default function OrdemImprimir() {
           .os-totals > div { font-size: 9pt !important; }
           .os-totals .os-grand-total { margin-top: 2mm !important; padding: 3mm 3.5mm !important; font-size: 10pt !important; }
           .os-totals .os-grand-total strong { font-size: 13pt !important; }
-          .os-signatures { gap: 16mm !important; padding: 8mm 4mm 4mm !important; margin-top: auto !important; }
+          .os-signatures { gap: 16mm !important; padding: 9mm 4mm 5mm !important; margin-top: 0 !important; }
           .os-signatures > div { padding-top: 2.5mm !important; font-size: 8pt !important; }
           .os-signature-name { font-size: 9pt !important; }
           .os-footer { margin-top: 2mm !important; padding-top: 3mm !important; font-size: 8pt !important; }
