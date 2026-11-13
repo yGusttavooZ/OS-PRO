@@ -285,49 +285,53 @@ export default function OrdemImprimir() {
           .os-technical { gap: 9px; }
           .os-bottom-grid { grid-template-columns: 1fr; gap: 12px; }
         }
-        @page { size: A4 portrait; margin: 7mm; }
+        @page { size: A4 portrait; margin: 9mm; }
         @media print {
           html, body, #root { width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
           body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .no-print, .os-print-actions { display: none !important; }
           .os-print-page { min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
           .os-sheet {
-            width: 100% !important; max-width: none !important; margin: 0 !important;
-            padding: 5mm 6mm !important; border: 0 !important; border-radius: 0 !important;
-            box-shadow: none !important; font-size: 9pt !important; line-height: 1.25 !important;
+            display: flex !important; flex-direction: column !important;
+            width: 100% !important; min-height: 279mm !important; max-width: none !important;
+            margin: 0 !important; padding: 8mm 8mm 7mm !important;
+            border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+            font-size: 10pt !important; line-height: 1.35 !important;
           }
-          .os-header { gap: 4mm !important; padding-bottom: 3mm !important; }
-          .os-logo { width: 12mm !important; height: 12mm !important; flex-basis: 12mm !important; }
-          .os-company { gap: 3mm !important; }
-          .os-company-info h1 { font-size: 12pt !important; }
-          .os-company-info p, .os-number > span:not(.os-kicker):not(.os-status) { font-size: 7.5pt !important; }
-          .os-number > strong { font-size: 18pt !important; }
-          .os-kicker { font-size: 7pt !important; }
-          .os-status { font-size: 7pt !important; padding: 1mm 2mm !important; }
-          .os-two-columns { gap: 3mm !important; padding: 3mm 0 !important; }
-          .os-panel { padding: 2.5mm 3mm !important; }
-          .os-sheet h2 { margin-bottom: 1.5mm !important; font-size: 7pt !important; }
-          .os-panel p, .os-tech-item p { font-size: 8pt !important; line-height: 1.25 !important; }
-          .os-panel .os-main-value { font-size: 9pt !important; }
-          .os-technical { gap: 3mm !important; padding: 3mm 1mm !important; }
-          .os-items-section { padding: 3mm 0 !important; }
-          .os-section-heading { margin-bottom: 1.5mm !important; }
-          .os-empty-items { padding: 2mm 3mm !important; font-size: 8pt !important; }
-          .os-items-table { font-size: 8pt !important; }
-          .os-items-table th { padding: 1.5mm 2mm !important; font-size: 6.5pt !important; }
-          .os-items-table td { padding: 1.5mm 2mm !important; }
-          .os-items-table td small { font-size: 6.5pt !important; }
-          .os-bottom-grid { grid-template-columns: minmax(0, 1.35fr) minmax(42mm, .8fr) !important; gap: 4mm !important; padding: 3mm 0 !important; }
-          .os-warranty-title { margin-bottom: 1.5mm !important; }
-          .os-warranty p { font-size: 7pt !important; line-height: 1.3 !important; }
-          .os-totals { gap: 1mm !important; }
-          .os-totals > div { font-size: 8pt !important; }
-          .os-totals .os-grand-total { margin-top: 1mm !important; padding: 2mm 2.5mm !important; font-size: 9pt !important; }
-          .os-totals .os-grand-total strong { font-size: 11pt !important; }
-          .os-signatures { gap: 12mm !important; padding: 4mm 3mm 2mm !important; }
-          .os-signatures > div { padding-top: 1.5mm !important; font-size: 7pt !important; }
-          .os-signature-name { font-size: 8pt !important; }
-          .os-footer { padding-top: 2mm !important; font-size: 7pt !important; }
+          .os-header { gap: 5mm !important; padding-bottom: 5mm !important; }
+          .os-logo { width: 16mm !important; height: 16mm !important; flex-basis: 16mm !important; }
+          .os-company { gap: 4mm !important; }
+          .os-company-info h1 { font-size: 15pt !important; margin-bottom: 1mm !important; }
+          .os-company-info p, .os-number > span:not(.os-kicker):not(.os-status) { font-size: 8.5pt !important; line-height: 1.35 !important; }
+          .os-number { gap: 1mm !important; }
+          .os-number > strong { font-size: 22pt !important; }
+          .os-kicker { font-size: 8pt !important; }
+          .os-status { font-size: 8pt !important; padding: 1.5mm 3mm !important; }
+          .os-two-columns { gap: 4mm !important; padding: 5mm 0 !important; }
+          .os-panel { padding: 4mm !important; }
+          .os-sheet h2 { margin-bottom: 2mm !important; font-size: 8pt !important; }
+          .os-panel p, .os-tech-item p { font-size: 9pt !important; line-height: 1.35 !important; }
+          .os-panel .os-main-value { font-size: 10.5pt !important; }
+          .os-technical { gap: 5mm !important; padding: 5mm 1mm !important; }
+          .os-items-section { padding: 5mm 0 !important; }
+          .os-section-heading { margin-bottom: 2.5mm !important; }
+          .os-empty-items { padding: 3mm 4mm !important; font-size: 9pt !important; }
+          .os-items-table { font-size: 9pt !important; }
+          .os-items-table th { padding: 2.5mm 3mm !important; font-size: 7.5pt !important; }
+          .os-items-table td { padding: 2.5mm 3mm !important; }
+          .os-items-table td small { font-size: 7.5pt !important; }
+          .os-bottom-grid { grid-template-columns: minmax(0, 1.35fr) minmax(48mm, .8fr) !important; gap: 6mm !important; padding: 5mm 0 !important; }
+          .os-warranty-title { margin-bottom: 2mm !important; }
+          .os-warranty-title strong { font-size: 8pt !important; padding: 1mm 2mm !important; }
+          .os-warranty p { font-size: 8.5pt !important; line-height: 1.4 !important; }
+          .os-totals { gap: 1.8mm !important; }
+          .os-totals > div { font-size: 9pt !important; }
+          .os-totals .os-grand-total { margin-top: 2mm !important; padding: 3mm 3.5mm !important; font-size: 10pt !important; }
+          .os-totals .os-grand-total strong { font-size: 13pt !important; }
+          .os-signatures { gap: 16mm !important; padding: 8mm 4mm 4mm !important; margin-top: auto !important; }
+          .os-signatures > div { padding-top: 2.5mm !important; font-size: 8pt !important; }
+          .os-signature-name { font-size: 9pt !important; }
+          .os-footer { margin-top: 2mm !important; padding-top: 3mm !important; font-size: 8pt !important; }
           .os-header, .os-two-columns, .os-technical, .os-items-section, .os-bottom-grid, .os-signatures, .os-footer { break-inside: avoid; }
           .os-items-table tr { break-inside: avoid; }
         }
