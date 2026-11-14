@@ -182,6 +182,7 @@ export default function OrdemDetalhe() {
   }
 
   const items = Array.isArray(order.items) ? order.items : [];
+  const isFinalOrder = ["Entregue", "Cancelado"].includes(order.status);
 
   return (
     <div>
@@ -287,7 +288,7 @@ export default function OrdemDetalhe() {
                     placeholder="Descreva o serviço executado"
                   />
                 </div>
-                <Button onClick={saveTechnicalData} disabled={savingTechnical} className="gap-2">
+                <Button onClick={saveTechnicalData} disabled={savingTechnical || isFinalOrder} className="gap-2">
                   {savingTechnical ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                   {savingTechnical ? "Salvando..." : "Salvar diagnóstico"}
                 </Button>
@@ -419,7 +420,7 @@ export default function OrdemDetalhe() {
           </section>
           )}
 
-          {can.changeStatus && (
+          {can.changeStatus && !(role === "technician" && isFinalOrder) && (
             <section className="surface p-5">
               <h2 className="font-heading font-bold text-[15px] flex items-center gap-2 mb-3">
                 <Clock className="w-4 h-4 text-muted-foreground" /> Atualizar status
