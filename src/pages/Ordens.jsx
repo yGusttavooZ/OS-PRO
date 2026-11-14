@@ -18,7 +18,7 @@ const TABS = [
 ];
 
 export default function Ordens() {
-  const { company } = useTenant();
+  const { company, role, user, can } = useTenant();
   const [tab, setTab] = useState("all");
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
@@ -31,7 +31,10 @@ export default function Ordens() {
     setLoading(true);
     const timer = setTimeout(async () => {
       const query = { company_id: company.id };
-      if (tab !== "all") query.doc_type = tab;
+      if (role === "technician") {
+        query.technician_uid = user?.uid || "";
+        query.doc_type = "ordem";
+      } else if (tab !== "all") query.doc_type = tab;
       if (status !== "all") query.status = status;
       if (search.trim()) query.search_key = { $regex: search.trim().toLowerCase() };
       const rows = await paged("ServiceOrder", query, { sort: "-created_date", limit: 80 });
@@ -43,7 +46,7 @@ export default function Ordens() {
       alive = false;
       clearTimeout(timer);
     };
-  }, [company?.id, tab, status, search]);
+  }, [company?.id, role, user?.uid, tab, status, search]);
 
   return (
     <div>
@@ -51,15 +54,16 @@ export default function Ordens() {
         eyebrow="Operação"
         title="Ordens de serviço"
         subtitle="Orçamentos e ordens numerados automaticamente para a sua empresa."
-        actions={
+        actions={can.createOrders ? (
           <Button asChild className="cta-gradient h-10 gap-2 rounded-xl font-semibold text-white shadow-lg shadow-primary/20">
             <Link to="/ordens/nova"><Plus className="w-4 h-4" /> Nova OS</Link>
           </Button>
-        }
+        ) : null}
       />
 
       <div className="surface p-4 sm:p-5">
         <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          {role !== "technician" && (
           <div className="inline-flex rounded-xl border border-border/70 bg-muted/50 p-1">
             {TABS.map((item) => (
               <button
@@ -76,6 +80,7 @@ export default function Ordens() {
               </button>
             ))}
           </div>
+          )}
 
           <div className="relative flex-1 min-w-[180px]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -114,9 +119,11 @@ export default function Ordens() {
               <p className="text-xs text-muted-foreground mt-1">
                 Ajuste os filtros ou emita uma nova ordem de serviço.
               </p>
-              <Button asChild size="sm" className="mt-4">
-                <Link to="/ordens/nova">Nova ordem</Link>
-              </Button>
+              {can.createOrders && (
+                <Button asChild size="sm" className="mt-4">
+                  <Link to="/ordens/nova">Nova ordem</Link>
+                </Button>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto -mx-4 sm:mx-0">
