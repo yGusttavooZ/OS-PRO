@@ -13,9 +13,9 @@ export const ORDER_STATUSES = [
 ];
 export const FINAL_STATUSES = ["Entregue", "Cancelado"];
 export const COMPANY_ROLES = [
-  { value: "admin", label: "Administrador", hint: "Acesso total ao sistema" },
-  { value: "technician", label: "Técnico", hint: "Ordens de serviço, diagnósticos e status" },
-  { value: "attendant", label: "Atendente", hint: "Clientes, cadastros e orçamentos" },
+  { value: "admin", label: "Administrador", hint: "Acesso total à empresa, equipe e financeiro" },
+  { value: "technician", label: "Técnico", hint: "OS atribuídas, diagnóstico e atualização de status" },
+  { value: "attendant", label: "Atendente", hint: "Clientes, equipamentos, orçamentos e ordens de serviço" },
 ];
 export const DEFAULT_WARRANTY = "A garantia cobre exclusivamente os serviços executados e as peças substituídas nesta ordem de serviço, pelo prazo indicado acima, contado da data de entrega do equipamento. Não estão cobertos danos por mau uso, quedas, oxidação, sobrecarga elétrica, violação por terceiros, vírus e arquivos pessoais. Os dados armazenados no equipamento são de responsabilidade do cliente, sendo recomendado backup prévio. Equipamentos não retirados em até 90 dias após a comunicação de conclusão poderão ser considerados abandonados, conforme o artigo 1.275 do Código Civil.";
 
