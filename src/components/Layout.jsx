@@ -107,8 +107,9 @@ export default function Layout() {
   }, [location.pathname]);
 
   const initials = (user?.full_name || user?.email || "U").slice(0, 1).toUpperCase();
-  const planLabel =
-    account?.plan_name || (account?.status === "trial" ? "Período de teste" : "Sem plano ativo");
+  const planLabel = role === "admin"
+    ? (account?.plan_name || (account?.status === "trial" ? "Período de teste" : "Sem plano ativo"))
+    : "Acesso de equipe";
   const current = NAV.find((item) => item.to === location.pathname)?.label || "OS PRO";
 
   return (
