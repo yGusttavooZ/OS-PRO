@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Printer, Pencil, Loader2, Trash2, FileCheck2, Wallet, Clock,
-  User, MonitorSmartphone, ClipboardList, History,
+  User, MonitorSmartphone, ClipboardList, History, Save,
 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import StatusBadge from "@/components/StatusBadge";
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { ORDER_STATUSES, changeOrderStatus, convertQuote, invalidateTenantCache, paged } from "@/lib/tenant";
+import { ORDER_STATUSES, changeOrderStatus, convertQuote, invalidateTenantCache, paged, updateRecord } from "@/lib/tenant";
 import { brl, dateTime, formatDoc, formatPhone, shortDate } from "@/lib/format";
 
 function InfoRow({ label, value }) {
@@ -45,6 +45,8 @@ export default function OrdemDetalhe() {
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const [payOpen, setPayOpen] = useState(false);
+  const [technicalData, setTechnicalData] = useState({ diagnosis: "", solution: "" });
+  const [savingTechnical, setSavingTechnical] = useState(false);
 
   const load = useCallback(async () => {
     if (!company?.id) return;
@@ -62,6 +64,10 @@ export default function OrdemDetalhe() {
       setNotFound(false);
       setOrder(found);
       setStatus(found.status);
+      setTechnicalData({
+        diagnosis: found.diagnosis || "",
+        solution: found.solution || "",
+      });
 
       try {
         const history = await paged("OrderEvent", { company_id: company.id, order_id: id }, { sort: "-at", limit: 60 });
@@ -105,6 +111,24 @@ export default function OrdemDetalhe() {
       setError(err?.message || "Não foi possível alterar o status.");
     } finally {
       setWorking(false);
+    }
+  };
+
+  const saveTechnicalData = async () => {
+    if (!order) return;
+    setSavingTechnical(true);
+    setError("");
+    try {
+      await updateRecord("ServiceOrder", order.id, {
+        diagnosis: technicalData.diagnosis,
+        solution: technicalData.solution,
+      });
+      invalidateTenantCache("ServiceOrder");
+      await load();
+    } catch (err) {
+      setError(err?.message || "Não foi possível salvar o diagnóstico técnico.");
+    } finally {
+      setSavingTechnical(false);
     }
   };
 
@@ -237,18 +261,51 @@ export default function OrdemDetalhe() {
             <h2 className="font-heading font-bold text-[15px] flex items-center gap-2 mb-3">
               <ClipboardList className="w-4 h-4 text-muted-foreground" /> Descrição técnica
             </h2>
-            <div className="grid gap-3 text-sm">
-              {[
-                ["Defeito relatado", order.reported_issue],
-                ["Diagnóstico técnico", order.diagnosis],
-                ["Solução aplicada", order.solution],
-              ].map(([label, value]) => (
-                <div key={label} className="rounded-lg border border-border/60 bg-muted/20 px-3.5 py-3 min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-                  <p className="mt-1.5 leading-relaxed text-foreground whitespace-pre-line break-words">{value || "—"}</p>
+            {role === "technician" ? (
+              <div className="space-y-3">
+                <div className="rounded-lg border border-border/60 bg-muted/20 px-3.5 py-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Defeito relatado</p>
+                  <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-line break-words">{order.reported_issue || "—"}</p>
                 </div>
-              ))}
-            </div>
+                <div>
+                  <Label htmlFor="technician-diagnosis" className="field-label">Diagnóstico técnico</Label>
+                  <Textarea
+                    id="technician-diagnosis"
+                    value={technicalData.diagnosis}
+                    onChange={(event) => setTechnicalData((prev) => ({ ...prev, diagnosis: event.target.value }))}
+                    className="mt-1.5 min-h-[90px]"
+                    placeholder="Registre os testes e a causa identificada"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="technician-solution" className="field-label">Solução aplicada</Label>
+                  <Textarea
+                    id="technician-solution"
+                    value={technicalData.solution}
+                    onChange={(event) => setTechnicalData((prev) => ({ ...prev, solution: event.target.value }))}
+                    className="mt-1.5 min-h-[90px]"
+                    placeholder="Descreva o serviço executado"
+                  />
+                </div>
+                <Button onClick={saveTechnicalData} disabled={savingTechnical} className="gap-2">
+                  {savingTechnical ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  {savingTechnical ? "Salvando..." : "Salvar diagnóstico"}
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-3 text-sm">
+                {[
+                  ["Defeito relatado", order.reported_issue],
+                  ["Diagnóstico técnico", order.diagnosis],
+                  ["Solução aplicada", order.solution],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-lg border border-border/60 bg-muted/20 px-3.5 py-3 min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+                    <p className="mt-1.5 leading-relaxed text-foreground whitespace-pre-line break-words">{value || "—"}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
 
           <section className="surface overflow-hidden">
@@ -371,9 +428,14 @@ export default function OrdemDetalhe() {
               <Select value={status} onValueChange={setStatus}>
                 <SelectTrigger className="mt-1.5 h-10"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {ORDER_STATUSES.map((item) => (
-                    <SelectItem key={item} value={item}>{item}</SelectItem>
-                  ))}
+                  {(role === "technician"
+                    ? ORDER_STATUSES.filter((item) => [
+                      "Aguardando equipamento", "Em execução", "Aguardando peça",
+                      "Concluído", "Aguardando retirada",
+                    ].includes(item))
+                    : ORDER_STATUSES).map((item) => (
+                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               <Label htmlFor="status-note" className="field-label mt-3 block">Observação (opcional)</Label>
