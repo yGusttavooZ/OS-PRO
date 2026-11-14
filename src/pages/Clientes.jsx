@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Users, Pencil, Trash2, ChevronRight, Building2 } from "lucide-react";
+import { Plus, Search, Loader2, Users, Pencil, Trash2, ChevronRight, Building2, Phone, Mail } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import ClientDialog from "@/components/clients/ClientDialog";
 import { Button } from "@/components/ui/button";
@@ -106,15 +106,15 @@ export default function Clientes() {
             </div>
           ) : (
             <div className="overflow-x-auto -mx-4 sm:mx-0">
-              <table className="w-full text-sm min-w-[680px]">
+              <table className="w-full text-sm min-w-[900px] table-fixed">
                 <thead>
                   <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground border-y border-border bg-muted/40">
-                    <th className="font-semibold px-4 py-2.5">Cliente</th>
-                    <th className="font-semibold px-4 py-2.5">Documento</th>
-                    <th className="font-semibold px-4 py-2.5">Contato</th>
-                    <th className="font-semibold px-4 py-2.5">Cidade</th>
-                    <th className="font-semibold px-4 py-2.5">Desde</th>
-                    <th className="px-2" />
+                    <th className="w-[24%] font-semibold px-4 py-2.5">Cliente</th>
+                    <th className="w-[17%] font-semibold px-4 py-2.5">Documento</th>
+                    <th className="w-[29%] font-semibold px-4 py-2.5">Contato</th>
+                    <th className="w-[13%] font-semibold px-4 py-2.5">Cidade</th>
+                    <th className="w-[12%] font-semibold px-4 py-2.5">Desde</th>
+                    <th className="w-[5%] px-2" />
                   </tr>
                 </thead>
                 <tbody>
@@ -130,8 +130,21 @@ export default function Clientes() {
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{formatDoc(client.document)}</td>
                       <td className="px-4 py-3">
-                        <span className="block">{formatPhone(client.phone)}</span>
-                        <span className="block text-[11px] text-muted-foreground truncate max-w-[180px]">{client.email}</span>
+                        <div className="flex flex-col gap-2">
+                          {client.phone && (
+                            <span className="flex items-center gap-2 whitespace-nowrap text-sm">
+                              <Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                              {formatPhone(client.phone)}
+                            </span>
+                          )}
+                          {client.email && (
+                            <span className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+                              <Mail className="h-3.5 w-3.5 shrink-0" />
+                              <span className="truncate">{client.email}</span>
+                            </span>
+                          )}
+                          {!client.phone && !client.email && <span className="text-muted-foreground">—</span>}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{client.city || "—"}</td>
                       <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{shortDate(client.created_date)}</td>
