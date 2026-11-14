@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, UserPlus, Trash2, Copy } from "lucide-react";
+import { Loader2, UserPlus, Trash2, Copy, Users, Mail, ShieldCheck, UserRound, CircleCheck, Clock3, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -117,120 +117,162 @@ export default function TeamSettings() {
     }
   };
 
-  return (
-    <div className="space-y-4">
-      <form onSubmit={invite} className="surface p-5">
-        <h2 className="font-heading font-bold text-[15px]">Convidar para a equipe</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Cada perfil define o que o usuário pode fazer dentro da empresa.
-        </p>
+  const activeCount = members.filter((member) => member.status === "active").length;
+  const invitedCount = members.filter((member) => member.status === "invited").length;
 
-        <div className="mt-4 grid sm:grid-cols-[1fr_1fr_180px_auto] gap-3 items-end">
-          <div>
-            <Label htmlFor="member-name" className="field-label">Nome</Label>
-            <Input id="member-name" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className="mt-1.5" />
+  return (
+    <div className="space-y-5">
+      <form onSubmit={invite} className="surface overflow-hidden">
+        <div className="flex items-start gap-3 border-b border-border/70 px-5 py-4">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+            <UserPlus className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="font-heading text-[15px] font-bold">Adicionar à equipe</h2>
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              Convide um funcionário e escolha quais áreas ele poderá acessar.
+            </p>
           </div>
-          <div>
-            <Label htmlFor="member-email" className="field-label">E-mail</Label>
-            <Input id="member-email" type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="mt-1.5" required />
-          </div>
-          <div>
-            <Label className="field-label">Perfil</Label>
-            <Select value={form.role} onValueChange={(v) => setForm((p) => ({ ...p, role: v }))}>
-              <SelectTrigger className="mt-1.5 h-10"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {COMPANY_ROLES.map((role) => (
-                  <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Button type="submit" disabled={saving} className="gap-2 h-10">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
-            Convidar
-          </Button>
         </div>
 
-        {message && <p className="mt-3 text-sm text-primary">{message}</p>}
-        {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
-        {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
+        <div className="grid gap-4 p-5">
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="min-w-0">
+              <Label htmlFor="member-name" className="field-label">Nome do funcionário</Label>
+              <Input id="member-name" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="Ex.: João da Silva" className="mt-1.5 h-10" />
+            </div>
+            <div className="min-w-0">
+              <Label htmlFor="member-email" className="field-label">E-mail de acesso</Label>
+              <Input id="member-email" type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="funcionario@email.com" className="mt-1.5 h-10" required />
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 border-t border-border/60 pt-4 sm:flex-row sm:items-end">
+            <div className="w-full sm:max-w-xs">
+              <Label className="field-label">Perfil de acesso</Label>
+              <Select value={form.role} onValueChange={(v) => setForm((p) => ({ ...p, role: v }))}>
+                <SelectTrigger className="mt-1.5 h-10"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {COMPANY_ROLES.map((role) => (
+                    <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="submit" disabled={saving} className="h-10 gap-2 sm:min-w-36">
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+              Enviar convite
+            </Button>
+          </div>
 
-        <div className="mt-4 rounded-xl bg-muted/60 p-3 text-[11px] text-muted-foreground space-y-1">
-          {COMPANY_ROLES.map((role) => (
-            <p key={role.value}><strong className="text-foreground/80">{role.label}:</strong> {role.hint}</p>
-          ))}
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {COMPANY_ROLES.map((role) => (
+              <div key={role.value} className="rounded-xl border border-border/70 bg-muted/20 p-3">
+                <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                  {role.label}
+                </div>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{role.hint}</p>
+              </div>
+            ))}
+          </div>
+          {message && <p className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5 text-sm text-primary">{message}</p>}
+          {error && <p role="alert" className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">{error}</p>}
         </div>
       </form>
 
-      <div className="surface overflow-hidden">
-        <h2 className="font-heading font-bold text-[15px] p-5 pb-3">Equipe ({members.length})</h2>
+      <section className="surface overflow-hidden">
+        <div className="flex flex-col gap-3 border-b border-border/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-muted-foreground">
+              <Users className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="font-heading text-[15px] font-bold">Membros da equipe</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground">Gerencie os acessos vinculados à empresa.</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-700"><CircleCheck className="h-3.5 w-3.5" /> {activeCount} ativos</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-1 font-medium text-amber-700"><Clock3 className="h-3.5 w-3.5" /> {invitedCount} convidados</span>
+            <span className="rounded-full bg-muted px-2.5 py-1 font-medium text-muted-foreground">{members.length} no total</span>
+          </div>
+        </div>
+
         {loading ? (
-          <div className="py-12 grid place-items-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /></div>
+          <div className="grid place-items-center py-14 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>
         ) : members.length === 0 ? (
-          <p className="px-5 pb-5 text-sm text-muted-foreground">Nenhum usuário vinculado ainda.</p>
+          <div className="px-5 py-12 text-center">
+            <span className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-muted text-muted-foreground"><Users className="h-5 w-5" /></span>
+            <p className="mt-3 text-sm font-semibold">Sua equipe ainda está vazia</p>
+            <p className="mt-1 text-xs text-muted-foreground">Use o formulário acima para convidar o primeiro funcionário.</p>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[560px]">
-              <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground border-y border-border bg-muted/40">
-                  <th className="font-semibold px-5 py-2.5">Usuário</th>
-                  <th className="font-semibold px-5 py-2.5">Perfil</th>
-                  <th className="font-semibold px-5 py-2.5">Situação</th>
-                  <th className="px-2" />
-                </tr>
-              </thead>
-              <tbody>
-                {members.map((member) => (
-                  <tr key={member.id} className="border-b border-border/60 last:border-0">
-                    <td className="px-5 py-3">
-                      <span className="font-medium">{member.user_name || member.user_email}</span>
-                      <span className="block text-[11px] text-muted-foreground">{member.user_email}</span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <Select value={member.role} onValueChange={(value) => changeRole(member, value)}>
-                        <SelectTrigger disabled={member.user_id === user?.id} className="h-8 w-[150px] text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {COMPANY_ROLES.map((role) => (
-                            <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </td>
-                    <td className="px-5 py-3">
+          <div className="divide-y divide-border/70">
+            {members.map((member) => (
+              <article key={member.id} className="flex flex-col gap-4 px-5 py-4 transition-colors hover:bg-muted/20 lg:flex-row lg:items-center">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                    <UserRound className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">{member.user_name || member.user_email}</p>
+                    <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+                      <Mail className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{member.user_email}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:w-[390px] lg:shrink-0">
+                  <div className="min-w-0">
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Perfil</p>
+                    <Select value={member.role} onValueChange={(value) => changeRole(member, value)}>
+                      <SelectTrigger disabled={member.user_id === user?.id} className="h-9 w-full text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {COMPANY_ROLES.map((role) => (
+                          <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Situação</p>
+                    <div className="flex min-h-9 flex-wrap items-center gap-2">
                       <button
                         disabled={member.user_id === user?.id}
                         onClick={() => toggleStatus(member)}
-                        className={`text-[11px] font-semibold rounded-full px-2 py-0.5 ring-1 ring-inset disabled:opacity-60 disabled:cursor-not-allowed ${
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset transition-opacity disabled:cursor-not-allowed disabled:opacity-60 ${
                           member.status === "active"
-                            ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+                            ? "bg-emerald-500/10 text-emerald-700 ring-emerald-600/20"
                             : member.status === "invited"
-                            ? "bg-amber-50 text-amber-700 ring-amber-200"
+                            ? "bg-amber-500/10 text-amber-700 ring-amber-600/20"
                             : "bg-muted text-muted-foreground ring-border"
                         }`}
                       >
+                        {member.status === "active" ? <CircleCheck className="h-3.5 w-3.5" /> : member.status === "invited" ? <Clock3 className="h-3.5 w-3.5" /> : <Ban className="h-3.5 w-3.5" />}
                         {member.status === "active" ? "Ativo" : member.status === "invited" ? "Convidado" : "Inativo"}
                       </button>
-                      {member.status === "invited" && <Button type="button" variant="outline" size="sm" className="ml-2 h-8 gap-1.5 rounded-lg border-primary/25 bg-primary/5 px-3 text-xs font-semibold text-primary shadow-sm transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary" onClick={() => copyInviteLink(member)}><Copy className="h-3.5 w-3.5" /> Copiar convite</Button>}
-                    </td>
-                    <td className="px-2 py-3 text-right">
-                      {member.user_id !== user?.id && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          onClick={() => remove(member)}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
+                      {member.status === "invited" && (
+                        <Button type="button" variant="outline" size="sm" className="h-8 gap-1.5 rounded-lg px-2.5 text-xs" onClick={() => copyInviteLink(member)}>
+                          <Copy className="h-3.5 w-3.5" /> Copiar link
                         </Button>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+                </div>
+
+                {member.user_id !== user?.id && (
+                  <Button variant="ghost" size="icon" className="h-9 w-9 self-end text-muted-foreground hover:bg-destructive/10 hover:text-destructive lg:self-center" onClick={() => remove(member)} title="Remover membro">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </article>
+            ))}
           </div>
         )}
-      </div>
+        {message && <p className="mx-5 mb-4 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5 text-sm text-primary">{message}</p>}
+        {error && <p role="alert" className="mx-5 mb-4 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">{error}</p>}
+      </section>
     </div>
   );
 }
