@@ -278,7 +278,12 @@ service cloud.firestore {
           (collectionName in ['clients', 'equipment']
             && role(resource.data.company_id) in ['admin', 'attendant'])
           || (collectionName == 'serviceOrders'
-            && validTechnicianAssignment(resource.data.company_id, request.resource.data)
+            && (
+              (('technician_uid' in request.resource.data)
+                && ('technician_uid' in resource.data)
+                && request.resource.data.technician_uid == resource.data.technician_uid)
+              || validTechnicianAssignment(resource.data.company_id, request.resource.data)
+            )
             && (
               role(resource.data.company_id) == 'admin'
               || (role(resource.data.company_id) == 'attendant'
