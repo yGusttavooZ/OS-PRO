@@ -61,8 +61,10 @@ export default function OrdemImprimir() {
     .filter(Boolean)
     .join(", ");
   const warrantyDays = order.warranty_days ?? company?.warranty_days ?? 0;
-  const warrantyTerms = company?.warranty_terms || order.warranty_terms ||
-    `Garantia de ${warrantyDays} dias sobre os serviços executados e peças substituídas.`;
+  const usesCompanyWarranty = order.warranty_terms_source === "company_default";
+  const warrantyTerms = (usesCompanyWarranty ? company?.warranty_terms : order.warranty_terms)
+    || company?.warranty_terms
+    || `Garantia de ${warrantyDays} dias sobre os serviços executados e peças substituídas.`;
 
   return (
     <div className="os-print-page min-h-screen bg-muted/40 py-6 print:bg-white print:py-0">
