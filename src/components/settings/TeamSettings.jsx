@@ -87,6 +87,8 @@ export default function TeamSettings() {
       await base44.entities.Membership.update(member.id, { role });
       if (member.user_id) {
         await updateDoc(doc(db, "companies", company.id, "members", member.user_id), { role });
+      } else if (member.user_email) {
+        await updateDoc(doc(db, "invites", member.user_email.trim().toLowerCase()), { role });
       }
       invalidateTenantCache("Membership");
       await load();
@@ -105,6 +107,10 @@ export default function TeamSettings() {
       await base44.entities.Membership.update(member.id, { status });
       if (member.user_id) {
         await updateDoc(doc(db, "companies", company.id, "members", member.user_id), { status });
+      } else if (member.user_email) {
+        await updateDoc(doc(db, "invites", member.user_email.trim().toLowerCase()), {
+          status: status === "invited" ? "pending" : "inactive",
+        });
       }
       invalidateTenantCache("Membership");
       await load();
@@ -121,6 +127,8 @@ export default function TeamSettings() {
     try {
       if (member.user_id) {
         await deleteDoc(doc(db, "companies", company.id, "members", member.user_id));
+      } else if (member.user_email) {
+        await deleteDoc(doc(db, "invites", member.user_email.trim().toLowerCase()));
       }
       await base44.entities.Membership.delete(member.id);
       invalidateTenantCache("Membership");
