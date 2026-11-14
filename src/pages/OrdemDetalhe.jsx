@@ -24,9 +24,9 @@ import { brl, dateTime, formatDoc, formatPhone, shortDate } from "@/lib/format";
 function InfoRow({ label, value }) {
   if (!value) return null;
   return (
-    <div className="data-row">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-sm text-right">{value}</span>
+    <div className="min-w-0 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-1 text-[13px] leading-relaxed text-foreground break-words text-left">{value}</p>
     </div>
   );
 }
@@ -209,7 +209,7 @@ export default function OrdemDetalhe() {
               <User className="w-4 h-4 text-muted-foreground" /> Cliente
             </h2>
             <p className="font-semibold">{order.client_name || "—"}</p>
-            <div className="mt-2 grid sm:grid-cols-2 gap-x-6">
+            <div className="mt-4 grid sm:grid-cols-2 gap-2.5">
               <InfoRow label="CPF/CNPJ" value={formatDoc(order.client_document)} />
               <InfoRow label="Telefone" value={formatPhone(order.client_phone)} />
               <InfoRow label="E-mail" value={order.client_email} />
@@ -235,19 +235,17 @@ export default function OrdemDetalhe() {
             <h2 className="font-heading font-bold text-[15px] flex items-center gap-2 mb-3">
               <ClipboardList className="w-4 h-4 text-muted-foreground" /> Descrição técnica
             </h2>
-            <div className="space-y-4 text-sm">
-              <div>
-                <p className="field-label">Defeito relatado</p>
-                <p className="mt-1 text-foreground/90 whitespace-pre-line">{order.reported_issue || "—"}</p>
-              </div>
-              <div>
-                <p className="field-label">Diagnóstico</p>
-                <p className="mt-1 text-foreground/90 whitespace-pre-line">{order.diagnosis || "—"}</p>
-              </div>
-              <div>
-                <p className="field-label">Solução</p>
-                <p className="mt-1 text-foreground/90 whitespace-pre-line">{order.solution || "—"}</p>
-              </div>
+            <div className="grid gap-3 text-sm">
+              {[
+                ["Defeito relatado", order.reported_issue],
+                ["Diagnóstico técnico", order.diagnosis],
+                ["Solução aplicada", order.solution],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-lg border border-border/60 bg-muted/20 px-3.5 py-3 min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+                  <p className="mt-1.5 leading-relaxed text-foreground whitespace-pre-line break-words">{value || "—"}</p>
+                </div>
+              ))}
             </div>
           </section>
 
