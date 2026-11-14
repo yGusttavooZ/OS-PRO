@@ -274,6 +274,7 @@ export default function OrdemDetalhe() {
                     id="technician-diagnosis"
                     value={technicalData.diagnosis}
                     onChange={(event) => setTechnicalData((prev) => ({ ...prev, diagnosis: event.target.value }))}
+                    disabled={savingTechnical || isFinalOrder}
                     className="mt-1.5 min-h-[90px]"
                     placeholder="Registre os testes e a causa identificada"
                   />
@@ -284,6 +285,7 @@ export default function OrdemDetalhe() {
                     id="technician-solution"
                     value={technicalData.solution}
                     onChange={(event) => setTechnicalData((prev) => ({ ...prev, solution: event.target.value }))}
+                    disabled={savingTechnical || isFinalOrder}
                     className="mt-1.5 min-h-[90px]"
                     placeholder="Descreva o serviço executado"
                   />
