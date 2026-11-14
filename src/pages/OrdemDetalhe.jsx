@@ -34,7 +34,7 @@ function InfoRow({ label, value }) {
 export default function OrdemDetalhe() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { company, user, can } = useTenant();
+  const { company, user, can, role } = useTenant();
   const [order, setOrder] = useState(null);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -169,7 +169,7 @@ export default function OrdemDetalhe() {
             <Button asChild variant="ghost" className="h-10 gap-1.5">
               <Link to="/ordens"><ArrowLeft className="w-4 h-4" /> Voltar</Link>
             </Button>
-            {can.finance && (
+            {role !== "technician" && (
               <Button asChild variant="outline" className="h-10 gap-1.5">
                 <Link to={`/ordens/${order.id}/imprimir`}><Printer className="w-4 h-4" /> Documento</Link>
               </Button>
@@ -263,7 +263,7 @@ export default function OrdemDetalhe() {
                       <th className="font-semibold px-5 py-2.5">Tipo</th>
                       <th className="font-semibold px-5 py-2.5">Descrição</th>
                       <th className="font-semibold px-5 py-2.5 text-center">Qtd.</th>
-                      {can.finance && (
+                      {role !== "technician" && (
                         <>
                           <th className="font-semibold px-5 py-2.5 text-right">Unit.</th>
                           <th className="font-semibold px-5 py-2.5 text-right">Subtotal</th>
@@ -279,7 +279,7 @@ export default function OrdemDetalhe() {
                         </td>
                         <td className="px-5 py-2.5">{item.description}</td>
                         <td className="px-5 py-2.5 text-center tabular-nums">{item.qty}</td>
-                        {can.finance && (
+                        {role !== "technician" && (
                           <>
                             <td className="px-5 py-2.5 text-right tabular-nums">{brl(item.unit_price)}</td>
                             <td className="px-5 py-2.5 text-right font-semibold tabular-nums">
@@ -331,7 +331,7 @@ export default function OrdemDetalhe() {
         </div>
 
         <div className="space-y-4">
-          {can.finance && (
+          {role !== "technician" && (
           <section className="surface p-5">
             <h2 className="font-heading font-bold text-[15px] mb-4">Resumo financeiro</h2>
             <div className="data-row">
