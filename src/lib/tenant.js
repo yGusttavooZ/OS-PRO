@@ -248,7 +248,8 @@ export function orderPayload({ company, payload, number, docType, status, totals
     diagnosis: payload.diagnosis || "", solution: payload.solution || "", items: items || [],
     services_total: totals.services_total, parts_total: totals.parts_total,
     discount: Number(payload.discount) || 0, surcharge: Number(payload.surcharge) || 0,
-    total: totals.total, technician: payload.technician || "", notes: payload.notes || "",
+    total: totals.total, technician: payload.technician || "",
+    technician_uid: payload.technician_uid || "", notes: payload.notes || "",
     warranty_terms: payload.warranty_terms || "",
     warranty_terms_source: payload.warranty_terms_source || (
       String(payload.warranty_terms || "").trim() === String(company.warranty_terms || DEFAULT_WARRANTY).trim()
