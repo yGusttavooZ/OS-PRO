@@ -121,29 +121,55 @@ export default function Layout() {
 
         <NavList role={role} isPlatformAdmin={isPlatformAdmin} />
 
-        <div className="relative px-4 pb-3">
-          <Button
-            asChild
-            className="h-10 w-full gap-2 rounded-xl bg-white text-[13px] font-semibold text-primary shadow-[0_10px_24px_-16px_rgba(0,0,0,0.9)] transition-transform hover:bg-white/95 active:scale-[0.99]"
-          >
-            <Link to="/ordens/nova"><Plus className="h-4 w-4" /> Nova OS</Link>
-          </Button>
+        <div className="relative px-4 pb-4">
+          <div className="rounded-2xl border border-white/[0.09] bg-white/[0.045] p-2 shadow-[0_12px_30px_-22px_rgba(0,0,0,0.9)]">
+            <p className="px-2 pb-2 pt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/35">Acesso rápido</p>
+            <Button
+              asChild
+              className="h-11 w-full justify-start gap-3 rounded-xl bg-white text-[13px] font-semibold text-primary shadow-[0_8px_20px_-14px_rgba(0,0,0,0.8)] transition-all hover:-translate-y-px hover:bg-white/95 active:translate-y-0"
+            >
+              <Link to="/ordens/nova">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/10">
+                  <Plus className="h-4 w-4" />
+                </span>
+                <span className="flex-1 text-left">Nova ordem de serviço</span>
+                <span className="text-[10px] font-medium text-primary/45">＋</span>
+              </Link>
+            </Button>
+          </div>
         </div>
 
-        <div className="relative border-t border-white/[0.07] p-3">
-          <Link
-            to="/configuracoes"
-            className="flex items-center gap-3 rounded-xl px-2.5 py-2.5 transition-colors hover:bg-white/[0.06]"
-          >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[hsl(152_70%_44%)] to-[hsl(174_70%_38%)] text-[11.5px] font-bold text-white ring-1 ring-white/20">
-              {initials}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[12.5px] font-semibold text-white">{user?.full_name || "Usuário"}</span>
-              <span className="mt-0.5 block truncate text-[10.5px] text-white/40">{planLabel}</span>
-            </span>
-            <ChevronDown className="h-3.5 w-3.5 shrink-0 -rotate-90 text-white/35" />
-          </Link>
+        <div className="relative border-t border-white/[0.08] px-3 pb-4 pt-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.045] p-2.5 text-left transition-all hover:border-white/[0.14] hover:bg-white/[0.075]">
+                <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[hsl(152_70%_44%)] to-[hsl(174_70%_38%)] text-[12px] font-bold text-white shadow-inner ring-1 ring-white/20">
+                  {initials}
+                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[hsl(var(--sidebar))] bg-[hsl(152_70%_52%)]" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[12px] font-semibold text-white">{user?.full_name || "Usuário"}</span>
+                  <span className="mt-1 block truncate text-[10.5px] text-white/45">{planLabel}</span>
+                </span>
+                <ChevronDown className="h-4 w-4 shrink-0 text-white/40 transition-transform group-data-[state=open]:rotate-180" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-[232px] rounded-xl">
+              <DropdownMenuLabel className="font-normal">
+                <p className="truncate text-sm font-semibold">{user?.full_name || "Usuário"}</p>
+                <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {role === "admin" && (
+                <DropdownMenuItem asChild>
+                  <Link to="/configuracoes">Configurações da empresa</Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => logout(true)} className="text-destructive">
+                <LogOut className="mr-2 h-4 w-4" /> Sair
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 
