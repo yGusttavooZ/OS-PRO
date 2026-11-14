@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Save, Upload, X } from "lucide-react";
+import { Building2, Contact, Loader2, MapPin, Phone, Save, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,20 +8,41 @@ import { useTenant } from "@/lib/TenantContext";
 import CompanyLogo from "@/components/CompanyLogo";
 import { invalidateTenantCache } from "@/lib/tenant";
 
-const FIELDS = [
-  { name: "name", label: "Razão social / nome", span: 2 },
-  { name: "trade_name", label: "Nome fantasia" },
-  { name: "document", label: "CNPJ / CPF" },
-  { name: "phone", label: "Telefone" },
-  { name: "whatsapp", label: "WhatsApp" },
-  { name: "email", label: "E-mail" },
-  { name: "zip", label: "CEP" },
-  { name: "address", label: "Endereço", span: 2 },
-  { name: "address_number", label: "Número" },
-  { name: "district", label: "Bairro" },
-  { name: "city", label: "Cidade" },
-  { name: "state", label: "UF" },
-  { name: "tech_responsible", label: "Responsável técnico" },
+const COMPANY_SECTIONS = [
+  {
+    title: "Identificação",
+    description: "Informações cadastrais que identificam sua assistência.",
+    icon: Building2,
+    fields: [
+      { name: "name", label: "Razão social / nome", span: 2 },
+      { name: "trade_name", label: "Nome fantasia" },
+      { name: "document", label: "CNPJ / CPF" },
+      { name: "tech_responsible", label: "Responsável técnico", span: 2 },
+    ],
+  },
+  {
+    title: "Contato",
+    description: "Canais de contato exibidos nos documentos da empresa.",
+    icon: Phone,
+    fields: [
+      { name: "phone", label: "Telefone" },
+      { name: "whatsapp", label: "WhatsApp" },
+      { name: "email", label: "E-mail", span: 2 },
+    ],
+  },
+  {
+    title: "Endereço",
+    description: "Localização e endereço que serão apresentados nos documentos.",
+    icon: MapPin,
+    fields: [
+      { name: "zip", label: "CEP" },
+      { name: "address", label: "Endereço", span: 2 },
+      { name: "address_number", label: "Número" },
+      { name: "district", label: "Bairro" },
+      { name: "city", label: "Cidade" },
+      { name: "state", label: "UF" },
+    ],
+  },
 ];
 
 const MAX_LOGO_BYTES = 350 * 1024;
@@ -141,87 +162,142 @@ export default function CompanySettings() {
 
   const hasLogo = Boolean(form.logo_base64 || form.logo_url);
 
-  return (
-    <form onSubmit={handleSave} className="surface p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="font-heading font-bold text-[15px]">Dados da empresa</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Aparecem no topo dos orçamentos e ordens de serviço.</p>
+  const renderFields = (fields) => (
+    <div className="grid gap-4 sm:grid-cols-2">
+      {fields.map((field) => (
+        <div key={field.name} className={field.span === 2 ? "sm:col-span-2" : ""}>
+          <Label htmlFor={"company-" + field.name} className="field-label">{field.label}</Label>
+          <Input
+            id={"company-" + field.name}
+            value={form[field.name] || ""}
+            onChange={(e) => set(field.name, e.target.value)}
+            className="mt-1.5"
+          />
         </div>
-        <Button type="button" onClick={handleSave} disabled={saving || processingLogo} className="gap-2 h-10">
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          {saving ? "Salvando..." : "Salvar"}
-        </Button>
+      ))}
+    </div>
+  );
+
+  return (
+    <form onSubmit={handleSave} className="space-y-5">
+      <div className="surface p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground">
+              <Building2 className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="font-heading text-[15px] font-bold">Dados da empresa</h2>
+              <p className="mt-1 text-xs text-muted-foreground">Gerencie as informações que aparecem nos orçamentos e ordens de serviço.</p>
+            </div>
+          </div>
+          <Button type="submit" disabled={saving || processingLogo} className="h-10 gap-2">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {saving ? "Salvando..." : "Salvar alterações"}
+          </Button>
+        </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-4">
-        <CompanyLogo
-          company={form}
-          className="w-16 h-16 rounded-xl object-contain border border-border bg-card"
-          fallback={
-            <span className="w-16 h-16 rounded-xl bg-accent text-accent-foreground grid place-items-center font-heading font-extrabold">
-              GO
-            </span>
-          }
-        />
-        <div className="flex-1 min-w-0">
-          <div className="mt-1.5 flex flex-wrap items-center gap-2">
-            <input
-              ref={logoInputRef}
-              id="company-logo-file"
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              onChange={handleLogoChange}
-              disabled={processingLogo || saving}
-              className="hidden"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              disabled={processingLogo || saving}
-              onClick={() => logoInputRef.current?.click()}
-              className="gap-2"
-            >
-              <Upload className="w-4 h-4" />
-              Logotipo
-            </Button>
-            {hasLogo && (
+      <section className="surface overflow-hidden">
+        <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+          <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent text-accent-foreground">
+            <Contact className="h-4 w-4" />
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold">Logotipo da empresa</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">A marca será utilizada nos documentos impressos.</p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+          <CompanyLogo
+            company={form}
+            className="h-20 w-20 shrink-0 rounded-xl border border-border bg-card object-contain p-2"
+            fallback={
+              <span className="grid h-20 w-20 shrink-0 place-items-center rounded-xl border border-border bg-accent font-heading text-lg font-extrabold text-accent-foreground">
+                GO
+              </span>
+            }
+          />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium">{hasLogo ? "Logotipo selecionado" : "Nenhum logotipo cadastrado"}</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Use uma imagem PNG, JPG ou WebP de até 5 MB. Ela será ajustada automaticamente para uso nos documentos.</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <input
+                ref={logoInputRef}
+                id="company-logo-file"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={handleLogoChange}
+                disabled={processingLogo || saving}
+                className="hidden"
+              />
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
                 disabled={processingLogo || saving}
-                onClick={() => {
-                  set("logo_base64", "");
-                  set("logo_url", "");
-                  setMessage("Logo removida da pré-visualização. Clique em Salvar para confirmar.");
-                }}
-                className="gap-1.5"
+                onClick={() => logoInputRef.current?.click()}
+                className="h-9 gap-2"
               >
-                <X className="w-4 h-4" /> Remover
+                {processingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {processingLogo ? "Processando..." : "Enviar logotipo"}
               </Button>
-            )}
+              {hasLogo && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={processingLogo || saving}
+                  onClick={() => {
+                    set("logo_base64", "");
+                    set("logo_url", "");
+                    setMessage("Logo removida da pré-visualização. Clique em Salvar para confirmar.");
+                  }}
+                  className="h-9 gap-1.5 text-muted-foreground"
+                >
+                  <X className="h-4 w-4" /> Remover
+                </Button>
+              )}
+            </div>
+            {processingLogo && <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> Processando imagem...</p>}
           </div>
-          {processingLogo && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Processando imagem...</p>}
         </div>
-      </div>
+      </section>
 
-      <div className="mt-5 grid sm:grid-cols-2 gap-4">
-        {FIELDS.map((field) => (
-          <div key={field.name} className={field.span === 2 ? "sm:col-span-2" : ""}>
-            <Label htmlFor={`company-${field.name}`} className="field-label">{field.label}</Label>
-            <Input
-              id={`company-${field.name}`}
-              value={form[field.name] || ""}
-              onChange={(e) => set(field.name, e.target.value)}
-              className="mt-1.5"
-            />
-          </div>
-        ))}
-      </div>
+      {COMPANY_SECTIONS.map((section) => {
+        const SectionIcon = section.icon;
+        return (
+          <section key={section.title} className="surface overflow-hidden">
+            <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent text-accent-foreground">
+                <SectionIcon className="h-4 w-4" />
+              </span>
+              <div>
+                <h3 className="text-sm font-semibold">{section.title}</h3>
+                <p className="mt-0.5 text-xs text-muted-foreground">{section.description}</p>
+              </div>
+            </div>
+            <div className="p-5">
+              {renderFields(section.fields)}
+            </div>
+          </section>
+        );
+      })}
 
-      {message && <p className="mt-4 text-sm text-primary">{message}</p>}
-      {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
+      {(message || error) && (
+        <div
+          role="status"
+          className={`rounded-xl border px-4 py-3 text-sm ${error ? "border-destructive/30 bg-destructive/5 text-destructive" : "border-primary/20 bg-primary/5 text-primary"}`}
+        >
+          {error || message}
+        </div>
+      )}
+
+      <div className="flex justify-end">
+        <Button type="submit" disabled={saving || processingLogo} className="h-10 gap-2 px-6">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {saving ? "Salvando..." : "Salvar alterações"}
+        </Button>
+      </div>
     </form>
   );
 }
