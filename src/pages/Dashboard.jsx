@@ -28,7 +28,7 @@ const STATUS_DEFS = [
 ];
 
 export default function Dashboard() {
-  const { user, company, account } = useTenant();
+  const { user, company, account, role, can } = useTenant();
   const [period, setPeriod] = useState("this_month");
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
@@ -41,10 +41,19 @@ export default function Dashboard() {
     (async () => {
       setLoading(true);
       try {
+        const orderQuery = { company_id: company.id };
+        if (role === "technician") {
+          orderQuery.technician_uid = user?.uid || "";
+          orderQuery.doc_type = "ordem";
+        }
         const [orderRows, txRows, clientCount] = await Promise.all([
-          paged("ServiceOrder", { company_id: company.id }, { sort: "-created_date", limit: 300 }),
-          paged("Transaction", { company_id: company.id }, { sort: "-reference_date", limit: 300 }),
-          base44.entities.Client.count({ company_id: company.id }),
+          paged("ServiceOrder", orderQuery, { sort: "-created_date", limit: 300 }),
+          can.finance
+            ? paged("Transaction", { company_id: company.id }, { sort: "-reference_date", limit: 300 })
+            : Promise.resolve([]),
+          can.viewClients
+            ? base44.entities.Client.count({ company_id: company.id })
+            : Promise.resolve(0),
         ]);
         if (!alive) return;
         setOrders(orderRows);
@@ -57,7 +66,7 @@ export default function Dashboard() {
     return () => {
       alive = false;
     };
-  }, [company?.id]);
+  }, [company?.id, role, user?.uid, can.finance, can.viewClients]);
 
   const { from, to } = periodRange(period);
 
@@ -144,7 +153,9 @@ export default function Dashboard() {
               Olá, {firstName}
             </h1>
             <p className="mt-2 max-w-none text-[12.5px] leading-relaxed text-white/55 lg:whitespace-nowrap">
-              Visão geral da operação — ordens em andamento, faturamento e status da bancada.
+              {role === "technician"
+                ? "Acompanhe as ordens de serviço atribuídas a você."
+                : "Visão geral da operação — ordens em andamento, faturamento e status da bancada."}
             </p>
 
             {trialDays !== null && trialDays >= 0 && (
@@ -169,12 +180,14 @@ export default function Dashboard() {
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              asChild
-              className="h-10 gap-2 rounded-xl bg-white px-4 text-[12.5px] font-semibold text-primary shadow-[0_14px_30px_-18px_rgba(0,0,0,0.9)] hover:bg-white/95"
-            >
-              <Link to="/ordens/nova"><Plus className="h-4 w-4" /> Nova OS</Link>
-            </Button>
+            {can.createOrders && (
+              <Button
+                asChild
+                className="h-10 gap-2 rounded-xl bg-white px-4 text-[12.5px] font-semibold text-primary shadow-[0_14px_30px_-18px_rgba(0,0,0,0.9)] hover:bg-white/95"
+              >
+                <Link to="/ordens/nova"><Plus className="h-4 w-4" /> Nova OS</Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>
@@ -186,6 +199,7 @@ export default function Dashboard() {
         <StatCard label="Entregues" value={loading ? "—" : num(counts.delivered)} hint="Finalizadas no período" icon={PackageCheck} tone="success" delay={180} />
       </div>
 
+      {can.finance && (
       <div className="mt-3 grid grid-cols-1 gap-3 sm:mt-4 sm:gap-4 md:grid-cols-3">
         <div className="surface-hover rounded-2xl border border-border/70 bg-card p-5" style={{ boxShadow: "var(--shadow-soft)" }}>
           <div className="flex items-start justify-between gap-3">
@@ -229,8 +243,10 @@ export default function Dashboard() {
           </p>
         </div>
       </div>
+      )}
 
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:mt-4 sm:gap-4 lg:grid-cols-3">
+            {can.finance ? (
+<div className="mt-3 grid grid-cols-1 gap-3 sm:mt-4 sm:gap-4 lg:grid-cols-3">
         <div className="surface p-5 lg:col-span-2">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
@@ -248,8 +264,13 @@ export default function Dashboard() {
           </div>
           {loading ? <Skeleton className="h-[240px] w-full rounded-xl" /> : <FinanceChart data={chartData} />}
         </div>
-        <StatusBreakdown rows={statusRows} clients={clients} />
+        {can.viewClients && <StatusBreakdown rows={statusRows} clients={clients} />}
       </div>
+      ) : can.viewClients ? (
+        <div className="mt-3">
+          <StatusBreakdown rows={statusRows} clients={clients} />
+        </div>
+      ) : null}
 
       <RecentOrders orders={recent} />
     </div>
