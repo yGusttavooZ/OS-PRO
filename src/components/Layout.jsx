@@ -18,8 +18,8 @@ import BrandMark from "@/components/BrandMark";
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "technician", "attendant"] },
   { to: "/ordens", label: "Ordens de Serviço", icon: FileText, roles: ["admin", "technician", "attendant"] },
-  { to: "/clientes", label: "Clientes", icon: Users, roles: ["admin", "technician", "attendant"] },
-  { to: "/equipamentos", label: "Equipamentos", icon: MonitorSmartphone, roles: ["admin", "technician", "attendant"] },
+  { to: "/clientes", label: "Clientes", icon: Users, roles: ["admin", "attendant"] },
+  { to: "/equipamentos", label: "Equipamentos", icon: MonitorSmartphone, roles: ["admin", "attendant"] },
   { to: "/financeiro", label: "Financeiro", icon: Wallet, roles: ["admin"] },
   { to: "/configuracoes", label: "Configurações", icon: Settings, roles: ["admin"] },
 ];
@@ -43,7 +43,7 @@ function Brand({ company, compact = false }) {
 }
 
 function NavList({ role, isPlatformAdmin, onNavigate }) {
-  const items = NAV.filter((item) => !role || item.roles.includes(role));
+  const items = NAV.filter((item) => item.roles.includes(role));
 
   const renderLink = (to, label, Icon, end = false) => (
     <NavLink
@@ -98,7 +98,7 @@ function NavList({ role, isPlatformAdmin, onNavigate }) {
 
 export default function Layout() {
   const { user, logout } = useAuth();
-  const { company, account, role, isPlatformAdmin } = useTenant();
+  const { company, account, role, isPlatformAdmin, can } = useTenant();
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
@@ -121,6 +121,7 @@ export default function Layout() {
 
         <NavList role={role} isPlatformAdmin={isPlatformAdmin} />
 
+        {can.createOrders && (
         <div className="relative px-4 pb-4">
           <Button
             asChild
@@ -134,6 +135,7 @@ export default function Layout() {
             </Link>
           </Button>
         </div>
+        )}
 
         <div className="relative px-3 pb-4 pt-3">
           <DropdownMenu>
