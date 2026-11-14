@@ -23,15 +23,13 @@ export async function loadTenantProfile(user) {
   const memberData = { id: memberSnap.id, ...memberSnap.data() };
   const [companySnap, accountSnap] = await Promise.all([
     getDoc(doc(db, "companies", companyId)),
-    memberData.role === "admin"
-      ? getDoc(doc(db, "companyAccounts", companyId))
-      : Promise.resolve(null),
+    getDoc(doc(db, "companyAccounts", companyId)),
   ]);
   const companyExists = companySnap.exists();
   return {
     userProfile,
     company: companyExists ? { id: companySnap.id, ...companySnap.data() } : null,
-    account: accountSnap?.exists() ? { id: accountSnap.id, ...accountSnap.data() } : null,
+    account: accountSnap.exists() ? { id: accountSnap.id, ...accountSnap.data() } : null,
     membership: memberData,
     accessRevoked: !companyExists,
   };
