@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, Loader2, MonitorSmartphone, Pencil, Trash2, Users } from "lucide-react";
+import { Plus, Search, Loader2, MonitorSmartphone, Pencil, Trash2, Users, Hash, X, UserRound } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import EquipmentDialog from "@/components/equipment/EquipmentDialog";
 import { Button } from "@/components/ui/button";
@@ -76,26 +76,24 @@ export default function Equipamentos() {
         }
       />
 
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-        <div className="surface p-4 sm:p-5">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold text-muted-foreground">Total de equipamentos</p>
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-muted/70 text-muted-foreground">
-              <MonitorSmartphone className="h-4 w-4" />
-            </span>
+      <section className="grid grid-cols-2 gap-3 mb-5">
+        <div className="surface flex items-center gap-3 p-3.5 sm:p-4">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+            <MonitorSmartphone className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[11px] sm:text-xs font-medium text-muted-foreground">Equipamentos</p>
+            <p className="mt-0.5 font-heading text-xl sm:text-2xl font-extrabold tabular-nums leading-none">{equipment.length}</p>
           </div>
-          <p className="mt-3 font-heading text-2xl font-extrabold tabular-nums">{equipment.length}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Cadastrados na empresa</p>
         </div>
-        <div className="surface p-4 sm:p-5">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold text-muted-foreground">Clientes vinculados</p>
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-muted/70 text-muted-foreground">
-              <Users className="h-4 w-4" />
-            </span>
+        <div className="surface flex items-center gap-3 p-3.5 sm:p-4">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-muted-foreground">
+            <Users className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[11px] sm:text-xs font-medium text-muted-foreground">Clientes atendidos</p>
+            <p className="mt-0.5 font-heading text-xl sm:text-2xl font-extrabold tabular-nums leading-none">{new Set(equipment.map((item) => item.client_id).filter(Boolean)).size}</p>
           </div>
-          <p className="mt-3 font-heading text-2xl font-extrabold tabular-nums">{new Set(equipment.map((item) => item.client_id).filter(Boolean)).size}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Com pelo menos um equipamento</p>
         </div>
       </section>
 
@@ -103,10 +101,12 @@ export default function Equipamentos() {
         <div className="p-4 sm:p-5 border-b border-border">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <div className="mr-auto">
-              <h2 className="font-heading font-bold text-base">Seus equipamentos</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-heading font-bold text-base">Inventário</h2>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">{filtered.length}</span>
+              </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                {filtered.length} {filtered.length === 1 ? "equipamento encontrado" : "equipamentos encontrados"}
-                {term ? " na busca" : " cadastrados"}
+                {term ? "Resultados para sua pesquisa" : "Equipamentos registrados nos seus clientes"}
               </p>
             </div>
             <div className="relative w-full sm:max-w-sm">
@@ -116,8 +116,18 @@ export default function Equipamentos() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar equipamento, série ou cliente..."
                 aria-label="Buscar equipamentos"
-                className="pl-9 h-10 bg-background"
+                className="pl-9 pr-9 h-10 bg-background border-border/70 focus-visible:ring-primary/20"
               />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  aria-label="Limpar busca"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -146,24 +156,24 @@ export default function Equipamentos() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 p-3 sm:p-4">
             {filtered.map((item) => (
-              <article key={item.id} className="rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/20">
+              <article key={item.id} className="group relative overflow-hidden rounded-xl border border-border/70 bg-card p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-sm">
                 <div className="flex items-start gap-3">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                    <MonitorSmartphone className="h-5 w-5" />
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/[0.08] text-primary ring-1 ring-primary/10">
+                    <MonitorSmartphone className="h-[19px] w-[19px]" />
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-sm leading-5 break-words">{item.name || "Equipamento sem nome"}</h3>
-                    <p className="mt-1 text-xs text-muted-foreground break-words">
-                      {[item.brand, item.model].filter(Boolean).join(" · ") || "Marca e modelo não informados"}
+                  <div className="min-w-0 flex-1 pt-0.5">
+                    <h3 className="font-semibold text-[14px] leading-5 break-words">{item.name || "Equipamento sem nome"}</h3>
+                    <p className="mt-1.5 text-xs text-muted-foreground break-words">
+                      {[item.brand, item.model].filter(Boolean).join(" / ") || "Marca e modelo não informados"}
                     </p>
                   </div>
                   {(can.editRecords || can.manageTeam) && (
-                    <div className="flex shrink-0 items-center gap-1 -mr-2 -mt-2">
+                    <div className="flex shrink-0 items-center gap-0.5 -mr-2 -mt-2 opacity-100 sm:opacity-70 sm:group-hover:opacity-100 transition-opacity">
                       {can.editRecords && (
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-8 w-8 rounded-lg"
                           title="Editar equipamento"
                           aria-label="Editar equipamento"
                           onClick={() => { setEditing(item); setDialogOpen(true); }}
@@ -175,7 +185,7 @@ export default function Equipamentos() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive"
                           title="Excluir equipamento"
                           aria-label="Excluir equipamento"
                           onClick={() => handleDelete(item)}
@@ -186,15 +196,21 @@ export default function Equipamentos() {
                     </div>
                   )}
                 </div>
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-border/70 pt-3">
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Cliente</p>
-                    <p className="mt-1 text-sm font-medium break-words">{clientMap[item.client_id]?.name || "Não vinculado"}</p>
+                <div className="mt-4 flex items-center gap-2 border-t border-border/60 pt-3">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground">
+                    <UserRound className="h-3.5 w-3.5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Cliente vinculado</p>
+                    <p className="mt-0.5 text-xs font-semibold break-words">{clientMap[item.client_id]?.name || "Não vinculado"}</p>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Número de série</p>
-                    <p className="mt-1 text-sm font-medium break-all">{item.serial || "Não informado"}</p>
-                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-muted/70 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                    <Hash className="h-3 w-3 shrink-0" />
+                    <span className="font-medium">Série:</span>
+                    <span className="max-w-[190px] break-all font-mono text-foreground">{item.serial || "Não informada"}</span>
+                  </span>
                 </div>
               </article>
             ))}
