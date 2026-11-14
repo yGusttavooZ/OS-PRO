@@ -135,7 +135,7 @@ export default function Ordens() {
                     <th className="font-semibold px-4 py-2.5">Equipamento</th>
                     <th className="font-semibold px-4 py-2.5">Status</th>
                     <th className="font-semibold px-4 py-2.5">Data</th>
-                    <th className="font-semibold px-4 py-2.5 text-right">Total</th>
+                    {role !== "technician" && <th className="font-semibold px-4 py-2.5 text-right">Total</th>}
                     <th className="px-2" />
                   </tr>
                 </thead>
@@ -160,7 +160,7 @@ export default function Ordens() {
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                       <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{shortDate(order.created_date)}</td>
-                      <td className="px-4 py-3 text-right font-semibold tabular-nums whitespace-nowrap">{brl(order.total)}</td>
+                      {role !== "technician" && <td className="px-4 py-3 text-right font-semibold tabular-nums whitespace-nowrap">{brl(order.total)}</td>}
                       <td className="px-2">
                         <Link to={`/ordens/${order.id}`} className="text-muted-foreground hover:text-primary">
                           <ChevronRight className="w-4 h-4" />
