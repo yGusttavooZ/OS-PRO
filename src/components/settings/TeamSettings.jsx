@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { Loader2, UserPlus, Trash2, Copy, Users, Mail, ShieldCheck, UserRound, CircleCheck, Clock3, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +11,7 @@ import { useTenant } from "@/lib/TenantContext";
 import { COMPANY_ROLES, invalidateTenantCache, paged } from "@/lib/tenant";
 
 export default function TeamSettings() {
-  const { company, user } = useTenant();
+  const { company, user, refresh } = useTenant();
   const [members, setMembers] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", role: "attendant" });
   const [saving, setSaving] = useState(false);
@@ -83,8 +85,12 @@ export default function TeamSettings() {
     setError("");
     try {
       await base44.entities.Membership.update(member.id, { role });
+      if (member.user_id) {
+        await updateDoc(doc(db, "companies", company.id, "members", member.user_id), { role });
+      }
       invalidateTenantCache("Membership");
       await load();
+      if (member.user_id === (user?.uid || user?.id)) await refresh();
     } catch (err) {
       setError(err?.message || "Não foi possível alterar o perfil do membro.");
     }
@@ -97,18 +103,25 @@ export default function TeamSettings() {
       : (member.status === "inactive" ? "invited" : "inactive");
     try {
       await base44.entities.Membership.update(member.id, { status });
+      if (member.user_id) {
+        await updateDoc(doc(db, "companies", company.id, "members", member.user_id), { status });
+      }
       invalidateTenantCache("Membership");
       await load();
+      if (member.user_id === (user?.uid || user?.id)) await refresh();
     } catch (err) {
       setError(err?.message || "Não foi possível alterar a situação do membro.");
     }
   };
 
   const remove = async (member) => {
-    if (member.user_id === user?.id) return;
+    if (member.user_id === (user?.uid || user?.id)) return;
     if (!window.confirm(`Remover ${member.user_name || member.user_email} da equipe?`)) return;
     setError("");
     try {
+      if (member.user_id) {
+        await deleteDoc(doc(db, "companies", company.id, "members", member.user_id));
+      }
       await base44.entities.Membership.delete(member.id);
       invalidateTenantCache("Membership");
       await load();
