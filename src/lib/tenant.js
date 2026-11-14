@@ -139,13 +139,14 @@ export async function paged(entityName, filters = {}, options = {}) {
     const sortValue = options?.sort || "";
     const sortField = sortValue.replace(/^-/, "");
     const descending = sortValue.startsWith("-");
-    if (sortField && !localFilters.length) constraints.push(orderBy(sortField, descending ? "desc" : "asc"));
-    if (Number(options?.limit) > 0 && !localFilters.length) constraints.push(firestoreLimit(Number(options.limit)));
+    const localSort = Boolean(filters?.technician_uid);
+    if (sortField && !localFilters.length && !localSort) constraints.push(orderBy(sortField, descending ? "desc" : "asc"));
+    if (Number(options?.limit) > 0 && !localFilters.length && !localSort) constraints.push(firestoreLimit(Number(options.limit)));
 
     const snapshot = await getDocs(query(collection(db, collectionName(entityName)), ...constraints));
     let rows = snapshot.docs.map(normalizeSnapshot);
     rows = rows.filter((row) => Object.entries(filters || {}).every(([field, condition]) => matchesLocal(row[field], condition)));
-    if (sortField && localFilters.length) {
+    if (sortField && (localFilters.length || localSort)) {
       rows.sort((a, b) => {
         const av = a[sortField] ?? "";
         const bv = b[sortField] ?? "";
@@ -153,7 +154,7 @@ export async function paged(entityName, filters = {}, options = {}) {
         return descending ? -cmp : cmp;
       });
     }
-    if (Number(options?.limit) > 0 && localFilters.length) rows = rows.slice(0, Number(options.limit));
+    if (Number(options?.limit) > 0 && (localFilters.length || localSort)) rows = rows.slice(0, Number(options.limit));
     readCache.set(cacheKey, { at: Date.now(), data: rows });
     return rows;
   })().finally(() => inFlight.delete(cacheKey));
