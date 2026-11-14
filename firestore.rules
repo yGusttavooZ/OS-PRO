@@ -302,6 +302,10 @@ service cloud.firestore {
                 ]))
               || (role(resource.data.company_id) == 'technician'
                 && resource.data.doc_type == 'ordem'
+                && resource.data.status in [
+                  'Aprovado', 'Aguardando aprovação', 'Aguardando equipamento',
+                  'Em execução', 'Aguardando peça', 'Concluído', 'Aguardando retirada'
+                ]
                 && resource.data.technician_uid == request.auth.uid
                 && request.resource.data.technician_uid == resource.data.technician_uid
                 && (
