@@ -53,8 +53,12 @@ export default function OrdemForm() {
   useEffect(() => {
     if (!company?.id || !can.createOrders) return;
     let active = true;
-    paged("Membership", { company_id: company.id, status: "active", role: "technician" }, { sort: "user_name", limit: 100 })
-      .then((rows) => { if (active) setTechnicians(rows.filter((member) => member.user_id)); })
+    paged("Membership", { company_id: company.id, status: "active", role: "technician" }, { limit: 100 })
+      .then((rows) => {
+        if (active) setTechnicians(rows
+          .filter((member) => member.user_id)
+          .sort((a, b) => String(a.user_name || a.user_email || "").localeCompare(String(b.user_name || b.user_email || ""))));
+      })
       .catch((err) => console.error("Não foi possível carregar os técnicos da equipe", err));
     return () => { active = false; };
   }, [company?.id, can.createOrders]);
