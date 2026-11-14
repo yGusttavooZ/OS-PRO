@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, ShieldCheck, Hash, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -67,71 +67,128 @@ export default function DocumentsSettings() {
   };
 
   return (
-    <form onSubmit={handleSave} className="surface p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="font-heading font-bold text-[15px]">Documentos e garantia</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Textos e numeração usados nos orçamentos e ordens de serviço.
-          </p>
+    <form onSubmit={handleSave} className="space-y-5">
+      <div className="flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+            <FileText className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="font-heading text-[15px] font-bold">Documentos e garantia</h2>
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              Personalize as informações utilizadas nos orçamentos e ordens de serviço.
+            </p>
+          </div>
         </div>
-        <Button type="submit" disabled={saving} className="gap-2 h-10">
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          {saving ? "Salvando..." : "Salvar"}
+        <Button type="submit" disabled={saving} className="h-10 gap-2 sm:min-w-32">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {saving ? "Salvando..." : "Salvar alterações"}
         </Button>
       </div>
 
-      <div className="mt-5 grid sm:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="warranty-days" className="field-label">Garantia padrão (dias)</Label>
-          <Input
-            id="warranty-days"
-            type="number"
-            min="0"
-            value={form.warranty_days}
-            onChange={(e) => set("warranty_days", e.target.value)}
-            className="mt-1.5"
-          />
+      <section className="surface overflow-hidden">
+        <div className="flex items-center gap-3 border-b border-border/70 px-5 py-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+            <ShieldCheck className="h-4 w-4" />
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold">Garantia padrão</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">Defina o prazo e as condições exibidas nos documentos.</p>
+          </div>
         </div>
-        <div>
-          <Label htmlFor="doc-start" className="field-label">Numeração inicial</Label>
-          <Input
-            id="doc-start"
-            type="number"
-            min="1"
-            value={form.doc_start_number}
-            onChange={(e) => set("doc_start_number", e.target.value)}
-            className="mt-1.5"
-          />
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            A numeração é sequencial por empresa e nunca se repete. O novo valor vale quando ainda não houver documentos.
-          </p>
+        <div className="grid gap-4 p-5">
+          <div className="max-w-xs">
+            <Label htmlFor="warranty-days" className="field-label">Prazo de garantia (dias)</Label>
+            <Input
+              id="warranty-days"
+              type="number"
+              min="0"
+              value={form.warranty_days}
+              onChange={(e) => set("warranty_days", e.target.value)}
+              className="mt-1.5 h-10"
+            />
+            <p className="mt-1.5 text-[11px] text-muted-foreground">Informe 0 se não desejar definir um prazo padrão.</p>
+          </div>
+          <div>
+            <Label htmlFor="warranty-terms" className="field-label">Termos e condições da garantia</Label>
+            <Textarea
+              id="warranty-terms"
+              value={form.warranty_terms}
+              onChange={(e) => set("warranty_terms", e.target.value)}
+              placeholder="Descreva as condições da garantia que aparecerão nos documentos."
+              className="mt-1.5 min-h-[150px] resize-y text-[13px] leading-relaxed"
+            />
+            <p className="mt-1.5 text-[11px] text-muted-foreground">Esse texto é utilizado como padrão nos documentos da empresa.</p>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="mt-4">
-        <Label htmlFor="warranty-terms" className="field-label">Termos de garantia do documento</Label>
-        <Textarea
-          id="warranty-terms"
-          value={form.warranty_terms}
-          onChange={(e) => set("warranty_terms", e.target.value)}
-          className="mt-1.5 min-h-[140px] text-[13px]"
-        />
-      </div>
+      <section className="surface overflow-hidden">
+        <div className="flex items-center gap-3 border-b border-border/70 px-5 py-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-muted text-muted-foreground">
+            <Hash className="h-4 w-4" />
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold">Numeração dos documentos</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">Configure o número inicial da sequência da empresa.</p>
+          </div>
+        </div>
+        <div className="grid gap-3 p-5 sm:grid-cols-[minmax(0,240px)_1fr] sm:items-start">
+          <div>
+            <Label htmlFor="doc-start" className="field-label">Numeração inicial</Label>
+            <Input
+              id="doc-start"
+              type="number"
+              min="1"
+              value={form.doc_start_number}
+              onChange={(e) => set("doc_start_number", e.target.value)}
+              className="mt-1.5 h-10"
+            />
+          </div>
+          <div className="flex gap-2 rounded-xl border border-border/70 bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground sm:mt-6">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <p>A numeração é sequencial por empresa e não se repete. O novo valor inicial só é aplicado quando ainda não existem ordens de serviço cadastradas.</p>
+          </div>
+        </div>
+      </section>
 
-      <div className="mt-4">
-        <Label htmlFor="doc-footer" className="field-label">Rodapé do documento</Label>
-        <Input
-          id="doc-footer"
-          value={form.doc_footer}
-          onChange={(e) => set("doc_footer", e.target.value)}
-          placeholder="Ex.: Assistência técnica autorizada · Rua das Flores, 120"
-          className="mt-1.5"
-        />
-      </div>
+      <section className="surface overflow-hidden">
+        <div className="flex items-center gap-3 border-b border-border/70 px-5 py-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-muted text-muted-foreground">
+            <FileText className="h-4 w-4" />
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold">Rodapé do documento</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">Adicione uma informação complementar ao final do documento.</p>
+          </div>
+        </div>
+        <div className="p-5">
+          <Label htmlFor="doc-footer" className="field-label">Texto do rodapé</Label>
+          <Input
+            id="doc-footer"
+            value={form.doc_footer}
+            onChange={(e) => set("doc_footer", e.target.value)}
+            placeholder="Ex.: Assistência técnica · Endereço · Telefone"
+            className="mt-1.5 h-10"
+          />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">Deixe em branco se não quiser exibir um texto adicional no rodapé.</p>
+        </div>
+      </section>
 
-      {message && <p className="mt-4 text-sm text-primary">{message}</p>}
-      {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
+      {(message || error) && (
+        <p role={error ? "alert" : "status"} className={`rounded-xl border px-4 py-3 text-sm ${
+          error ? "border-destructive/20 bg-destructive/5 text-destructive" : "border-primary/20 bg-primary/5 text-primary"
+        }`}>
+          {error || message}
+        </p>
+      )}
+
+      <div className="flex justify-end">
+        <Button type="submit" disabled={saving} className="h-10 min-w-36 gap-2">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {saving ? "Salvando..." : "Salvar alterações"}
+        </Button>
+      </div>
     </form>
   );
 }
