@@ -4,7 +4,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { brl, shortDate } from "@/lib/format";
 
-export default function RecentOrders({ orders = [] }) {
+export default function RecentOrders({ orders = [], showAmounts = true, canCreate = true }) {
   return (
     <div className="surface mt-3 sm:mt-4 overflow-hidden">
       <div className="flex items-center justify-between p-5 pb-4">
@@ -23,10 +23,14 @@ export default function RecentOrders({ orders = [] }) {
             <FileText className="w-5 h-5" />
           </span>
           <p className="mt-3 text-sm font-semibold">Nenhuma ordem cadastrada ainda</p>
-          <p className="text-xs text-muted-foreground mt-1">Cadastre um cliente e emita sua primeira OS.</p>
-          <Button asChild size="sm" className="mt-4">
-            <Link to="/ordens/nova">Nova ordem de serviço</Link>
-          </Button>
+          <p className="text-xs text-muted-foreground mt-1">
+            {canCreate ? "Cadastre um cliente e emita sua primeira OS." : "Quando uma OS for atribuída a você, ela aparecerá aqui."}
+          </p>
+          {canCreate && (
+            <Button asChild size="sm" className="mt-4">
+              <Link to="/ordens/nova">Nova ordem de serviço</Link>
+            </Button>
+          )}
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -38,7 +42,7 @@ export default function RecentOrders({ orders = [] }) {
                 <th className="font-semibold px-5 py-2.5 hidden md:table-cell">Equipamento</th>
                 <th className="font-semibold px-5 py-2.5">Status</th>
                 <th className="font-semibold px-5 py-2.5 hidden sm:table-cell">Data</th>
-                <th className="font-semibold px-5 py-2.5 text-right">Valor</th>
+                {showAmounts && <th className="font-semibold px-5 py-2.5 text-right">Valor</th>}
               </tr>
             </thead>
             <tbody>
@@ -57,9 +61,11 @@ export default function RecentOrders({ orders = [] }) {
                   <td className="px-5 py-3 text-muted-foreground whitespace-nowrap hidden sm:table-cell">
                     {shortDate(order.created_date)}
                   </td>
-                  <td className="px-5 py-3 text-right font-semibold tabular-nums whitespace-nowrap">
-                    {brl(order.total)}
-                  </td>
+                  {showAmounts && (
+                    <td className="px-5 py-3 text-right font-semibold tabular-nums whitespace-nowrap">
+                      {brl(order.total)}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
