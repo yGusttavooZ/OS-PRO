@@ -249,7 +249,13 @@ export function orderPayload({ company, payload, number, docType, status, totals
     services_total: totals.services_total, parts_total: totals.parts_total,
     discount: Number(payload.discount) || 0, surcharge: Number(payload.surcharge) || 0,
     total: totals.total, technician: payload.technician || "", notes: payload.notes || "",
-    warranty_terms: payload.warranty_terms || "", warranty_days: Number(payload.warranty_days) || 90,
+    warranty_terms: payload.warranty_terms || "",
+    warranty_terms_source: payload.warranty_terms_source || (
+      String(payload.warranty_terms || "").trim() === String(company.warranty_terms || DEFAULT_WARRANTY).trim()
+        ? "company_default"
+        : "custom"
+    ),
+    warranty_days: Number(payload.warranty_days) || 90,
     source_quote_id: payload.source_quote_id || "",
     search_key: buildSearchKey(docLabel(docType, number), payload.client_name, payload.client_document, payload.equipment_name, payload.equipment_serial, payload.reported_issue),
   };
