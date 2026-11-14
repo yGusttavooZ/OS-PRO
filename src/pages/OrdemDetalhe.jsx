@@ -429,10 +429,13 @@ export default function OrdemDetalhe() {
                 <SelectTrigger className="mt-1.5 h-10"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {(role === "technician"
-                    ? ORDER_STATUSES.filter((item) => [
-                      "Aguardando equipamento", "Em execução", "Aguardando peça",
-                      "Concluído", "Aguardando retirada",
-                    ].includes(item))
+                    ? [...new Set([
+                      order.status,
+                      ...ORDER_STATUSES.filter((item) => [
+                        "Aguardando equipamento", "Em execução", "Aguardando peça",
+                        "Concluído", "Aguardando retirada",
+                      ].includes(item)),
+                    ])]
                     : ORDER_STATUSES).map((item) => (
                       <SelectItem key={item} value={item}>{item}</SelectItem>
                     ))}
