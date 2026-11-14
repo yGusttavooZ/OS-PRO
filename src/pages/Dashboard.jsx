@@ -272,7 +272,11 @@ export default function Dashboard() {
         </div>
       ) : null}
 
-      <RecentOrders orders={recent} />
+      <RecentOrders
+        orders={recent}
+        showAmounts={role !== "technician"}
+        canCreate={can.createOrders}
+      />
     </div>
   );
 }
