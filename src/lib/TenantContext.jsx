@@ -35,6 +35,9 @@ export function TenantProvider({ children }) {
     can: {
       manageTeam: role === "admin",
       finance: role === "admin",
+      createOrders: role === "admin" || role === "attendant",
+      viewClients: role === "admin" || role === "attendant",
+      viewEquipment: role === "admin" || role === "attendant",
       editRecords: role === "admin" || role === "attendant",
       changeStatus: role === "admin" || role === "technician",
     },
