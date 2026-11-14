@@ -235,6 +235,7 @@ service cloud.firestore {
               && resource.data.order_id is string
               && exists(/databases/$(database)/documents/serviceOrders/$(resource.data.order_id))
               && get(/databases/$(database)/documents/serviceOrders/$(resource.data.order_id)).data.company_id == resource.data.company_id
+              && get(/databases/$(database)/documents/serviceOrders/$(resource.data.order_id)).data.doc_type == 'ordem'
               && get(/databases/$(database)/documents/serviceOrders/$(resource.data.order_id)).data.technician_uid == request.auth.uid)
           ));
       allow create: if collectionName in [
@@ -257,6 +258,7 @@ service cloud.firestore {
                 && request.resource.data.order_id is string
                 && exists(/databases/$(database)/documents/serviceOrders/$(request.resource.data.order_id))
                 && get(/databases/$(database)/documents/serviceOrders/$(request.resource.data.order_id)).data.company_id == request.resource.data.company_id
+                && get(/databases/$(database)/documents/serviceOrders/$(request.resource.data.order_id)).data.doc_type == 'ordem'
                 && get(/databases/$(database)/documents/serviceOrders/$(request.resource.data.order_id)).data.technician_uid == request.auth.uid)
             ))
           || (collectionName == 'planRequests'
