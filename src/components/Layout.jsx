@@ -239,31 +239,6 @@ export default function Layout() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-2 transition-colors hover:bg-muted">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-primary to-chart-3 text-[11.5px] font-bold text-primary-foreground">
-                  {initials}
-                </span>
-                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60 rounded-xl">
-              <DropdownMenuLabel className="font-normal">
-                <p className="truncate text-sm font-semibold">{user?.full_name || "Usuário"}</p>
-                <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {role === "admin" && (
-                <DropdownMenuItem asChild>
-                  <Link to="/configuracoes">Configurações da empresa</Link>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={() => logout(true)} className="text-destructive">
-                <LogOut className="mr-2 h-4 w-4" /> Sair
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </header>
 
         <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
