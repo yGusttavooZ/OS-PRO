@@ -48,7 +48,7 @@ export default function Login() {
       cardTitle={undefined}
       panelTitle="Bem-vindo de volta ao seu painel"
       panelSubtitle="Retome suas ordens de serviço, orçamentos e lançamentos financeiros exatamente de onde parou."
-      footer={<>Ainda não tem conta? <Link to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")} className="font-semibold text-primary underline-offset-4 hover:underline">Cadastrar minha empresa</Link></>}
+      footer={<><span>Ainda não tem conta? <Link to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")} className="font-semibold text-primary underline-offset-4 hover:underline">Cadastrar minha empresa</Link></span><span className="mt-2 block"><Link to="/configurar-proprietario" className="font-semibold text-primary underline-offset-4 hover:underline">Configurar acesso do proprietário</Link></span></>}
     >
       <div className="mb-5">
         <div className="flex items-center gap-3.5">
