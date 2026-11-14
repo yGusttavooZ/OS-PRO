@@ -10,6 +10,7 @@ import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import RequireCompany from '@/components/RequireCompany';
 import PlatformGuard from '@/components/PlatformGuard';
+import RequireRole from '@/components/RequireRole';
 import Layout from '@/components/Layout';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -67,14 +68,14 @@ const AuthenticatedApp = () => {
           <Route element={<RequireCompany><Layout /></RequireCompany>}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/ordens" element={<Ordens />} />
-            <Route path="/ordens/nova" element={<OrdemForm />} />
+            <Route path="/ordens/nova" element={<RequireRole allowedRoles={["admin", "attendant"]}><OrdemForm /></RequireRole>} />
             <Route path="/ordens/:id" element={<OrdemDetalhe />} />
-            <Route path="/ordens/:id/editar" element={<OrdemForm />} />
-            <Route path="/clientes" element={<Clientes />} />
-            <Route path="/clientes/:id" element={<ClienteDetalhe />} />
-            <Route path="/equipamentos" element={<Equipamentos />} />
-            <Route path="/financeiro" element={<Financeiro />} />
-            <Route path="/configuracoes" element={<Configuracoes />} />
+            <Route path="/ordens/:id/editar" element={<RequireRole allowedRoles={["admin", "attendant"]}><OrdemForm /></RequireRole>} />
+            <Route path="/clientes" element={<RequireRole allowedRoles={["admin", "attendant"]}><Clientes /></RequireRole>} />
+            <Route path="/clientes/:id" element={<RequireRole allowedRoles={["admin", "attendant"]}><ClienteDetalhe /></RequireRole>} />
+            <Route path="/equipamentos" element={<RequireRole allowedRoles={["admin", "attendant"]}><Equipamentos /></RequireRole>} />
+            <Route path="/financeiro" element={<RequireRole allowedRoles={["admin"]}><Financeiro /></RequireRole>} />
+            <Route path="/configuracoes" element={<RequireRole allowedRoles={["admin"]}><Configuracoes /></RequireRole>} />
           </Route>
         </Route>
         <Route path="*" element={<PageNotFound />} />
