@@ -37,6 +37,14 @@ service cloud.firestore {
         && request.resource.data.company_id is string
         && isMember(request.resource.data.company_id);
     }
+    function validTechnicianAssignment(companyId, data) {
+      return !('technician_uid' in data)
+        || data.technician_uid == ''
+        || (data.technician_uid is string
+          && exists(memberPath(companyId, data.technician_uid))
+          && get(memberPath(companyId, data.technician_uid)).data.role == 'technician'
+          && get(memberPath(companyId, data.technician_uid)).data.status == 'active');
+    }
     function platformAdmin() {
       return signedIn()
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.platform_role == 'platform_admin';
@@ -164,6 +172,9 @@ service cloud.firestore {
         membershipId == request.auth.uid
         || platformAdmin()
         || (resource.data.company_id is string && isAdmin(resource.data.company_id))
+        || (resource.data.company_id is string
+          && isMember(resource.data.company_id)
+          && resource.data.status == 'active')
       );
       allow create: if signedIn() && (
         (membershipId == request.auth.uid
@@ -193,7 +204,7 @@ service cloud.firestore {
     }
 
     match /companyAccounts/{companyId} {
-      allow read: if isMember(companyId) || platformAdmin();
+      allow read: if isAdmin(companyId) || platformAdmin();
       allow create: if platformAdmin() || (signedIn() && existsAfter(memberPath(companyId, request.auth.uid))
         && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin');
       allow update: if platformAdmin();
@@ -201,23 +212,53 @@ service cloud.firestore {
     }
 
     match /{collectionName}/{recordId} {
-      allow read: if collectionName in [
-        'serviceOrders', 'clients', 'equipment', 'transactions',
-        'orderEvents', 'auditLogs', 'counters', 'planRequests'
-      ] && (platformAdmin() || (sameCompanyRecord()
-        && (!(collectionName in ['transactions', 'auditLogs', 'planRequests'])
-          || isAdmin(resource.data.company_id))));
+      allow read: if platformAdmin()
+        || (collectionName == 'serviceOrders'
+          && sameCompanyRecord()
+          && (
+            role(resource.data.company_id) in ['admin', 'attendant']
+            || (role(resource.data.company_id) == 'technician'
+              && resource.data.doc_type == 'ordem'
+              && resource.data.technician_uid == request.auth.uid)
+          ))
+        || (collectionName in ['clients', 'equipment']
+          && sameCompanyRecord()
+          && role(resource.data.company_id) in ['admin', 'attendant'])
+        || (collectionName in ['transactions', 'auditLogs', 'planRequests']
+          && sameCompanyRecord()
+          && isAdmin(resource.data.company_id))
+        || (collectionName == 'orderEvents'
+          && sameCompanyRecord()
+          && (
+            role(resource.data.company_id) in ['admin', 'attendant']
+            || (role(resource.data.company_id) == 'technician'
+              && resource.data.order_id is string
+              && exists(/databases/$(database)/documents/serviceOrders/$(resource.data.order_id))
+              && get(/databases/$(database)/documents/serviceOrders/$(resource.data.order_id)).data.company_id == resource.data.company_id
+              && get(/databases/$(database)/documents/serviceOrders/$(resource.data.order_id)).data.technician_uid == request.auth.uid)
+          ));
       allow create: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions',
         'orderEvents', 'auditLogs', 'planRequests'
       ] && sameCompanyWrite()
         && (
-          (collectionName in ['clients', 'equipment', 'serviceOrders']
+          (collectionName in ['clients', 'equipment']
             && role(request.resource.data.company_id) in ['admin', 'attendant'])
+          || (collectionName == 'serviceOrders'
+            && role(request.resource.data.company_id) in ['admin', 'attendant']
+            && validTechnicianAssignment(request.resource.data.company_id, request.resource.data))
           || (collectionName == 'transactions'
             && role(request.resource.data.company_id) == 'admin')
           || (collectionName in ['orderEvents', 'auditLogs']
-            && role(request.resource.data.company_id) in ['admin', 'attendant', 'technician'])
+            && (
+              role(request.resource.data.company_id) in ['admin', 'attendant']
+              || (collectionName == 'orderEvents'
+                && role(request.resource.data.company_id) == 'technician'
+                && request.resource.data.order_id is string
+                && exists(/databases/$(database)/documents/serviceOrders/$(request.resource.data.order_id))
+                && get(/databases/$(database)/documents/serviceOrders/$(request.resource.data.order_id)).data.company_id == request.resource.data.company_id
+                && get(/databases/$(database)/documents/serviceOrders/$(request.resource.data.order_id)).data.technician_uid == request.auth.uid)
+            ))
           || (collectionName == 'planRequests'
             && role(request.resource.data.company_id) == 'admin')
         );
@@ -237,6 +278,7 @@ service cloud.firestore {
           (collectionName in ['clients', 'equipment']
             && role(resource.data.company_id) in ['admin', 'attendant'])
           || (collectionName == 'serviceOrders'
+            && validTechnicianAssignment(resource.data.company_id, request.resource.data)
             && (
               role(resource.data.company_id) == 'admin'
               || (role(resource.data.company_id) == 'attendant'
@@ -247,18 +289,20 @@ service cloud.firestore {
                   'equipment_brand', 'equipment_model', 'equipment_serial',
                   'equipment_accessories', 'equipment_condition', 'reported_issue',
                   'diagnosis', 'solution', 'items', 'services_total', 'parts_total',
-                  'discount', 'surcharge', 'total', 'technician', 'notes',
+                  'discount', 'surcharge', 'total', 'technician', 'technician_uid', 'notes',
                   'warranty_terms', 'warranty_days', 'search_key',
                   'updated_date', 'updated_at'
                 ]))
               || (role(resource.data.company_id) == 'technician'
+                && resource.data.doc_type == 'ordem'
+                && resource.data.technician_uid == request.auth.uid
+                && request.resource.data.technician_uid == resource.data.technician_uid
                 && request.resource.data.status in [
-                  'Orçamento', 'Aguardando aprovação', 'Aprovado',
                   'Aguardando equipamento', 'Em execução', 'Aguardando peça',
-                  'Concluído', 'Aguardando retirada', 'Entregue', 'Cancelado'
+                  'Concluído', 'Aguardando retirada'
                 ]
                 && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-                  'status', 'exit_at', 'exit_time', 'updated_date', 'updated_at'
+                  'status', 'updated_date', 'updated_at'
                 ]))
             ))
           || (collectionName == 'transactions'
