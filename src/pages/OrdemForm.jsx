@@ -23,7 +23,7 @@ const EMPTY = {
   client_id: "", client_name: "", client_document: "", client_phone: "", client_email: "", client_address: "",
   equipment_id: "", equipment_name: "", equipment_brand: "", equipment_model: "",
   equipment_serial: "", equipment_accessories: "", equipment_condition: "",
-  reported_issue: "", diagnosis: "", solution: "", technician: "", notes: "",
+  reported_issue: "", diagnosis: "", solution: "", technician: "", technician_uid: "", notes: "",
   discount: 0, surcharge: 0, warranty_days: 90, warranty_terms: DEFAULT_WARRANTY,
 };
 
@@ -38,6 +38,7 @@ export default function OrdemForm() {
   const [loading, setLoading] = useState(editing);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [technicians, setTechnicians] = useState([]);
 
   useEffect(() => {
     if (!company) return;
@@ -45,9 +46,18 @@ export default function OrdemForm() {
       ...prev,
       warranty_terms: editing ? prev.warranty_terms : (company.warranty_terms || DEFAULT_WARRANTY),
       warranty_days: editing ? prev.warranty_days : (Number(company.warranty_days) || 90),
-      technician: prev.technician || user?.full_name || "",
+      technician: prev.technician || "",
     }));
   }, [company?.id]);
+
+  useEffect(() => {
+    if (!company?.id || !can.createOrders) return;
+    let active = true;
+    paged("Membership", { company_id: company.id, status: "active", role: "technician" }, { sort: "user_name", limit: 100 })
+      .then((rows) => { if (active) setTechnicians(rows.filter((member) => member.user_id)); })
+      .catch((err) => console.error("Não foi possível carregar os técnicos da equipe", err));
+    return () => { active = false; };
+  }, [company?.id, can.createOrders]);
 
   useEffect(() => {
     if (!editing || !company?.id) return;
@@ -268,8 +278,31 @@ export default function OrdemForm() {
               </div>
             )}
             <div>
-              <Label htmlFor="technician" className="field-label">Técnico responsável</Label>
-              <Input id="technician" value={form.technician || ""} onChange={(e) => set("technician", e.target.value)} className="mt-1.5" />
+              <Label className="field-label">Técnico responsável</Label>
+              <Select
+                value={form.technician_uid || "unassigned"}
+                onValueChange={(uid) => {
+                  const selected = technicians.find((member) => member.user_id === uid);
+                  setForm((prev) => ({
+                    ...prev,
+                    technician_uid: uid === "unassigned" ? "" : uid,
+                    technician: selected ? (selected.user_name || selected.user_email || "") : "",
+                  }));
+                }}
+              >
+                <SelectTrigger className="mt-1.5 h-10"><SelectValue placeholder="Selecione um técnico" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Sem técnico atribuído</SelectItem>
+                  {form.technician_uid && !technicians.some((member) => member.user_id === form.technician_uid) && (
+                    <SelectItem value={form.technician_uid}>{form.technician || "Técnico atual"}</SelectItem>
+                  )}
+                  {technicians.map((member) => (
+                    <SelectItem key={member.user_id} value={member.user_id}>
+                      {member.user_name || member.user_email || "Técnico"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="warranty" className="field-label">Garantia (dias)</Label>
