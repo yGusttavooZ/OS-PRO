@@ -122,27 +122,24 @@ export default function Layout() {
         <NavList role={role} isPlatformAdmin={isPlatformAdmin} />
 
         <div className="relative px-4 pb-4">
-          <div className="rounded-2xl border border-white/[0.09] bg-white/[0.045] p-2 shadow-[0_12px_30px_-22px_rgba(0,0,0,0.9)]">
-            <p className="px-2 pb-2 pt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/35">Acesso rápido</p>
-            <Button
-              asChild
-              className="h-11 w-full justify-start gap-3 rounded-xl bg-white text-[13px] font-semibold text-primary shadow-[0_8px_20px_-14px_rgba(0,0,0,0.8)] transition-all hover:-translate-y-px hover:bg-white/95 active:translate-y-0"
-            >
-              <Link to="/ordens/nova">
-                <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/10">
-                  <Plus className="h-4 w-4" />
-                </span>
-                <span className="flex-1 text-left">Nova ordem de serviço</span>
-                <span className="text-[10px] font-medium text-primary/45">＋</span>
-              </Link>
-            </Button>
-          </div>
+          <Button
+            asChild
+            className="h-11 w-full justify-start gap-3 rounded-xl bg-white text-[13px] font-semibold text-primary shadow-[0_8px_20px_-14px_rgba(0,0,0,0.8)] transition-all hover:-translate-y-px hover:bg-white/95 active:translate-y-0"
+          >
+            <Link to="/ordens/nova">
+              <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/10">
+                <Plus className="h-4 w-4" />
+              </span>
+              <span className="flex-1 text-left">Nova ordem de serviço</span>
+              <span className="text-[10px] font-medium text-primary/45">＋</span>
+            </Link>
+          </Button>
         </div>
 
-        <div className="relative border-t border-white/[0.08] px-3 pb-4 pt-3">
+        <div className="relative px-3 pb-4 pt-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="group flex w-full items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.045] p-2.5 text-left transition-all hover:border-white/[0.14] hover:bg-white/[0.075]">
+              <button className="group flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-all hover:bg-white/[0.06]">
                 <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[hsl(152_70%_44%)] to-[hsl(174_70%_38%)] text-[12px] font-bold text-white shadow-inner ring-1 ring-white/20">
                   {initials}
                   <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[hsl(var(--sidebar))] bg-[hsl(152_70%_52%)]" />
