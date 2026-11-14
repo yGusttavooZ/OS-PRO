@@ -124,14 +124,13 @@ export default function Layout() {
         <div className="relative px-4 pb-4">
           <Button
             asChild
-            className="h-11 w-full justify-start gap-3 rounded-xl bg-white text-[13px] font-semibold text-primary shadow-[0_8px_20px_-14px_rgba(0,0,0,0.8)] transition-all hover:-translate-y-px hover:bg-white/95 active:translate-y-0"
+            className="h-11 w-full justify-start gap-3 rounded-xl border border-emerald-400/20 bg-emerald-500/15 text-[13px] font-semibold text-white shadow-none transition-colors hover:bg-emerald-500/25 hover:text-white active:bg-emerald-500/30"
           >
             <Link to="/ordens/nova">
-              <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/10">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-emerald-400/20 text-emerald-200">
                 <Plus className="h-4 w-4" />
               </span>
               <span className="flex-1 text-left">Nova ordem de serviço</span>
-              <span className="text-[10px] font-medium text-primary/45">＋</span>
             </Link>
           </Button>
         </div>
