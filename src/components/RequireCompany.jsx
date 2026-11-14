@@ -42,7 +42,9 @@ export default function RequireCompany({ children }) {
   const { loading, company, account, membership, accessRevoked, isPlatformAdmin } = useTenant();
 
   if (loading) return <FullScreenLoading />;
-  if (isPlatformAdmin && (accessRevoked || !company)) return <Navigate to="/plataforma" replace />;
+  if (isPlatformAdmin && (accessRevoked || !company || account?.status === "suspended")) {
+    return <Navigate to="/plataforma" replace />;
+  }
   if (accessRevoked) return <AccessRevoked />;
   if (!company) return <Navigate to="/onboarding" replace />;
   if (account?.status === "suspended") return <SuspendedNotice company={company} />;
