@@ -132,7 +132,7 @@ export default function Dashboard() {
 
   const recent = orders.slice(0, 5);
   const firstName = (user?.full_name || "").split(" ")[0] || "bem-vindo";
-  const trialDays = account?.status === "trial" && account?.trial_ends_at
+  const trialDays = role === "admin" && account?.status === "trial" && account?.trial_ends_at
     ? Math.ceil((new Date(account.trial_ends_at) - new Date()) / 86400000)
     : null;
 
