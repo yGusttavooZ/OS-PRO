@@ -28,6 +28,7 @@ import Equipamentos from '@/pages/Equipamentos';
 import Financeiro from '@/pages/Financeiro';
 import Configuracoes from '@/pages/Configuracoes';
 import Plataforma from '@/pages/Plataforma';
+import OwnerSetup from '@/pages/OwnerSetup';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
     <TenantProvider>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/configurar-proprietario" element={<OwnerSetup />} />
         <Route path="/register/employee" element={<Register />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
