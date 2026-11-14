@@ -53,7 +53,9 @@ export default function Ordens() {
       <PageHeader
         eyebrow="Operação"
         title="Ordens de serviço"
-        subtitle="Orçamentos e ordens numerados automaticamente para a sua empresa."
+        subtitle={role === "technician"
+          ? "Ordens de serviço atribuídas a você."
+          : "Orçamentos e ordens numerados automaticamente para a sua empresa."}
         actions={can.createOrders ? (
           <Button asChild className="cta-gradient h-10 gap-2 rounded-xl font-semibold text-white shadow-lg shadow-primary/20">
             <Link to="/ordens/nova"><Plus className="w-4 h-4" /> Nova OS</Link>
@@ -117,7 +119,9 @@ export default function Ordens() {
               </span>
               <p className="mt-3 font-semibold text-sm">Nenhum documento encontrado</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Ajuste os filtros ou emita uma nova ordem de serviço.
+                {role === "technician"
+                  ? "Quando uma OS for atribuída a você, ela aparecerá aqui."
+                  : "Ajuste os filtros ou emita uma nova ordem de serviço."}
               </p>
               {can.createOrders && (
                 <Button asChild size="sm" className="mt-4">
