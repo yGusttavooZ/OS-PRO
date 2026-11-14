@@ -221,9 +221,17 @@ service cloud.firestore {
           || (collectionName == 'planRequests'
             && role(request.resource.data.company_id) == 'admin')
         );
-      allow update: if collectionName in [
-        'serviceOrders', 'clients', 'equipment', 'transactions', 'planRequests'
-      ] && sameCompanyRecord() && sameCompanyWrite()
+      allow update: if (
+        collectionName == 'planRequests'
+        && platformAdmin()
+        && request.resource.data.company_id == resource.data.company_id
+        && request.resource.data.status in ['pending', 'contacted', 'done', 'canceled']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status', 'updated_date', 'updated_at'
+        ])
+      ) || (
+        collectionName in ['serviceOrders', 'clients', 'equipment', 'transactions']
+        && sameCompanyRecord() && sameCompanyWrite()
         && request.resource.data.company_id == resource.data.company_id
         && (
           (collectionName in ['clients', 'equipment']
@@ -255,9 +263,8 @@ service cloud.firestore {
             ))
           || (collectionName == 'transactions'
             && role(resource.data.company_id) == 'admin')
-          || (collectionName == 'planRequests'
-            && platformAdmin())
-        );
+        )
+      );
       allow delete: if collectionName in [
         'serviceOrders', 'clients', 'equipment', 'transactions', 'orderEvents'
       ] && sameCompanyRecord() && isAdmin(resource.data.company_id);
