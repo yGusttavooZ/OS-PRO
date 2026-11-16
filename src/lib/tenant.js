@@ -178,6 +178,63 @@ export async function updateRecord(entityName, id, payload) {
   return { id, ...data };
 }
 
+/** Confirma a contratação e ativa a assinatura junto com a conclusão da solicitação. */
+export async function activatePlanRequest(request) {
+  if (!request?.id || !request?.company_id || !request?.plan_id) {
+    throw new Error("A solicitação não contém empresa ou plano válido.");
+  }
+
+  const requestRef = doc(db, "planRequests", request.id);
+  const planRef = doc(db, "plans", request.plan_id);
+  const accountRef = doc(db, "companyAccounts", request.company_id);
+  const now = new Date();
+  const periodEnd = new Date(now);
+  periodEnd.setMonth(periodEnd.getMonth() + 1);
+
+  await runTransaction(db, async (transaction) => {
+    const [requestSnap, planSnap, accountSnap] = await Promise.all([
+      transaction.get(requestRef),
+      transaction.get(planRef),
+      transaction.get(accountRef),
+    ]);
+
+    if (!requestSnap.exists()) throw new Error("Solicitação não encontrada.");
+    if (!planSnap.exists()) throw new Error("O plano solicitado não existe mais.");
+    const plan = planSnap.data();
+    if (plan.active === false) throw new Error("Este plano está inativo e não pode ser ativado.");
+    const currentRequest = requestSnap.data();
+    if (currentRequest.company_id !== request.company_id || currentRequest.plan_id !== request.plan_id) {
+      throw new Error("Os dados da solicitação foram alterados. Atualize a página.");
+    }
+    if (["canceled"].includes(currentRequest.status)) {
+      throw new Error("Uma solicitação cancelada não pode ativar uma assinatura.");
+    }
+
+    transaction.set(accountRef, {
+      company_id: request.company_id,
+      company_name: currentRequest.company_name || request.company_name || "",
+      status: "active",
+      plan_id: planSnap.id,
+      plan_name: plan.name || currentRequest.plan_name || "",
+      price: Number(plan.price_monthly) || 0,
+      max_users: Number(plan.max_users) || 0,
+      max_orders_month: Number(plan.max_orders_month) || 0,
+      trial_ends_at: "",
+      current_period_end: periodEnd.toISOString(),
+      updated_at: serverTimestamp(),
+      ...(accountSnap.exists() ? {} : { created_at: serverTimestamp() }),
+    }, { merge: true });
+
+    transaction.update(requestRef, {
+      status: "done",
+      updated_date: now.toISOString(),
+      updated_at: serverTimestamp(),
+    });
+  });
+
+  invalidateTenantCache("CompanyAccount", "PlanRequest");
+}
+
 export async function deleteRecord(entityName, id) {
   await deleteDoc(doc(db, collectionName(entityName), id));
   invalidateTenantCache(entityName);
