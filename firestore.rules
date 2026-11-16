@@ -72,7 +72,7 @@ service cloud.firestore {
         && request.resource.data.owner_uid == request.auth.uid
         && existsAfter(memberPath(companyId, request.auth.uid))
         && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin';
-      allow update: if (isAdmin(companyId) || platformAdmin())
+      allow update: if isAdmin(companyId)
         && request.resource.data.owner_uid == resource.data.owner_uid
         && request.resource.data.company_id == resource.data.company_id;
       allow delete: if false;
@@ -212,7 +212,7 @@ service cloud.firestore {
     }
 
     match /{collectionName}/{recordId} {
-      allow read: if platformAdmin()
+      allow read: if (platformAdmin() && collectionName in ['auditLogs', 'planRequests'])
         || (collectionName == 'serviceOrders'
           && sameCompanyRecord()
           && (
