@@ -219,6 +219,9 @@ export async function activatePlanRequest(request) {
       price: Number(plan.price_monthly) || 0,
       max_users: Number(plan.max_users) || 0,
       max_orders_month: Number(plan.max_orders_month) || 0,
+      // Migração segura: a empresa atual possui somente o administrador inicial.
+      reserved_users: Number.isInteger(accountSnap.data()?.reserved_users)
+        ? accountSnap.data().reserved_users : 1,
       trial_ends_at: "",
       current_period_end: periodEnd.toISOString(),
       updated_at: serverTimestamp(),
