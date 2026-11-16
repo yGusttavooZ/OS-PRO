@@ -48,6 +48,7 @@ export default function Plataforma() {
   const [audit, setAudit] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [requestActionError, setRequestActionError] = useState("");
   const [accountDialog, setAccountDialog] = useState({ open: false, company: null, account: null });
   const [planDialog, setPlanDialog] = useState({ open: false, plan: null });
 
@@ -105,12 +106,17 @@ export default function Plataforma() {
   }, [companies, accounts, requests]);
 
   const setRequestStatus = async (request, status) => {
-    if (status === "done") {
-      await activatePlanRequest(request);
-    } else {
-      await base44.entities.PlanRequest.update(request.id, { status });
+    setRequestActionError("");
+    try {
+      if (status === "done") {
+        await activatePlanRequest(request);
+      } else {
+        await base44.entities.PlanRequest.update(request.id, { status });
+      }
+      await load();
+    } catch (error) {
+      setRequestActionError(error?.message || "Não foi possível atualizar a solicitação.");
     }
-    await load();
   };
 
   if (!isPlatformAdmin) return null;
@@ -240,6 +246,11 @@ export default function Plataforma() {
                 <p className="text-xs text-muted-foreground mt-0.5 mb-4">
                   Pedidos feitos pelas empresas. A ativação acontece após a confirmação do pagamento.
                 </p>
+                {requestActionError && (
+                  <p role="alert" className="mb-3 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+                    {requestActionError}
+                  </p>
+                )}
                 {requests.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nenhuma solicitação registrada.</p>
                 ) : (
