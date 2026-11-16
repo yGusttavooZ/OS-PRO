@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Loader2, UserPlus, Trash2, Copy, Users, Mail, ShieldCheck, UserRound, CircleCheck, Clock3, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,11 +83,6 @@ export default function TeamSettings() {
     setError("");
     try {
       await base44.entities.Membership.update(member.id, { role });
-      if (member.user_id) {
-        await updateDoc(doc(db, "companies", company.id, "members", member.user_id), { role });
-      } else if (member.user_email) {
-        await updateDoc(doc(db, "invites", member.user_email.trim().toLowerCase()), { role });
-      }
       invalidateTenantCache("Membership");
       await load();
       if (member.user_id === (user?.uid || user?.id)) await refresh();
@@ -105,13 +98,6 @@ export default function TeamSettings() {
       : (member.status === "inactive" ? "invited" : "inactive");
     try {
       await base44.entities.Membership.update(member.id, { status });
-      if (member.user_id) {
-        await updateDoc(doc(db, "companies", company.id, "members", member.user_id), { status });
-      } else if (member.user_email) {
-        await updateDoc(doc(db, "invites", member.user_email.trim().toLowerCase()), {
-          status: status === "invited" ? "pending" : "inactive",
-        });
-      }
       invalidateTenantCache("Membership");
       await load();
       if (member.user_id === (user?.uid || user?.id)) await refresh();
@@ -125,11 +111,6 @@ export default function TeamSettings() {
     if (!window.confirm(`Remover ${member.user_name || member.user_email} da equipe?`)) return;
     setError("");
     try {
-      if (member.user_id) {
-        await deleteDoc(doc(db, "companies", company.id, "members", member.user_id));
-      } else if (member.user_email) {
-        await deleteDoc(doc(db, "invites", member.user_email.trim().toLowerCase()));
-      }
       await base44.entities.Membership.delete(member.id);
       invalidateTenantCache("Membership");
       await load();
