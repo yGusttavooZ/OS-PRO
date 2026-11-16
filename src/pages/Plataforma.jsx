@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
 import { useAuth } from "@/lib/AuthContext";
-import { paged } from "@/lib/tenant";
+import { activatePlanRequest, paged } from "@/lib/tenant";
 import { brl, dateTime, shortDate } from "@/lib/format";
 
 const STATUS_STYLES = {
@@ -105,8 +105,12 @@ export default function Plataforma() {
   }, [companies, accounts, requests]);
 
   const setRequestStatus = async (request, status) => {
-    await base44.entities.PlanRequest.update(request.id, { status });
-    load();
+    if (status === "done") {
+      await activatePlanRequest(request);
+    } else {
+      await base44.entities.PlanRequest.update(request.id, { status });
+    }
+    await load();
   };
 
   if (!isPlatformAdmin) return null;
@@ -256,10 +260,14 @@ export default function Plataforma() {
                             {request.status === "pending" ? "pendente" : request.status === "contacted" ? "contatado" : request.status === "done" ? "concluído" : "cancelado"}
                           </span>
                         </div>
-                        {request.status !== "done" && (
-                          <div className="mt-2 flex gap-2">
-                            <Button size="sm" variant="outline" onClick={() => setRequestStatus(request, "contacted")}>Marcar contato</Button>
-                            <Button size="sm" onClick={() => setRequestStatus(request, "done")}>Concluir</Button>
+                        {(request.status !== "done" || accountByCompany[request.company_id]?.status !== "active" || accountByCompany[request.company_id]?.plan_id !== request.plan_id) && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {request.status !== "done" && (
+                              <Button size="sm" variant="outline" onClick={() => setRequestStatus(request, "contacted")}>Marcar contato</Button>
+                            )}
+                            <Button size="sm" onClick={() => setRequestStatus(request, "done")}>
+                              {request.status === "done" ? "Ativar plano" : "Confirmar pagamento e ativar"}
+                            </Button>
                           </div>
                         )}
                       </li>
