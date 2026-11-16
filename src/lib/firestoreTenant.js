@@ -153,6 +153,7 @@ export async function createCompanyForUser({ user, form }) {
       company_id: companyRef.id, company_name: companyName, status: "trial",
       plan_id: "", plan_name: "Período de teste", price: 0,
       trial_ends_at: trialEnd, contact_email: user.email || "",
+      reserved_users: 1,
       created_at: serverTimestamp(),
     });
     transaction.set(counterRef, { key: "doc", value: 1, updated_at: serverTimestamp() });
