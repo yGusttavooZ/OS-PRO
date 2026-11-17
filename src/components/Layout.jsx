@@ -139,36 +139,77 @@ export default function Layout() {
         )}
 
         <div className="relative px-3 pb-4 pt-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="group flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-all hover:bg-white/[0.06]">
-                <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[hsl(152_70%_44%)] to-[hsl(174_70%_38%)] text-[12px] font-bold text-white shadow-inner ring-1 ring-white/20">
-                  {initials}
-                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[hsl(var(--sidebar))] bg-[hsl(152_70%_52%)]" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[12px] font-semibold text-white">{user?.full_name || "Usuário"}</span>
-                  <span className="mt-1 block truncate text-[10.5px] text-white/45">{planLabel}</span>
-                </span>
-                <ChevronDown className="h-4 w-4 shrink-0 text-white/40 transition-transform group-data-[state=open]:rotate-180" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-[232px] rounded-xl">
-              <DropdownMenuLabel className="font-normal">
-                <p className="truncate text-sm font-semibold">{user?.full_name || "Usuário"}</p>
-                <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+          <div className="rounded-2xl border border-white/10 bg-white/[0.055] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+            <div className="mb-3 flex items-center justify-between px-0.5">
+              <span className="text-[9px] font-bold uppercase tracking-[0.17em] text-white/40">Conta e assinatura</span>
               {role === "admin" && (
-                <DropdownMenuItem asChild>
-                  <Link to="/configuracoes">Configurações da empresa</Link>
-                </DropdownMenuItem>
+                <span className={cn(
+                  "rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-wide",
+                  account?.status === "active" ? "bg-emerald-400/15 text-emerald-300" :
+                    account?.status === "trial" ? "bg-sky-400/15 text-sky-300" :
+                    "bg-white/10 text-white/55"
+                )}>
+                  {account?.status === "active" ? "Ativo" : account?.status === "trial" ? "Em teste" : account?.status === "suspended" ? "Suspenso" : "Conta"}
+                </span>
               )}
-              <DropdownMenuItem onClick={() => logout(true)} className="text-destructive">
-                <LogOut className="mr-2 h-4 w-4" /> Sair
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="group flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-white/[0.06]">
+                  <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[hsl(152_70%_44%)] to-[hsl(174_70%_38%)] text-[12px] font-bold text-white shadow-inner ring-1 ring-white/20">
+                    {initials}
+                    <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[hsl(var(--sidebar))] bg-[hsl(152_70%_52%)]" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[12px] font-semibold text-white">{user?.full_name || "Usuário"}</span>
+                    <span className="mt-1 block truncate text-[10px] text-white/45">{user?.email || "Conta do OS PRO"}</span>
+                  </span>
+                  <ChevronDown className="h-4 w-4 shrink-0 text-white/40 transition-transform group-data-[state=open]:rotate-180" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-[232px] rounded-xl">
+                <DropdownMenuLabel className="font-normal">
+                  <p className="truncate text-sm font-semibold">{user?.full_name || "Usuário"}</p>
+                  <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {role === "admin" && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/configuracoes">Configurações da empresa</Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => logout(true)} className="text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" /> Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <div className="mt-3 border-t border-white/10 pt-3">
+              <div className="flex items-end justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-[9px] font-medium uppercase tracking-[0.12em] text-white/40">Plano contratado</p>
+                  <p className="mt-0.5 truncate font-heading text-[15px] font-bold text-white">{planLabel}</p>
+                </div>
+                {role === "admin" && account?.max_users != null && (
+                  <span className="shrink-0 text-[10px] tabular-nums text-white/50">
+                    {account?.reserved_users ?? 0} / {account.max_users} usuários
+                  </span>
+                )}
+              </div>
+              {role === "admin" && account?.max_users > 0 && (
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-all"
+                    style={{ width: `${Math.min(100, ((account?.reserved_users || 0) / account.max_users) * 100)}%` }}
+                  />
+                </div>
+              )}
+              {role === "admin" && (
+                <Link to="/configuracoes" className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-300 transition-colors hover:text-emerald-200">
+                  <Settings className="h-3 w-3" /> Gerenciar assinatura e conta
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
       </aside>
 
