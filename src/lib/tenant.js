@@ -366,7 +366,12 @@ export function orderPayload({ company, payload, number, docType, status, totals
 
 export async function createDocument({ company, user, payload }) {
   const docType = payload.doc_type === "ordem" ? "ordem" : "orcamento";
-  const number = await nextDocNumber(company);
+  let number;
+  try {
+    number = await nextDocNumber(company);
+  } catch (error) {
+    throw new Error(`Falha ao reservar o número do documento: ${error?.message || error}`);
+  }
   const items = (payload.items || []).filter((item) => String(item?.description || "").trim());
   const totals = computeTotals(items, payload.discount, payload.surcharge);
   const status = payload.status || (docType === "ordem" ? "Aprovado" : "Orçamento");
@@ -374,9 +379,14 @@ export async function createDocument({ company, user, payload }) {
   const record = orderPayload({ company, payload, number, docType, status, totals, items });
   record.opened_at = payload.opened_at || now.toISOString();
   record.entry_time = payload.entry_time || now.toTimeString().slice(0, 5);
-  const created = docType === "ordem"
-    ? await createMonthlyServiceOrder(record)
-    : await createRecord("ServiceOrder", record);
+  let created;
+  try {
+    created = docType === "ordem"
+      ? await createMonthlyServiceOrder(record)
+      : await createRecord("ServiceOrder", record);
+  } catch (error) {
+    throw new Error(`Falha ao gravar a OS e atualizar o limite mensal: ${error?.message || error}`);
+  }
   await addOrderEvent(company, user, created, null, status, "Documento criado");
   await logAudit(company, user, "create_order", created.number_label, `${docType} criado`);
   return created;
