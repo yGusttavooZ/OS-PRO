@@ -113,11 +113,11 @@ service cloud.firestore {
         && after.orders_month_count >= 1
         && after.orders_month_count <= after.max_orders_month
         && (
-          (before.orders_month_year == request.time.year()
-            && before.orders_month_number == request.time.month()
+          (before.get('orders_month_year', 0) == request.time.year()
+            && before.get('orders_month_number', 0) == request.time.month()
             && after.orders_month_count == before.orders_month_count + 1)
-          || ((before.orders_month_year != request.time.year()
-            || before.orders_month_number != request.time.month())
+          || ((before.get('orders_month_year', 0) != request.time.year()
+            || before.get('orders_month_number', 0) != request.time.month())
             && after.orders_month_count == 1)
         );
     }
