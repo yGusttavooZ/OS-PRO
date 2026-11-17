@@ -127,7 +127,6 @@ service cloud.firestore {
       return existsAfter(accountPath(companyId))
         && after.orders_month_year == request.time.year()
         && after.orders_month_number == request.time.month()
-        && after.orders_month_updated_at == request.time
         && after.orders_month_count is int
         && after.orders_month_count >= 1
         && after.orders_month_count <= after.max_orders_month;
