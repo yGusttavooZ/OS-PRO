@@ -4,6 +4,7 @@ import {
   Building2, Loader2, ShieldCheck, Users, Wallet, Plus, Pencil, LogOut, ArrowLeft, Inbox,
 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import BrandMark from "@/components/BrandMark";
 import CompanyAccountDialog from "@/components/platform/CompanyAccountDialog";
 import PlanDialog from "@/components/platform/PlanDialog";
 import { Button } from "@/components/ui/button";
@@ -134,8 +135,8 @@ export default function Plataforma() {
     <div className="min-h-screen bg-background">
       <header className="no-print sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center gap-3">
-          <span className="w-9 h-9 rounded-xl bg-primary text-primary-foreground grid place-items-center font-heading font-extrabold text-sm">
-            OS
+          <span className="w-9 h-9 rounded-xl bg-primary text-primary-foreground grid place-items-center">
+            <BrandMark className="h-6 w-6 text-primary-foreground" />
           </span>
           <span className="leading-tight">
             <span className="block font-heading font-extrabold text-[15px]">OS PRO</span>
