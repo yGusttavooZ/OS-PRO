@@ -154,11 +154,12 @@ service cloud.firestore {
           && request.resource.data.status in ['active', 'inactive']
           && (
             request.resource.data.status == resource.data.status
-            || validSeatStatusChange(companyId, resource.data.email, uid,
+            || validSeatStatusChange(companyId,
+              get(membershipPath(uid)).data.user_email, uid,
               resource.data.status, request.resource.data.status)
           );
         allow delete: if isAdmin(companyId) && uid != request.auth.uid
-          && seatReleaseAfter(companyId, resource.data.email, uid);
+          && seatReleaseAfter(companyId, get(membershipPath(uid)).data.user_email, uid);
       }
 
       match /counters/{counterId} {
