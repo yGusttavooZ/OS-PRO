@@ -100,9 +100,11 @@ export default function OrdemForm() {
     }
     setSaving(true);
     setError("");
+    let saveStage = "preparar o documento";
     try {
       let equipmentId = form.equipment_id;
       if (!equipmentId) {
+        saveStage = "salvar o equipamento";
         const equipment = await base44.entities.Equipment.create({
           company_id: company.id,
           client_id: form.client_id,
@@ -142,11 +144,13 @@ export default function OrdemForm() {
         });
         navigate(`/ordens/${id}`);
       } else {
+        saveStage = "criar a ordem de serviço";
         const created = await createDocument({ company, user, payload });
         navigate(`/ordens/${created.id}`);
       }
     } catch (err) {
-      setError(err?.message || "Não foi possível salvar o documento.");
+      console.error("Falha ao salvar documento", { etapa: saveStage, error: err });
+      setError(`Falha ao ${saveStage}: ${err?.message || "permissão insuficiente"}`);
       setSaving(false);
     }
   };
