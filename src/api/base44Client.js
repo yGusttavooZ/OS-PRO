@@ -164,9 +164,13 @@ const entityApi = (entityName) => ({
         throw new Error("O controle de vagas ainda não foi inicializado.");
       }
       if (["active", "invited"].includes(member.status)) {
+        if (accountSnap.data().reserved_users <= 1) {
+          throw new Error("A vaga do administrador principal não pode ser removida.");
+        }
         transaction.update(accountRef, {
-          reserved_users: Math.max(0, accountSnap.data().reserved_users - 1),
+          reserved_users: accountSnap.data().reserved_users - 1,
           seat_change_email: emailKey(member.user_email || id),
+          seat_change_member_id: id,
           seat_change_action: "release",
           seat_change_at: timestamp,
           updated_at: timestamp,
