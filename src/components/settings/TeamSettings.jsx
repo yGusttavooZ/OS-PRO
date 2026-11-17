@@ -147,34 +147,30 @@ export default function TeamSettings() {
           </div>
         </div>
 
-        <div className="grid gap-4 p-5">
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="min-w-0">
-              <Label htmlFor="member-name" className="field-label">Nome do funcionário</Label>
-              <Input id="member-name" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="Ex.: João da Silva" className="mt-1.5 h-10" />
-            </div>
-            <div className="min-w-0">
-              <Label htmlFor="member-email" className="field-label">E-mail de acesso</Label>
-              <Input id="member-email" type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="funcionario@email.com" className="mt-1.5 h-10" required />
-            </div>
+        <div className="grid gap-3 p-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(180px,0.7fr)_auto] xl:items-end">
+          <div className="min-w-0">
+            <Label htmlFor="member-name" className="field-label">Nome do funcionário</Label>
+            <Input id="member-name" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="Ex.: João da Silva" className="mt-1.5 h-10" />
           </div>
-          <div className="flex flex-col gap-3 border-t border-border/60 pt-4 sm:flex-row sm:items-end">
-            <div className="w-full sm:max-w-xs">
-              <Label className="field-label">Perfil de acesso</Label>
-              <Select value={form.role} onValueChange={(v) => setForm((p) => ({ ...p, role: v }))}>
-                <SelectTrigger className="mt-1.5 h-10"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {COMPANY_ROLES.map((role) => (
-                    <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button type="submit" disabled={saving || seatsFull} className="h-10 gap-2 sm:min-w-36">
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
-              {seatsFull ? "Limite atingido" : "Enviar convite"}
-            </Button>
+          <div className="min-w-0">
+            <Label htmlFor="member-email" className="field-label">E-mail de acesso</Label>
+            <Input id="member-email" type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="funcionario@email.com" className="mt-1.5 h-10" required />
           </div>
+          <div className="min-w-0">
+            <Label className="field-label">Perfil de acesso</Label>
+            <Select value={form.role} onValueChange={(v) => setForm((p) => ({ ...p, role: v }))}>
+              <SelectTrigger className="mt-1.5 h-10"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {COMPANY_ROLES.map((role) => (
+                  <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button type="submit" disabled={saving || seatsFull} className="h-10 gap-2 xl:min-w-36">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+            {seatsFull ? "Limite atingido" : "Enviar convite"}
+          </Button>
           {hasSeatLimit && (
             <div className={`rounded-xl border px-3 py-2.5 text-sm ${seatsFull ? "border-amber-500/30 bg-amber-500/5 text-amber-800" : "border-border/70 bg-muted/30 text-muted-foreground"}`}>
               <span className="font-semibold text-foreground">{reservedUsers} de {maxUsers} vagas utilizadas</span>
