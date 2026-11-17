@@ -171,6 +171,47 @@ export async function createRecord(entityName, payload) {
   return { id: ref.id, ...record };
 }
 
+/** Cria uma OS e incrementa o consumo mensal na mesma transação. */
+async function createMonthlyServiceOrder(payload) {
+  const companyId = payload.company_id;
+  if (!companyId) throw new Error("Empresa não identificada para validar o limite de OS.");
+  const accountRef = doc(db, "companyAccounts", companyId);
+  const orderRef = doc(collection(db, "serviceOrders"));
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
+  const timestamp = serverTimestamp();
+  const nowIso = now.toISOString();
+  const record = {
+    ...payload, created_date: payload.created_date || nowIso,
+    updated_date: nowIso, created_at: timestamp, updated_at: timestamp,
+  };
+
+  await runTransaction(db, async (transaction) => {
+    const accountSnap = await transaction.get(accountRef);
+    if (!accountSnap.exists()) throw new Error("Assinatura da empresa não encontrada.");
+    const account = accountSnap.data();
+    if (account.status !== "active") {
+      throw new Error("A assinatura da empresa não está ativa. Não é possível criar novas OS.");
+    }
+    const maxOrders = Number(account.max_orders_month) || 0;
+    if (maxOrders < 1) throw new Error("O plano atual não permite criar ordens de serviço.");
+    const sameMonth = account.orders_month_year === year && account.orders_month_number === month;
+    const nextCount = sameMonth ? (Number(account.orders_month_count) || 0) + 1 : 1;
+    if (nextCount > maxOrders) {
+      throw new Error(`Limite mensal atingido: ${maxOrders} ordens de serviço. O limite será renovado no próximo mês.`);
+    }
+    transaction.update(accountRef, {
+      orders_month_year: year, orders_month_number: month,
+      orders_month_count: nextCount, orders_month_updated_at: timestamp,
+    });
+    transaction.set(orderRef, record);
+  });
+
+  invalidateTenantCache("ServiceOrder", "CompanyAccount");
+  return { id: orderRef.id, ...record };
+}
+
 export async function updateRecord(entityName, id, payload) {
   const data = { ...payload, updated_date: new Date().toISOString(), updated_at: serverTimestamp() };
   await updateDoc(doc(db, collectionName(entityName), id), data);
@@ -333,7 +374,9 @@ export async function createDocument({ company, user, payload }) {
   const record = orderPayload({ company, payload, number, docType, status, totals, items });
   record.opened_at = payload.opened_at || now.toISOString();
   record.entry_time = payload.entry_time || now.toTimeString().slice(0, 5);
-  const created = await createRecord("ServiceOrder", record);
+  const created = docType === "ordem"
+    ? await createMonthlyServiceOrder(record)
+    : await createRecord("ServiceOrder", record);
   await addOrderEvent(company, user, created, null, status, "Documento criado");
   await logAudit(company, user, "create_order", created.number_label, `${docType} criado`);
   return created;
@@ -362,7 +405,7 @@ export async function convertQuote({ company, user, quote }) {
   });
   record.opened_at = now.toISOString();
   record.entry_time = now.toTimeString().slice(0, 5);
-  const created = await createRecord("ServiceOrder", record);
+  const created = await createMonthlyServiceOrder(record);
   await updateRecord("ServiceOrder", quote.id, { status: "Aprovado" });
   await addOrderEvent(company, user, quote, quote.status, "Aprovado", `Aprovado e convertido na ${created.number_label}`);
   await addOrderEvent(company, user, created, null, "Aprovado", `Originada do orçamento ${quote.number_label}`);
