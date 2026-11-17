@@ -101,6 +101,27 @@ service cloud.firestore {
       );
     }
 
+    function validOrderUsageAfter(companyId) {
+      return exists(accountPath(companyId))
+        && existsAfter(accountPath(companyId))
+        && getAfter(accountPath(companyId)).data.orders_month_year == request.time.year()
+        && getAfter(accountPath(companyId)).data.orders_month_number == request.time.month()
+        && getAfter(accountPath(companyId)).data.orders_month_updated_at == request.time
+        && getAfter(accountPath(companyId)).data.orders_month_count is int
+        && getAfter(accountPath(companyId)).data.orders_month_count >= 1
+        && getAfter(accountPath(companyId)).data.orders_month_count
+          <= getAfter(accountPath(companyId)).data.max_orders_month
+        && (
+          (get(accountPath(companyId)).data.orders_month_year == request.time.year()
+            && get(accountPath(companyId)).data.orders_month_number == request.time.month()
+            && getAfter(accountPath(companyId)).data.orders_month_count
+              == get(accountPath(companyId)).data.orders_month_count + 1)
+          || ((get(accountPath(companyId)).data.orders_month_year != request.time.year()
+            || get(accountPath(companyId)).data.orders_month_number != request.time.month())
+            && getAfter(accountPath(companyId)).data.orders_month_count == 1)
+        );
+    }
+
     match /users/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
       allow create: if signedIn() && request.auth.uid == uid
@@ -294,28 +315,39 @@ service cloud.firestore {
         && request.resource.data.reserved_users == 1);
       allow update: if platformAdmin() || (
         isAdmin(companyId)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'reserved_users', 'seat_change_email', 'seat_change_member_id', 'seat_change_action',
-          'seat_change_at', 'updated_at'
-        ])
-        && request.resource.data.seat_change_email is string
-        && request.resource.data.seat_change_at == request.time
         && (
-          (request.resource.data.seat_change_action == 'reserve'
-            && request.resource.data.reserved_users == resource.data.reserved_users + 1
-            && request.resource.data.reserved_users <= resource.data.max_users
-            && request.resource.data.seat_change_member_id is string
-            && existsAfter(membershipPath(request.resource.data.seat_change_member_id))
-            && getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.company_id == companyId
-            && getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.status in ['invited', 'active'])
-          || (request.resource.data.seat_change_action == 'release'
-            && request.resource.data.reserved_users == resource.data.reserved_users - 1
-            && request.resource.data.reserved_users >= 1
-            && request.resource.data.seat_change_member_id is string
-            && (!existsAfter(membershipPath(request.resource.data.seat_change_member_id))
-              || getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.status == 'inactive')
-            && (!existsAfter(memberPath(companyId, request.resource.data.seat_change_member_id))
-              || getAfter(memberPath(companyId, request.resource.data.seat_change_member_id)).data.status == 'inactive'))
+          (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'reserved_users', 'seat_change_email', 'seat_change_member_id', 'seat_change_action',
+              'seat_change_at', 'updated_at'
+            ])
+            && request.resource.data.seat_change_email is string
+            && request.resource.data.seat_change_at == request.time
+            && (
+              (request.resource.data.seat_change_action == 'reserve'
+                && request.resource.data.reserved_users == resource.data.reserved_users + 1
+                && request.resource.data.reserved_users <= resource.data.max_users
+                && request.resource.data.seat_change_member_id is string
+                && existsAfter(membershipPath(request.resource.data.seat_change_member_id))
+                && getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.company_id == companyId
+                && getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.status in ['invited', 'active'])
+              || (request.resource.data.seat_change_action == 'release'
+                && request.resource.data.reserved_users == resource.data.reserved_users - 1
+                && request.resource.data.reserved_users >= 1
+                && request.resource.data.seat_change_member_id is string
+                && (!existsAfter(membershipPath(request.resource.data.seat_change_member_id))
+                  || getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.status == 'inactive')
+                && (!existsAfter(memberPath(companyId, request.resource.data.seat_change_member_id))
+                  || getAfter(memberPath(companyId, request.resource.data.seat_change_member_id)).data.status == 'inactive'))
+            )
+          )
+          || (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'orders_month_year', 'orders_month_number', 'orders_month_count', 'orders_month_updated_at'
+            ])
+            && request.resource.data.orders_month_updated_at == request.time
+            && validOrderUsageAfter(companyId)
+          )
         )
       );
       allow delete: if false;
@@ -357,7 +389,9 @@ service cloud.firestore {
             && role(request.resource.data.company_id) in ['admin', 'attendant'])
           || (collectionName == 'serviceOrders'
             && role(request.resource.data.company_id) in ['admin', 'attendant']
-            && validTechnicianAssignment(request.resource.data.company_id, request.resource.data))
+            && validTechnicianAssignment(request.resource.data.company_id, request.resource.data)
+            && (request.resource.data.doc_type != 'ordem'
+              || validOrderUsageAfter(request.resource.data.company_id)))
           || (collectionName == 'transactions'
             && role(request.resource.data.company_id) == 'admin')
           || (collectionName in ['orderEvents', 'auditLogs']
