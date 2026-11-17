@@ -9,7 +9,7 @@ import { useTenant } from "@/lib/TenantContext";
 import { COMPANY_ROLES, invalidateTenantCache, paged } from "@/lib/tenant";
 
 export default function TeamSettings() {
-  const { company, user, refresh } = useTenant();
+  const { company, user, refresh, account } = useTenant();
   const [members, setMembers] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", role: "attendant" });
   const [saving, setSaving] = useState(false);
@@ -38,6 +38,10 @@ export default function TeamSettings() {
     event.preventDefault();
     if (!form.email.trim()) {
       setError("Informe o e-mail do convidado.");
+      return;
+    }
+    if (seatsFull) {
+      setError(`Limite do plano atingido: ${reservedUsers} de ${maxUsers} vagas utilizadas.`);
       return;
     }
     setSaving(true);
@@ -121,6 +125,12 @@ export default function TeamSettings() {
 
   const activeCount = members.filter((member) => member.status === "active").length;
   const invitedCount = members.filter((member) => member.status === "invited").length;
+  const maxUsers = Number(account?.max_users || 0);
+  const reservedUsers = Number.isInteger(account?.reserved_users)
+    ? account.reserved_users
+    : activeCount + invitedCount;
+  const hasSeatLimit = maxUsers > 0;
+  const seatsFull = hasSeatLimit && reservedUsers >= maxUsers;
 
   return (
     <div className="space-y-5">
@@ -160,11 +170,17 @@ export default function TeamSettings() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" disabled={saving} className="h-10 gap-2 sm:min-w-36">
+            <Button type="submit" disabled={saving || seatsFull} className="h-10 gap-2 sm:min-w-36">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
-              Enviar convite
+              {seatsFull ? "Limite atingido" : "Enviar convite"}
             </Button>
           </div>
+          {hasSeatLimit && (
+            <div className={`rounded-xl border px-3 py-2.5 text-sm ${seatsFull ? "border-amber-500/30 bg-amber-500/5 text-amber-800" : "border-border/70 bg-muted/30 text-muted-foreground"}`}>
+              <span className="font-semibold text-foreground">{reservedUsers} de {maxUsers} vagas utilizadas</span>
+              <span className="ml-2">{seatsFull ? "Não há vagas disponíveis neste plano." : `${maxUsers - reservedUsers} vaga(s) disponível(is).`}</span>
+            </div>
+          )}
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {COMPANY_ROLES.map((role) => (
