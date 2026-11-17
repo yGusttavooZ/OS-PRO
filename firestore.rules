@@ -49,6 +49,51 @@ service cloud.firestore {
       return signedIn()
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.platform_role == 'platform_admin';
     }
+    function accountPath(companyId) {
+      return /databases/$(database)/documents/companyAccounts/$(companyId);
+    }
+    function membershipPath(email) {
+      return /databases/$(database)/documents/memberships/$(email);
+    }
+    function invitePath(email) {
+      return /databases/$(database)/documents/invites/$(email);
+    }
+    function seatReservationAfter(companyId, email) {
+      return existsAfter(accountPath(companyId))
+        && getAfter(accountPath(companyId)).data.seat_change_email == email
+        && getAfter(accountPath(companyId)).data.seat_change_action == 'reserve'
+        && getAfter(accountPath(companyId)).data.reserved_users
+          == get(accountPath(companyId)).data.reserved_users + 1
+        && getAfter(accountPath(companyId)).data.reserved_users
+          <= getAfter(accountPath(companyId)).data.max_users
+        && existsAfter(membershipPath(email))
+        && getAfter(membershipPath(email)).data.company_id == companyId
+        && getAfter(membershipPath(email)).data.status in ['invited', 'active'];
+    }
+    function seatReleaseAfter(companyId, email) {
+      return existsAfter(accountPath(companyId))
+        && getAfter(accountPath(companyId)).data.seat_change_email == email
+        && getAfter(accountPath(companyId)).data.seat_change_action == 'release'
+        && getAfter(accountPath(companyId)).data.reserved_users
+          == get(accountPath(companyId)).data.reserved_users - 1
+        && getAfter(accountPath(companyId)).data.reserved_users >= 1
+        && (
+          !existsAfter(membershipPath(email))
+          || (getAfter(membershipPath(email)).data.company_id == companyId
+            && getAfter(membershipPath(email)).data.status == 'inactive')
+        );
+    }
+    function validSeatStatusChange(companyId, email, oldStatus, newStatus) {
+      return (
+        !(oldStatus in ['active', 'invited']) && (newStatus in ['active', 'invited'])
+        && seatReservationAfter(companyId, email)
+      ) || (
+        (oldStatus in ['active', 'invited']) && !(newStatus in ['active', 'invited'])
+        && seatReleaseAfter(companyId, email)
+      ) || (
+        (oldStatus in ['active', 'invited']) && (newStatus in ['active', 'invited'])
+      );
+    }
 
     match /users/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
@@ -205,9 +250,32 @@ service cloud.firestore {
 
     match /companyAccounts/{companyId} {
       allow read: if isMember(companyId) || platformAdmin();
-      allow create: if platformAdmin() || (signedIn() && existsAfter(memberPath(companyId, request.auth.uid))
-        && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin');
-      allow update: if platformAdmin();
+      allow create: if platformAdmin() || (signedIn()
+        && existsAfter(memberPath(companyId, request.auth.uid))
+        && getAfter(memberPath(companyId, request.auth.uid)).data.role == 'admin'
+        && request.resource.data.reserved_users == 1);
+      allow update: if platformAdmin() || (
+        isAdmin(companyId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'reserved_users', 'seat_change_email', 'seat_change_action',
+          'seat_change_at', 'updated_at'
+        ])
+        && request.resource.data.seat_change_email is string
+        && request.resource.data.seat_change_at == request.time
+        && (
+          (request.resource.data.seat_change_action == 'reserve'
+            && request.resource.data.reserved_users == resource.data.reserved_users + 1
+            && request.resource.data.reserved_users <= resource.data.max_users
+            && existsAfter(membershipPath(request.resource.data.seat_change_email))
+            && getAfter(membershipPath(request.resource.data.seat_change_email)).data.company_id == companyId
+            && getAfter(membershipPath(request.resource.data.seat_change_email)).data.status in ['invited', 'active'])
+          || (request.resource.data.seat_change_action == 'release'
+            && request.resource.data.reserved_users == resource.data.reserved_users - 1
+            && request.resource.data.reserved_users >= 1
+            && (!existsAfter(membershipPath(request.resource.data.seat_change_email))
+              || getAfter(membershipPath(request.resource.data.seat_change_email)).data.status == 'inactive'))
+        )
+      );
       allow delete: if false;
     }
 
