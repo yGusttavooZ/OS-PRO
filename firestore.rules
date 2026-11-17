@@ -52,8 +52,8 @@ service cloud.firestore {
     function accountPath(companyId) {
       return /databases/$(database)/documents/companyAccounts/$(companyId);
     }
-    function membershipPath(email) {
-      return /databases/$(database)/documents/memberships/$(email);
+    function membershipPath(memberId) {
+      return /databases/$(database)/documents/memberships/$(memberId);
     }
     function invitePath(email) {
       return /databases/$(database)/documents/invites/$(email);
@@ -66,30 +66,36 @@ service cloud.firestore {
           == get(accountPath(companyId)).data.reserved_users + 1
         && getAfter(accountPath(companyId)).data.reserved_users
           <= getAfter(accountPath(companyId)).data.max_users
-        && existsAfter(membershipPath(email))
-        && getAfter(membershipPath(email)).data.company_id == companyId
-        && getAfter(membershipPath(email)).data.status in ['invited', 'active'];
+        && getAfter(accountPath(companyId)).data.seat_change_member_id is string
+        && existsAfter(membershipPath(getAfter(accountPath(companyId)).data.seat_change_member_id))
+        && getAfter(membershipPath(getAfter(accountPath(companyId)).data.seat_change_member_id)).data.company_id == companyId
+        && getAfter(membershipPath(getAfter(accountPath(companyId)).data.seat_change_member_id)).data.status in ['invited', 'active'];
     }
-    function seatReleaseAfter(companyId, email) {
+    function seatReleaseAfter(companyId, email, memberId) {
       return existsAfter(accountPath(companyId))
         && getAfter(accountPath(companyId)).data.seat_change_email == email
+        && getAfter(accountPath(companyId)).data.seat_change_member_id == memberId
         && getAfter(accountPath(companyId)).data.seat_change_action == 'release'
         && getAfter(accountPath(companyId)).data.reserved_users
           == get(accountPath(companyId)).data.reserved_users - 1
         && getAfter(accountPath(companyId)).data.reserved_users >= 1
         && (
-          !existsAfter(membershipPath(email))
-          || (getAfter(membershipPath(email)).data.company_id == companyId
-            && getAfter(membershipPath(email)).data.status == 'inactive')
+          !existsAfter(membershipPath(memberId))
+          || (getAfter(membershipPath(memberId)).data.company_id == companyId
+            && getAfter(membershipPath(memberId)).data.status == 'inactive')
+        )
+        && (
+          !existsAfter(memberPath(companyId, memberId))
+          || getAfter(memberPath(companyId, memberId)).data.status == 'inactive'
         );
     }
-    function validSeatStatusChange(companyId, email, oldStatus, newStatus) {
+    function validSeatStatusChange(companyId, email, memberId, oldStatus, newStatus) {
       return (
         !(oldStatus in ['active', 'invited']) && (newStatus in ['active', 'invited'])
         && seatReservationAfter(companyId, email)
       ) || (
         (oldStatus in ['active', 'invited']) && !(newStatus in ['active', 'invited'])
-        && seatReleaseAfter(companyId, email)
+        && seatReleaseAfter(companyId, email, memberId)
       ) || (
         (oldStatus in ['active', 'invited']) && (newStatus in ['active', 'invited'])
       );
@@ -140,16 +146,19 @@ service cloud.firestore {
             && getAfter(/databases/$(database)/documents/companies/$(companyId)).data.owner_uid == uid
             && request.resource.data.role == 'admin'
             && request.resource.data.status == 'active')
-          || isAdmin(companyId)
         );
         allow update: if isAdmin(companyId)
           && request.resource.data.uid == resource.data.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'role', 'status'
-          ])
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role', 'status'])
           && request.resource.data.role in ['admin', 'attendant', 'technician']
-          && request.resource.data.status in ['active', 'inactive'];
-        allow delete: if isAdmin(companyId) && uid != request.auth.uid;
+          && request.resource.data.status in ['active', 'inactive']
+          && (
+            request.resource.data.status == resource.data.status
+            || validSeatStatusChange(companyId, resource.data.email, uid,
+              resource.data.status, request.resource.data.status)
+          );
+        allow delete: if isAdmin(companyId) && uid != request.auth.uid
+          && seatReleaseAfter(companyId, resource.data.email, uid);
       }
 
       match /counters/{counterId} {
@@ -186,7 +195,9 @@ service cloud.firestore {
       );
       allow create: if signedIn()
         && request.resource.data.company_id is string
-        && isAdmin(request.resource.data.company_id);
+        && request.resource.data.email == email
+        && isAdmin(request.resource.data.company_id)
+        && seatReservationAfter(request.resource.data.company_id, email);
       allow update: if signedIn() && (
         (resource.data.company_id is string
           && isAdmin(resource.data.company_id)
@@ -196,7 +207,13 @@ service cloud.firestore {
             'role', 'status', 'updated_at'
           ])
           && request.resource.data.role in ['admin', 'attendant', 'technician']
-          && request.resource.data.status in ['pending', 'inactive'])
+          && request.resource.data.status in ['pending', 'inactive']
+          && (
+            request.resource.data.status == resource.data.status
+            || validSeatStatusChange(resource.data.company_id, email, email,
+              resource.data.status == 'pending' ? 'invited' : 'inactive',
+              request.resource.data.status == 'pending' ? 'invited' : 'inactive')
+          ))
         || (request.auth.token.email == resource.data.email
           && resource.data.status == 'pending'
           && request.resource.data.status == 'accepted'
@@ -209,7 +226,8 @@ service cloud.firestore {
       );
       allow delete: if signedIn()
         && resource.data.company_id is string
-        && isAdmin(resource.data.company_id);
+        && isAdmin(resource.data.company_id)
+        && seatReleaseAfter(resource.data.company_id, email, email);
     }
 
     match /memberships/{membershipId} {
@@ -225,7 +243,10 @@ service cloud.firestore {
         (membershipId == request.auth.uid
           && request.resource.data.user_id == request.auth.uid
           && existsAfter(memberPath(request.resource.data.company_id, request.auth.uid)))
-        || (request.resource.data.company_id is string && isAdmin(request.resource.data.company_id))
+        || (request.resource.data.company_id is string
+          && request.resource.data.user_email == membershipId
+          && isAdmin(request.resource.data.company_id)
+          && seatReservationAfter(request.resource.data.company_id, membershipId))
       );
       allow update: if signedIn() && resource.data.company_id is string
         && isAdmin(resource.data.company_id)
@@ -236,9 +257,16 @@ service cloud.firestore {
           'role', 'status', 'updated_at'
         ])
         && request.resource.data.role in ['admin', 'attendant', 'technician']
-        && request.resource.data.status in ['active', 'inactive', 'invited'];
+        && request.resource.data.status in ['active', 'inactive', 'invited']
+        && (
+          request.resource.data.status == resource.data.status
+          || validSeatStatusChange(resource.data.company_id,
+            resource.data.user_email, membershipId,
+            resource.data.status, request.resource.data.status)
+        );
       allow delete: if signedIn() && (
-        (resource.data.company_id is string && isAdmin(resource.data.company_id))
+        (resource.data.company_id is string && isAdmin(resource.data.company_id)
+          && seatReleaseAfter(resource.data.company_id, resource.data.user_email, membershipId))
         || (resource.data.user_email == request.auth.token.email
           && resource.data.status == 'invited'
           && existsAfter(/databases/$(database)/documents/invites/$(request.auth.token.email))
@@ -257,7 +285,7 @@ service cloud.firestore {
       allow update: if platformAdmin() || (
         isAdmin(companyId)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'reserved_users', 'seat_change_email', 'seat_change_action',
+          'reserved_users', 'seat_change_email', 'seat_change_member_id', 'seat_change_action',
           'seat_change_at', 'updated_at'
         ])
         && request.resource.data.seat_change_email is string
@@ -266,14 +294,18 @@ service cloud.firestore {
           (request.resource.data.seat_change_action == 'reserve'
             && request.resource.data.reserved_users == resource.data.reserved_users + 1
             && request.resource.data.reserved_users <= resource.data.max_users
-            && existsAfter(membershipPath(request.resource.data.seat_change_email))
-            && getAfter(membershipPath(request.resource.data.seat_change_email)).data.company_id == companyId
-            && getAfter(membershipPath(request.resource.data.seat_change_email)).data.status in ['invited', 'active'])
+            && request.resource.data.seat_change_member_id is string
+            && existsAfter(membershipPath(request.resource.data.seat_change_member_id))
+            && getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.company_id == companyId
+            && getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.status in ['invited', 'active'])
           || (request.resource.data.seat_change_action == 'release'
             && request.resource.data.reserved_users == resource.data.reserved_users - 1
             && request.resource.data.reserved_users >= 1
-            && (!existsAfter(membershipPath(request.resource.data.seat_change_email))
-              || getAfter(membershipPath(request.resource.data.seat_change_email)).data.status == 'inactive'))
+            && request.resource.data.seat_change_member_id is string
+            && (!existsAfter(membershipPath(request.resource.data.seat_change_member_id))
+              || getAfter(membershipPath(request.resource.data.seat_change_member_id)).data.status == 'inactive')
+            && (!existsAfter(memberPath(companyId, request.resource.data.seat_change_member_id))
+              || getAfter(memberPath(companyId, request.resource.data.seat_change_member_id)).data.status == 'inactive'))
         )
       );
       allow delete: if false;
