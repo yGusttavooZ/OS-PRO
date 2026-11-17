@@ -168,7 +168,9 @@ const entityApi = (entityName) => ({
         });
       }
       if (nestedRef && nestedSnap?.exists()) transaction.delete(nestedRef);
-      if (inviteRef && inviteSnap?.exists() && inviteSnap.data().company_id === companyId) {
+      if (inviteRef && inviteSnap?.exists()
+        && inviteSnap.data().company_id === companyId
+        && inviteSnap.data().status !== "accepted") {
         transaction.delete(inviteRef);
       }
       transaction.delete(memberRef);
