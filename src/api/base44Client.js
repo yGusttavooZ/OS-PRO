@@ -51,7 +51,7 @@ const entityApi = (entityName) => ({
         if (next > Number(account.max_users || 0)) {
           throw new Error(`Limite do plano atingido: ${account.max_users || 0} usuários.`);
         }
-        transaction.update(accountRef, { reserved_users: next, updated_at: timestamp });
+        transaction.update(accountRef, { reserved_users: next, seat_change_email: email, seat_change_action: "reserve", seat_change_at: timestamp, updated_at: timestamp });
       }
 
       const invite = {
@@ -107,10 +107,13 @@ const entityApi = (entityName) => ({
         if (next > Number(accountSnap.data().max_users || 0)) {
           throw new Error(`Limite do plano atingido: ${accountSnap.data().max_users || 0} usuários.`);
         }
-        transaction.update(accountRef, { reserved_users: next, updated_at: timestamp });
+        transaction.update(accountRef, { reserved_users: next, seat_change_email: emailKey(member.user_email || id), seat_change_action: "reserve", seat_change_at: timestamp, updated_at: timestamp });
       } else if (delta < 0) {
         transaction.update(accountRef, {
           reserved_users: Math.max(0, accountSnap.data().reserved_users - 1),
+          seat_change_email: emailKey(member.user_email || id),
+          seat_change_action: "release",
+          seat_change_at: timestamp,
           updated_at: timestamp,
         });
       }
@@ -157,6 +160,9 @@ const entityApi = (entityName) => ({
       if (["active", "invited"].includes(member.status)) {
         transaction.update(accountRef, {
           reserved_users: Math.max(0, accountSnap.data().reserved_users - 1),
+          seat_change_email: emailKey(member.user_email || id),
+          seat_change_action: "release",
+          seat_change_at: timestamp,
           updated_at: timestamp,
         });
       }
