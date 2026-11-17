@@ -159,7 +159,10 @@ service cloud.firestore {
               resource.data.status, request.resource.data.status)
           );
         allow delete: if isAdmin(companyId) && uid != request.auth.uid
-          && seatReleaseAfter(companyId, get(membershipPath(uid)).data.user_email, uid);
+          && (
+            (resource.data.status == 'inactive' && !existsAfter(membershipPath(uid)))
+            || seatReleaseAfter(companyId, get(membershipPath(uid)).data.user_email, uid)
+          );
       }
 
       match /counters/{counterId} {
@@ -228,7 +231,10 @@ service cloud.firestore {
       allow delete: if signedIn()
         && resource.data.company_id is string
         && isAdmin(resource.data.company_id)
-        && seatReleaseAfter(resource.data.company_id, email, email);
+        && (
+          (resource.data.status == 'inactive' && !existsAfter(membershipPath(email)))
+          || seatReleaseAfter(resource.data.company_id, email, email)
+        );
     }
 
     match /memberships/{membershipId} {
@@ -267,7 +273,10 @@ service cloud.firestore {
         );
       allow delete: if signedIn() && (
         (resource.data.company_id is string && isAdmin(resource.data.company_id)
-          && seatReleaseAfter(resource.data.company_id, resource.data.user_email, membershipId))
+          && (
+            (resource.data.status == 'inactive' && !existsAfter(membershipPath(membershipId)))
+            || seatReleaseAfter(resource.data.company_id, resource.data.user_email, membershipId)
+          ))
         || (resource.data.user_email == request.auth.token.email
           && resource.data.status == 'invited'
           && existsAfter(/databases/$(database)/documents/invites/$(request.auth.token.email))
