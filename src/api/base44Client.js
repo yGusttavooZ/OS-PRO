@@ -54,18 +54,23 @@ const entityApi = (entityName) => ({
         transaction.update(accountRef, { reserved_users: next, seat_change_email: email, seat_change_member_id: email, seat_change_action: "reserve", seat_change_at: timestamp, updated_at: timestamp });
       }
 
-      const invite = {
-        ...payload, user_email: email, status: "invited",
-        created_date: new Date().toISOString(), created_at: timestamp,
-      };
-      transaction.set(memberRef, invite);
-      transaction.set(inviteRef, {
-        email, company_id: companyId, company_name: payload.company_name || "",
-        role, status: "pending",
-        invited_by: auth.currentUser?.uid || "",
-        ...(inviteSnap.exists() ? {} : { created_at: timestamp }),
-        updated_at: timestamp,
-      }, { merge: true });
+      if (memberSnap.exists()) {
+        transaction.update(memberRef, { role, status: "invited", updated_at: timestamp });
+      } else {
+        transaction.set(memberRef, {
+          ...payload, user_email: email, status: "invited",
+          created_date: new Date().toISOString(), created_at: timestamp,
+        });
+      }
+      if (inviteSnap.exists()) {
+        transaction.update(inviteRef, { role, status: "pending", updated_at: timestamp });
+      } else {
+        transaction.set(inviteRef, {
+          email, company_id: companyId, company_name: payload.company_name || "",
+          role, status: "pending", invited_by: auth.currentUser?.uid || "",
+          created_at: timestamp, updated_at: timestamp,
+        });
+      }
     });
     return { id: email, ...payload, user_email: email, status: "invited" };
   },
