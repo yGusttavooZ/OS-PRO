@@ -156,13 +156,13 @@ export default function Layout() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="group flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-white/[0.06]">
-                  <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[hsl(152_70%_44%)] to-[hsl(174_70%_38%)] text-[12px] font-bold text-white shadow-inner ring-1 ring-white/20">
-                    {initials}
+                  <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-emerald-300/20 bg-gradient-to-br from-white/15 to-emerald-400/10 shadow-inner">
+                    <BrandMark className="h-7 w-7 text-emerald-200" />
                     <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[hsl(var(--sidebar))] bg-[hsl(152_70%_52%)]" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[12px] font-semibold text-white">{user?.full_name || "Usuário"}</span>
-                    <span className="mt-1 block truncate text-[10px] text-white/45">{user?.email || "Conta do OS PRO"}</span>
+                    <span className="mt-1 block truncate text-[10px] text-white/45">{role === "admin" ? "Administrador da empresa" : role === "technician" ? "Técnico" : role === "attendant" ? "Atendente" : "Conta OS PRO"}</span>
                   </span>
                   <ChevronDown className="h-4 w-4 shrink-0 text-white/40 transition-transform group-data-[state=open]:rotate-180" />
                 </button>
@@ -170,7 +170,6 @@ export default function Layout() {
               <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-[232px] rounded-xl">
                 <DropdownMenuLabel className="font-normal">
                   <p className="truncate text-sm font-semibold">{user?.full_name || "Usuário"}</p>
-                  <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {role === "admin" && (
