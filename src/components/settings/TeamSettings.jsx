@@ -147,7 +147,8 @@ export default function TeamSettings() {
           </div>
         </div>
 
-        <div className="grid gap-3 p-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(180px,0.7fr)_auto] xl:items-end">
+        <div className="space-y-4 p-5">
+          <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(180px,0.7fr)_auto] xl:items-end">
           <div className="min-w-0">
             <Label htmlFor="member-name" className="field-label">Nome do funcionário</Label>
             <Input id="member-name" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="Ex.: João da Silva" className="mt-1.5 h-10" />
@@ -171,6 +172,7 @@ export default function TeamSettings() {
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
             {seatsFull ? "Limite atingido" : "Enviar convite"}
           </Button>
+          </div>
           {hasSeatLimit && (
             <div className={`rounded-xl border px-3 py-2.5 text-sm ${seatsFull ? "border-amber-500/30 bg-amber-500/5 text-amber-800" : "border-border/70 bg-muted/30 text-muted-foreground"}`}>
               <span className="font-semibold text-foreground">{reservedUsers} de {maxUsers} vagas utilizadas</span>
