@@ -102,24 +102,35 @@ service cloud.firestore {
     }
 
     function validOrderUsageAfter(companyId) {
+      let before = get(accountPath(companyId)).data;
+      let after = getAfter(accountPath(companyId)).data;
       return exists(accountPath(companyId))
         && existsAfter(accountPath(companyId))
-        && getAfter(accountPath(companyId)).data.orders_month_year == request.time.year()
-        && getAfter(accountPath(companyId)).data.orders_month_number == request.time.month()
-        && getAfter(accountPath(companyId)).data.orders_month_updated_at == request.time
-        && getAfter(accountPath(companyId)).data.orders_month_count is int
-        && getAfter(accountPath(companyId)).data.orders_month_count >= 1
-        && getAfter(accountPath(companyId)).data.orders_month_count
-          <= getAfter(accountPath(companyId)).data.max_orders_month
+        && after.orders_month_year == request.time.year()
+        && after.orders_month_number == request.time.month()
+        && after.orders_month_updated_at == request.time
+        && after.orders_month_count is int
+        && after.orders_month_count >= 1
+        && after.orders_month_count <= after.max_orders_month
         && (
-          (get(accountPath(companyId)).data.orders_month_year == request.time.year()
-            && get(accountPath(companyId)).data.orders_month_number == request.time.month()
-            && getAfter(accountPath(companyId)).data.orders_month_count
-              == get(accountPath(companyId)).data.orders_month_count + 1)
-          || ((get(accountPath(companyId)).data.orders_month_year != request.time.year()
-            || get(accountPath(companyId)).data.orders_month_number != request.time.month())
-            && getAfter(accountPath(companyId)).data.orders_month_count == 1)
+          (before.orders_month_year == request.time.year()
+            && before.orders_month_number == request.time.month()
+            && after.orders_month_count == before.orders_month_count + 1)
+          || ((before.orders_month_year != request.time.year()
+            || before.orders_month_number != request.time.month())
+            && after.orders_month_count == 1)
         );
+    }
+
+    function orderUsageWithinLimitAfter(companyId) {
+      let after = getAfter(accountPath(companyId)).data;
+      return existsAfter(accountPath(companyId))
+        && after.orders_month_year == request.time.year()
+        && after.orders_month_number == request.time.month()
+        && after.orders_month_updated_at == request.time
+        && after.orders_month_count is int
+        && after.orders_month_count >= 1
+        && after.orders_month_count <= after.max_orders_month;
     }
 
     match /users/{uid} {
@@ -391,7 +402,7 @@ service cloud.firestore {
             && role(request.resource.data.company_id) in ['admin', 'attendant']
             && validTechnicianAssignment(request.resource.data.company_id, request.resource.data)
             && (request.resource.data.doc_type != 'ordem'
-              || validOrderUsageAfter(request.resource.data.company_id)))
+              || orderUsageWithinLimitAfter(request.resource.data.company_id)))
           || (collectionName == 'transactions'
             && role(request.resource.data.company_id) == 'admin')
           || (collectionName in ['orderEvents', 'auditLogs']
