@@ -6,7 +6,7 @@ import ClientDialog from "@/components/clients/ClientDialog";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/lib/TenantContext";
-import { useTenantCacheRefresh, paged } from "@/lib/tenant";
+import { paged } from "@/lib/tenant";
 import { brl, formatDoc, formatPhone, shortDate } from "@/lib/format";
 
 function Field({ label, value }) {
@@ -54,8 +54,6 @@ export default function ClienteDetalhe() {
     if (!company?.id || !id) return;
     load();
   }, [id, company?.id]);
-
-  useTenantCacheRefresh(load, "Client", "Equipment", "ServiceOrder");
 
   if (loading) {
     return (
