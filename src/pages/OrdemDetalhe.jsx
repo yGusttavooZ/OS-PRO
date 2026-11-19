@@ -23,7 +23,6 @@ import { brl, dateTime, formatDoc, formatPhone, shortDate } from "@/lib/format";
 
 function InfoRow({ label, value }) {
   if (!value) return null;
-  useTenantCacheRefresh(load, "ServiceOrder", "OrderEvent", "Transaction");
 
   return (
     <div className="min-w-0 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5">
@@ -90,6 +89,8 @@ export default function OrdemDetalhe() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useTenantCacheRefresh(load, "ServiceOrder", "OrderEvent", "Transaction");
 
   useEffect(() => {
     if (!notFound) return;
