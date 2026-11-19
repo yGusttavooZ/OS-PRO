@@ -5,7 +5,6 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useEffect, useRef } from "react";
 
 export const ORDER_STATUSES = [
   "Orçamento", "Aguardando aprovação", "Aprovado", "Aguardando equipamento",
@@ -58,7 +57,6 @@ const COLLECTIONS = {
 const READ_TTL = 12000;
 const readCache = new Map();
 const inFlight = new Map();
-const cacheListeners = new Set();
 let cacheUserId = auth.currentUser?.uid || null;
 
 // Nunca reutilize dados lidos por uma conta após a troca de usuário.
@@ -68,34 +66,13 @@ onAuthStateChanged(auth, (user) => {
     cacheUserId = nextUserId;
     readCache.clear();
     inFlight.clear();
-    cacheListeners.forEach((listener) => listener([]));
   }
 });
-
-export function subscribeTenantCache(listener) {
-  cacheListeners.add(listener);
-  return () => cacheListeners.delete(listener);
-}
-
-export function useTenantCacheRefresh(load, ...entityNames) {
-  const loadRef = useRef(load);
-  const entitiesRef = useRef(entityNames);
-  useEffect(() => { loadRef.current = load; }, [load]);
-  useEffect(() => {
-    entitiesRef.current = entityNames;
-  }, [entityNames.join("|")]);
-  useEffect(() => subscribeTenantCache((changed) => {
-    if (!changed.length || !entitiesRef.current.length || changed.some((name) => entitiesRef.current.includes(name))) {
-      loadRef.current?.();
-    }
-  }), []);
-}
 
 export function invalidateTenantCache(...entityNames) {
   for (const key of [...readCache.keys()]) {
     if (!entityNames.length || entityNames.some((name) => key.includes(`::${name}::`))) readCache.delete(key);
   }
-  cacheListeners.forEach((listener) => listener(entityNames));
 }
 
 function collectionName(entityName) {
