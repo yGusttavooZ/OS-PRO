@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { invalidateTenantCache, paged } from "@/lib/tenant";
+import { useTenantCacheRefresh, invalidateTenantCache, paged } from "@/lib/tenant";
 
 export default function Equipamentos() {
   const { company, can } = useTenant();
@@ -55,6 +55,8 @@ export default function Equipamentos() {
     invalidateTenantCache("Equipment");
     load();
   };
+
+  useTenantCacheRefresh(load, "Equipment", "Client", "ServiceOrder");
 
   return (
     <div>
