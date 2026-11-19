@@ -231,7 +231,7 @@ export default function OrdemImprimir() {
           border-bottom: 2px solid hsl(var(--primary));
         }
         .os-company { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .os-logo { width: 48px; height: 48px; flex: 0 0 48px; }
+        .os-logo { width: 64px; height: 64px; flex: 0 0 64px; }
         .os-logo-fallback { font-size: 17px; }
         .os-company-info { min-width: 0; }
         .os-company-info h1 { margin: 0 0 3px; font-size: 17px; line-height: 1.2; font-weight: 800; color: #172033; }
@@ -281,7 +281,7 @@ export default function OrdemImprimir() {
         @media (max-width: 600px) {
           .os-sheet { padding: 22px 18px; border-radius: 0; }
           .os-header { align-items: flex-start; gap: 10px; }
-          .os-logo { width: 40px; height: 40px; flex-basis: 40px; }
+          .os-logo { width: 54px; height: 54px; flex-basis: 54px; }
           .os-company-info h1 { font-size: 14px; }
           .os-number > strong { font-size: 19px; }
           .os-two-columns { gap: 8px; }
@@ -304,7 +304,7 @@ export default function OrdemImprimir() {
             font-size: 10pt !important; line-height: 1.35 !important;
           }
           .os-header { gap: 5mm !important; padding-bottom: 5mm !important; }
-          .os-logo { width: 16mm !important; height: 16mm !important; flex-basis: 16mm !important; }
+          .os-logo { width: 20mm !important; height: 20mm !important; flex-basis: 20mm !important; }
           .os-company { gap: 4mm !important; }
           .os-company-info h1 { font-size: 15pt !important; margin-bottom: 1mm !important; }
           .os-company-info p, .os-number > span:not(.os-kicker):not(.os-status) { font-size: 8.5pt !important; line-height: 1.35 !important; }
