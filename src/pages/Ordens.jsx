@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTenant } from "@/lib/TenantContext";
-import { ORDER_STATUSES, paged } from "@/lib/tenant";
+import { useTenantCacheRefresh, ORDER_STATUSES, paged } from "@/lib/tenant";
 import { brl, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +47,8 @@ export default function Ordens() {
       clearTimeout(timer);
     };
   }, [company?.id, role, user?.uid, tab, status, search]);
+
+  useTenantCacheRefresh(load, "ServiceOrder", "Client", "Equipment");
 
   return (
     <div>
