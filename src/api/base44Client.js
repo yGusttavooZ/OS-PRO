@@ -72,6 +72,7 @@ const entityApi = (entityName) => ({
         });
       }
     });
+    invalidateTenantCache("Membership", "CompanyAccount");
     return { id: email, ...payload, user_email: email, status: "invited" };
   },
   update: async (id, payload) => {
@@ -135,6 +136,7 @@ const entityApi = (entityName) => ({
         });
       }
     });
+    invalidateTenantCache("Membership", "CompanyAccount");
     return { id, ...payload };
   },
   delete: async (id) => {
@@ -184,6 +186,7 @@ const entityApi = (entityName) => ({
       }
       transaction.delete(memberRef);
     });
+    invalidateTenantCache("Membership", "CompanyAccount");
   },
   deleteMany: (filters = {}) => deleteRecords(entityName, filters),
   count: (filters = {}) => countRecords(entityName, filters),
