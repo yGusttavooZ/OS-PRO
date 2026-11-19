@@ -93,7 +93,7 @@ export function useTenantCacheRefresh(load, ...entityNames) {
 
 export function invalidateTenantCache(...entityNames) {
   for (const key of [...readCache.keys()]) {
-    if (!entityNames.length || entityNames.some((name) => key.startsWith(`${name}::`))) readCache.delete(key);
+    if (!entityNames.length || entityNames.some((name) => key.includes(`::${name}::`))) readCache.delete(key);
   }
   cacheListeners.forEach((listener) => listener(entityNames));
 }
