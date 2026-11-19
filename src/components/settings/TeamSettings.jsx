@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { COMPANY_ROLES, invalidateTenantCache, paged } from "@/lib/tenant";
+import { useTenantCacheRefresh, COMPANY_ROLES, invalidateTenantCache, paged } from "@/lib/tenant";
 
 export default function TeamSettings() {
   const { company, user, refresh, account } = useTenant();
@@ -131,6 +131,8 @@ export default function TeamSettings() {
     : activeCount + invitedCount;
   const hasSeatLimit = maxUsers > 0;
   const seatsFull = hasSeatLimit && reservedUsers >= maxUsers;
+
+  useTenantCacheRefresh(load, "Membership", "CompanyAccount");
 
   return (
     <div className="space-y-5">
