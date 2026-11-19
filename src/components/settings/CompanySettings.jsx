@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { updateCompany } from "@/lib/firestoreTenant";
 import { useTenant } from "@/lib/TenantContext";
 import CompanyLogo from "@/components/CompanyLogo";
-import { invalidateTenantCache } from "@/lib/tenant";
+import { useTenantCacheRefresh, invalidateTenantCache } from "@/lib/tenant";
 
 const COMPANY_SECTIONS = [
   {
@@ -177,6 +177,8 @@ export default function CompanySettings() {
       ))}
     </div>
   );
+
+  useTenantCacheRefresh(load, "Company", "CompanyAccount");
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
