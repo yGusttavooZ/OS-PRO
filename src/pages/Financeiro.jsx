@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { useTenantCacheRefresh, invalidateTenantCache, paged } from "@/lib/tenant";
+import { invalidateTenantCache, paged } from "@/lib/tenant";
 import { brl, monthLabel, periodRange, shortDate } from "@/lib/format";
 
 const PERIODS = [
@@ -121,8 +121,6 @@ export default function Financeiro() {
       setError(err?.message || "Não foi possível confirmar o lançamento.");
     }
   };
-
-  useTenantCacheRefresh(load, "Transaction");
 
   const remove = async (row) => {
     if (!window.confirm(`Excluir o lançamento "${row.description || "sem descrição"}"? Esta ação não pode ser desfeita.`)) return;
