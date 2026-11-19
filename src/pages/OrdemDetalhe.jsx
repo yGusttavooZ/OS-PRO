@@ -18,11 +18,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { ORDER_STATUSES, changeOrderStatus, convertQuote, invalidateTenantCache, paged, updateRecord } from "@/lib/tenant";
+import { useTenantCacheRefresh, ORDER_STATUSES, changeOrderStatus, convertQuote, invalidateTenantCache, paged, updateRecord } from "@/lib/tenant";
 import { brl, dateTime, formatDoc, formatPhone, shortDate } from "@/lib/format";
 
 function InfoRow({ label, value }) {
   if (!value) return null;
+  useTenantCacheRefresh(load, "ServiceOrder", "OrderEvent", "Transaction");
+
   return (
     <div className="min-w-0 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5">
       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
