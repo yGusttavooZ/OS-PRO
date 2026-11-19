@@ -11,7 +11,6 @@ import { brl, formatDoc, formatPhone, shortDate } from "@/lib/format";
 
 function Field({ label, value }) {
   if (!value) return null;
-  useTenantCacheRefresh(load, "Client", "Equipment", "ServiceOrder");
 
   return (
     <div>
@@ -55,6 +54,8 @@ export default function ClienteDetalhe() {
     if (!company?.id || !id) return;
     load();
   }, [id, company?.id]);
+
+  useTenantCacheRefresh(load, "Client", "Equipment", "ServiceOrder");
 
   if (loading) {
     return (
