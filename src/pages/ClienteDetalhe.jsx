@@ -6,11 +6,13 @@ import ClientDialog from "@/components/clients/ClientDialog";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/lib/TenantContext";
-import { paged } from "@/lib/tenant";
+import { useTenantCacheRefresh, paged } from "@/lib/tenant";
 import { brl, formatDoc, formatPhone, shortDate } from "@/lib/format";
 
 function Field({ label, value }) {
   if (!value) return null;
+  useTenantCacheRefresh(load, "Client", "Equipment", "ServiceOrder");
+
   return (
     <div>
       <p className="field-label">{label}</p>
