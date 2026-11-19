@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { invalidateTenantCache, paged } from "@/lib/tenant";
+import { useTenantCacheRefresh, invalidateTenantCache, paged } from "@/lib/tenant";
 import { brl, monthLabel, periodRange, shortDate } from "@/lib/format";
 
 const PERIODS = [
@@ -155,6 +155,8 @@ export default function Financeiro() {
     { label: "Pago", value: totals.paid, tone: "text-rose-600", icon: TrendingDown },
     { label: "A pagar", value: totals.pendingOut, tone: "text-rose-500", icon: ArrowUpRight },
   ];
+
+  useTenantCacheRefresh(load, "Transaction");
 
   return (
     <div>
