@@ -122,6 +122,8 @@ export default function Financeiro() {
     }
   };
 
+  useTenantCacheRefresh(load, "Transaction");
+
   const remove = async (row) => {
     if (!window.confirm(`Excluir o lançamento "${row.description || "sem descrição"}"? Esta ação não pode ser desfeita.`)) return;
     setError("");
@@ -155,8 +157,6 @@ export default function Financeiro() {
     { label: "Pago", value: totals.paid, tone: "text-rose-600", icon: TrendingDown },
     { label: "A pagar", value: totals.pendingOut, tone: "text-rose-500", icon: ArrowUpRight },
   ];
-
-  useTenantCacheRefresh(load, "Transaction");
 
   return (
     <div>
