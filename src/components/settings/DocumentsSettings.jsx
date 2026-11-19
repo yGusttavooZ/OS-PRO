@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { useTenantCacheRefresh, DEFAULT_WARRANTY, invalidateTenantCache } from "@/lib/tenant";
+import { DEFAULT_WARRANTY, invalidateTenantCache } from "@/lib/tenant";
 
 export default function DocumentsSettings() {
   const { company, refresh } = useTenant();
@@ -65,8 +65,6 @@ export default function DocumentsSettings() {
       setSaving(false);
     }
   };
-
-  useTenantCacheRefresh(load, "Company");
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
