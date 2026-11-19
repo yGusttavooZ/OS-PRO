@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { useTenantCacheRefresh, paged } from "@/lib/tenant";
+import { paged } from "@/lib/tenant";
 import { brl, monthLabel, num, periodRange } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -135,8 +135,6 @@ export default function Dashboard() {
   const trialDays = role === "admin" && account?.status === "trial" && account?.trial_ends_at
     ? Math.ceil((new Date(account.trial_ends_at) - new Date()) / 86400000)
     : null;
-
-  useTenantCacheRefresh(load, "ServiceOrder", "Client", "Equipment", "Transaction");
 
   return (
     <div>
