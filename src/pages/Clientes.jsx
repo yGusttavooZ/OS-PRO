@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { useTenantCacheRefresh, invalidateTenantCache, paged } from "@/lib/tenant";
+import { invalidateTenantCache, paged } from "@/lib/tenant";
 import { formatDoc, formatPhone, shortDate } from "@/lib/format";
 
 export default function Clientes() {
@@ -48,8 +48,6 @@ export default function Clientes() {
     invalidateTenantCache("Client", "Equipment");
     load();
   };
-
-  useTenantCacheRefresh(load, "Client", "Equipment", "ServiceOrder");
 
   return (
     <div>
