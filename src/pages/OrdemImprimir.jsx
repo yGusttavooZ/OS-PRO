@@ -515,6 +515,42 @@ export default function OrdemImprimir() {
           .os-bottom-grid { grid-template-columns: 1fr; gap: 12px; }
           .os-totals { justify-content: flex-start; }
         }
+        /* Mantém a leitura do modelo de referência no mesmo padrão do documento original */
+        .os-template-referencia { font-size:12px; line-height:1.4; }
+        .os-template-referencia .ref-company-info,
+        .os-template-referencia .ref-company-contact { font-size:10px; line-height:1.4; }
+        .os-template-referencia .ref-company-info strong { font-size:15px; }
+        .os-template-referencia .ref-titlebar { font-size:12px; padding:6px 8px; }
+        .os-template-referencia .ref-section>h2 { font-size:11px; padding:5px 7px; }
+        .os-template-referencia .ref-grid,
+        .os-template-referencia .ref-detail,
+        .os-template-referencia .ref-observations { font-size:11px; }
+        .os-template-referencia .ref-items { font-size:11px; }
+        .os-template-referencia .ref-items th,
+        .os-template-referencia .ref-items td { padding:6px 7px; }
+        .os-template-referencia .ref-totals { font-size:12px; }
+        .os-template-referencia .ref-totals .ref-total { font-size:13px; }
+        .os-template-referencia .ref-signatures small { font-size:10px; }
+        .os-template-referencia .ref-footer { font-size:9px; }
+        @media print {
+          .os-template-referencia { font-size:10pt !important; line-height:1.35 !important; }
+          .os-template-referencia .ref-company-info,
+          .os-template-referencia .ref-company-contact { font-size:8.5pt !important; }
+          .os-template-referencia .ref-company-info strong { font-size:12pt !important; }
+          .os-template-referencia .ref-titlebar { font-size:10pt !important; padding:2mm 2.5mm !important; }
+          .os-template-referencia .ref-section>h2 { font-size:8.5pt !important; padding:1.5mm 2mm !important; }
+          .os-template-referencia .ref-grid,
+          .os-template-referencia .ref-detail,
+          .os-template-referencia .ref-observations { font-size:9pt !important; }
+          .os-template-referencia .ref-items { font-size:9pt !important; }
+          .os-template-referencia .ref-items th,
+          .os-template-referencia .ref-items td { padding:2mm 2.2mm !important; }
+          .os-template-referencia .ref-totals { font-size:9pt !important; }
+          .os-template-referencia .ref-totals .ref-total { font-size:10pt !important; }
+          .os-template-referencia .ref-signatures small { font-size:8.5pt !important; }
+          .os-template-referencia .ref-footer { font-size:8pt !important; }
+        }
+
         @page { size: A4 portrait; margin: 9mm; }
         @media print {
           html, body, #root { width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
