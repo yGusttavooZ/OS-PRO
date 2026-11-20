@@ -65,6 +65,7 @@ export default function OrdemImprimir() {
   const warrantyTerms = (usesCompanyWarranty ? company?.warranty_terms : order.warranty_terms)
     || company?.warranty_terms
     || `Garantia de ${warrantyDays} dias sobre os serviços executados e peças substituídas.`;
+  const template = ["profissional", "compacto", "premium"].includes(company?.os_template) ? company.os_template : "profissional";
 
   return (
     <div className="os-print-page min-h-screen bg-muted/40 py-6 print:bg-white print:py-0">
@@ -77,7 +78,7 @@ export default function OrdemImprimir() {
         </Button>
       </div>
 
-      <article className="os-sheet max-w-[820px] mx-auto bg-card text-card-foreground shadow-sm border border-border">
+      <article className={`os-sheet os-template-${template} max-w-[820px] mx-auto bg-card text-card-foreground shadow-sm border border-border`}>
         <header className="os-header">
           <div className="os-company">
             <CompanyLogo
@@ -222,6 +223,23 @@ export default function OrdemImprimir() {
           line-height: 1.4;
         }
         .os-sheet * { box-sizing: border-box; }
+        .os-template-compacto { padding: 22px 26px; font-size: 11px; }
+        .os-template-compacto .os-header { padding-bottom: 11px; }
+        .os-template-compacto .os-logo { width: 54px; height: 54px; flex-basis: 54px; }
+        .os-template-compacto .os-two-columns { padding: 9px 0; gap: 8px; }
+        .os-template-compacto .os-panel { padding: 8px 10px; }
+        .os-template-compacto .os-technical { padding: 6px 2px; }
+        .os-template-compacto .os-tech-item { padding: 3px 6px; }
+        .os-template-compacto .os-items-section { padding: 9px 0; }
+        .os-template-compacto .os-items-table th, .os-template-compacto .os-items-table td { padding-top: 4px; padding-bottom: 4px; }
+        .os-template-compacto .os-bottom-grid { padding: 8px 0; gap: 7px; }
+        .os-template-compacto .os-signatures { padding-top: 6mm; padding-bottom: 3mm; }
+        .os-template-premium { border-top: 5px solid hsl(var(--primary)); }
+        .os-template-premium .os-header { padding-bottom: 20px; }
+        .os-template-premium .os-number > strong { color: hsl(var(--primary)); }
+        .os-template-premium .os-panel { background: #f7faf9; border-color: #d7e7e2; }
+        .os-template-premium .os-section-heading { padding: 7px 9px; border-radius: 6px; background: hsl(var(--primary) / .08); }
+        .os-template-premium .os-grand-total { box-shadow: inset 0 0 0 1px hsl(var(--primary) / .16); }
         .os-header {
           display: flex;
           justify-content: space-between;
