@@ -93,17 +93,33 @@ export default function DocumentsSettings() {
         <div className="grid gap-3 p-5 md:grid-cols-2">
           {[
             { id: "profissional", title: "Original", desc: "Mantém o modelo atual do OS-PRO" },
-            { id: "referencia", title: "Modelo em tabela", desc: "Baseado na referência enviada, com as cores do OS-PRO" },
+            { id: "referencia", title: "Modelo da referência", desc: "Reproduz a estrutura da imagem enviada, nas cores do OS-PRO" },
           ].map((model) => (
             <button key={model.id} type="button" onClick={() => set("os_template", model.id)} aria-pressed={form.os_template === model.id}
               className={`rounded-xl border p-3 text-left transition-colors ${form.os_template === model.id ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/70 hover:border-primary/50"}`}>
               <div className="mb-3 flex items-center justify-between"><span className="text-sm font-semibold">{model.title}</span>{form.os_template === model.id && <span className="text-[10px] font-semibold text-primary">Selecionado</span>}</div>
-              <div className="mb-3 rounded-lg border bg-white p-2 shadow-sm space-y-1">
-                <div className="flex items-center justify-between border-b border-emerald-600 pb-2"><span className="h-5 w-5 rounded bg-slate-300" /><span className="text-[7px] font-bold text-slate-700">OS #001</span></div>
-                <div className="grid grid-cols-2 gap-1"><span className="h-5 rounded bg-slate-100" /><span className="h-5 rounded bg-slate-100" /></div>
-                <div className="space-y-1"><span className="block h-1.5 rounded bg-slate-100" /><span className="block h-1.5 w-4/5 rounded bg-slate-100" /></div>
-                <div className="ml-auto h-4 w-1/3 rounded bg-emerald-100" />
-              </div>
+              {model.id === "referencia" ? (
+                <div className="mb-3 rounded-sm border border-slate-300 bg-white p-2 shadow-sm space-y-1">
+                  <div className="flex items-center gap-2 border border-slate-200 p-1">
+                    <span className="h-8 w-8 shrink-0 rounded-full border-2 border-emerald-600 bg-emerald-50" />
+                    <div className="min-w-0 flex-1 space-y-1"><span className="block h-1.5 w-3/4 bg-slate-500" /><span className="block h-1 w-full bg-slate-200" /><span className="block h-1 w-4/5 bg-slate-200" /></div>
+                    <span className="h-5 w-12 bg-slate-100" />
+                  </div>
+                  <div className="h-2 bg-emerald-100" />
+                  <div className="space-y-1 border border-slate-200 p-1"><div className="h-2 bg-emerald-50" /><div className="grid grid-cols-2 gap-1"><span className="h-3 border border-slate-200" /><span className="h-3 border border-slate-200" /><span className="h-3 border border-slate-200" /><span className="h-3 border border-slate-200" /></div></div>
+                  <div className="h-2 bg-emerald-100" />
+                  <div className="space-y-1 border border-slate-200 p-1"><span className="block h-2 bg-slate-100" /><span className="block h-2 bg-slate-100" /><span className="block h-2 w-2/3 bg-slate-100" /></div>
+                  <div className="ml-auto h-3 w-1/3 bg-emerald-100" />
+                  <div className="grid grid-cols-2 gap-3 px-2 pt-2"><span className="h-3 border-b border-slate-400" /><span className="h-3 border-b border-slate-400" /></div>
+                </div>
+              ) : (
+                <div className="mb-3 rounded-lg border bg-white p-2 shadow-sm space-y-1">
+                  <div className="flex items-center justify-between border-b border-emerald-600 pb-2"><span className="h-5 w-5 rounded bg-slate-300" /><span className="text-[7px] font-bold text-slate-700">OS #001</span></div>
+                  <div className="grid grid-cols-2 gap-1"><span className="h-5 rounded bg-slate-100" /><span className="h-5 rounded bg-slate-100" /></div>
+                  <div className="space-y-1"><span className="block h-1.5 rounded bg-slate-100" /><span className="block h-1.5 w-4/5 rounded bg-slate-100" /></div>
+                  <div className="ml-auto h-4 w-1/3 rounded bg-emerald-100" />
+                </div>
+              )}
               <span className="text-xs text-muted-foreground">{model.desc}</span>
             </button>
           ))}
