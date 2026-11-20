@@ -24,7 +24,7 @@ export default function DocumentsSettings() {
       warranty_terms: company.warranty_terms || DEFAULT_WARRANTY,
       doc_footer: company.doc_footer || "",
       doc_start_number: Number(company.doc_start_number) || 1,
-      os_template: ["profissional", "compacto", "premium"].includes(company.os_template) ? company.os_template : "profissional",
+      os_template: company.os_template === "referencia" ? "referencia" : "profissional",
     });
   }, [company?.id]);
 
@@ -90,20 +90,19 @@ export default function DocumentsSettings() {
 
       <section className="surface overflow-hidden">
         <div className="border-b border-border/70 px-5 py-4"><h3 className="text-sm font-semibold">Modelo da ordem de serviço</h3><p className="mt-1 text-xs text-muted-foreground">Escolha o visual usado ao imprimir ou salvar a OS em PDF.</p></div>
-        <div className="grid gap-3 p-5 md:grid-cols-3">
+        <div className="grid gap-3 p-5 md:grid-cols-2">
           {[
-            { id: "profissional", title: "Profissional", desc: "Equilibrado e completo" },
-            { id: "compacto", title: "Compacto", desc: "Mais enxuto e econômico" },
-            { id: "premium", title: "Premium", desc: "Visual mais destacado" },
+            { id: "profissional", title: "Original", desc: "Mantém o modelo atual do OS-PRO" },
+            { id: "referencia", title: "Modelo em tabela", desc: "Baseado na referência enviada, com as cores do OS-PRO" },
           ].map((model) => (
             <button key={model.id} type="button" onClick={() => set("os_template", model.id)} aria-pressed={form.os_template === model.id}
               className={`rounded-xl border p-3 text-left transition-colors ${form.os_template === model.id ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/70 hover:border-primary/50"}`}>
               <div className="mb-3 flex items-center justify-between"><span className="text-sm font-semibold">{model.title}</span>{form.os_template === model.id && <span className="text-[10px] font-semibold text-primary">Selecionado</span>}</div>
-              <div className={`mb-3 rounded-lg border bg-white p-2 shadow-sm ${model.id === "compacto" ? "space-y-1" : "space-y-2"}`}>
-                <div className={`flex items-center justify-between border-b pb-2 ${model.id === "premium" ? "border-emerald-600 border-b-2" : "border-slate-200"}`}><span className="h-5 w-5 rounded bg-slate-300" /><span className="text-[7px] font-bold text-slate-700">OS #001</span></div>
+              <div className="mb-3 rounded-lg border bg-white p-2 shadow-sm space-y-1">
+                <div className="flex items-center justify-between border-b border-emerald-600 pb-2"><span className="h-5 w-5 rounded bg-slate-300" /><span className="text-[7px] font-bold text-slate-700">OS #001</span></div>
                 <div className="grid grid-cols-2 gap-1"><span className="h-5 rounded bg-slate-100" /><span className="h-5 rounded bg-slate-100" /></div>
                 <div className="space-y-1"><span className="block h-1.5 rounded bg-slate-100" /><span className="block h-1.5 w-4/5 rounded bg-slate-100" /></div>
-                <div className={`ml-auto h-4 w-1/3 rounded ${model.id === "premium" ? "bg-emerald-100" : "bg-slate-100"}`} />
+                <div className="ml-auto h-4 w-1/3 rounded bg-emerald-100" />
               </div>
               <span className="text-xs text-muted-foreground">{model.desc}</span>
             </button>
