@@ -11,6 +11,7 @@ export default function OrdemImprimir() {
   const { id } = useParams();
   const { company } = useTenant();
   const [order, setOrder] = useState(null);
+  const [clientRecord, setClientRecord] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,6 +30,15 @@ export default function OrdemImprimir() {
     })();
     return () => { active = false; };
   }, [id, company?.id]);
+
+  useEffect(() => {
+    if (!order?.client_id || !company?.id) { setClientRecord(null); return; }
+    let active = true;
+    paged("Client", { id: order.client_id, company_id: company.id }, { limit: 1 })
+      .then((rows) => { if (active) setClientRecord(rows[0] || null); })
+      .catch((error) => { console.error("Falha ao carregar dados complementares do cliente", error); if (active) setClientRecord(null); });
+    return () => { active = false; };
+  }, [order?.client_id, company?.id]);
 
   useEffect(() => {
     if (!order) return;
@@ -87,42 +97,88 @@ export default function OrdemImprimir() {
                 <CompanyLogo company={company} className="ref-logo object-contain" fallback={<span className="ref-logo-fallback">OS</span>} />
                 <div className="ref-company-info">
                   <strong>{company?.name || "Assistência técnica"}</strong>
-                  {company?.document && <span>CNPJ/CPF: {formatDoc(company.document)}</span>}
-                  {address && <span>{address}</span>}
-                  {(company?.phone || company?.email) && <span>{company?.phone ? formatPhone(company.phone) : ""}{company?.phone && company?.email ? " · " : ""}{company?.email || ""}</span>}
+                  {company?.document && <span>CNPJ: {formatDoc(company.document)}</span>}
+                  {address && <span>{address}{company?.zip ? " · CEP: " + company.zip : ""}</span>}
+                  {company?.email && <span>{company.email}</span>}
                 </div>
               </div>
-              <div className="ref-company-contact">{company?.tech_responsible && <span>Responsável: {company.tech_responsible}</span>}{company?.phone && <span>{formatPhone(company.phone)}</span>}</div>
+              <div className="ref-company-contact">
+                {company?.phone && <span>{formatPhone(company.phone)}</span>}
+                {company?.whatsapp && <span>{formatPhone(company.whatsapp)}</span>}
+                {company?.tech_responsible && <span>Responsável: {company.tech_responsible}</span>}
+              </div>
             </header>
-            <div className="ref-titlebar"><strong>{order.doc_type === "orcamento" ? "ORÇAMENTO" : "ORDEM DE SERVIÇO"} Nº {order.number_label}</strong><span>{shortDate(order.created_date)}</span></div>
-            <section className="ref-section"><h2>PERÍODO DE EXECUÇÃO</h2><div className="ref-grid ref-execution"><div><b>Entrada:</b> {shortDate(order.created_date)}</div><div><b>Saída:</b> {order.completed_date ? shortDate(order.completed_date) : "____/____/______"}</div></div></section>
-            <section className="ref-section"><h2>DADOS DO CLIENTE</h2><div className="ref-grid ref-client-grid">
-              <div><b>Nome:</b><span>{order.client_name || "—"}</span></div><div><b>Documento:</b><span>{order.client_document ? formatDoc(order.client_document) : "—"}</span></div>
-              <div><b>Telefone:</b><span>{order.client_phone ? formatPhone(order.client_phone) : "—"}</span></div><div><b>E-mail:</b><span>{order.client_email || "—"}</span></div>
-              <div className="ref-wide"><b>Endereço:</b><span>{order.client_address || "—"}</span></div>
-            </div></section>
-            <section className="ref-section"><h2>EQUIPAMENTO</h2>
-              <div className="ref-grid ref-equipment-grid"><div><b>Equipamento</b><span>{order.equipment_name || "—"}</span></div><div><b>Marca</b><span>{order.equipment_brand || "—"}</span></div><div><b>Modelo</b><span>{order.equipment_model || "—"}</span></div><div><b>Série</b><span>{order.equipment_serial || "—"}</span></div></div>
-              <div className="ref-detail"><b>Condições</b><span>{order.equipment_condition || "—"}</span></div>
-              <div className="ref-detail"><b>Defeitos / Problema relatado</b><span>{order.reported_issue || "—"}</span></div>
-              <div className="ref-detail"><b>Diagnóstico técnico</b><span>{order.diagnosis || "—"}</span></div>
-              <div className="ref-detail"><b>Solução aplicada</b><span>{order.solution || "—"}</span></div>
-              <div className="ref-detail"><b>Acessórios</b><span>{order.equipment_accessories || "—"}</span></div>
-              <div className="ref-detail"><b>Termos de garantia ({warrantyDays} dias)</b><span>{warrantyTerms}</span></div>
+
+            <div className="ref-titlebar">
+              <strong>{order.doc_type === "orcamento" ? "ORÇAMENTO" : "ORDEM DE SERVIÇO"} Nº {order.number_label}</strong>
+              <span>{shortDate(order.created_date)}</span>
+            </div>
+
+            <section className="ref-section">
+              <h2>PERÍODO DE EXECUÇÃO</h2>
+              <div className="ref-grid ref-execution">
+                <div><b>Entrada:</b><span>{shortDate(order.created_date)}</span></div>
+                <div><b>Saída:</b><span>{order.completed_date ? shortDate(order.completed_date) : "____/____/______"}</span></div>
+              </div>
             </section>
-            <section className="ref-section"><h2>SERVIÇOS E PEÇAS</h2>
-              <table className="ref-items"><thead><tr><th>ITEM</th><th>DESCRIÇÃO</th><th>QTD.</th><th>VR. UNIT.</th><th>SUBTOTAL</th></tr></thead>
-                <tbody>{items.map((item,index)=><tr key={index}><td>{index+1}</td><td>{item.description}<small>{item.kind==="part"?"Peça":"Serviço"}</small></td><td>{item.qty}</td><td>{brl(item.unit_price)}</td><td>{brl((Number(item.qty)||0)*(Number(item.unit_price)||0))}</td></tr>)}
-                  {items.length===0&&<tr><td colSpan="5">Nenhum item lançado.</td></tr>}</tbody>
+
+            <section className="ref-section">
+              <h2>DADOS DO CLIENTE</h2>
+              <div className="ref-grid ref-client-grid">
+                <div><b>Razão social:</b><span>{clientRecord?.name || order.client_name || "—"}</span></div>
+                <div><b>Nome fantasia:</b><span>{clientRecord?.trade_name || "—"}</span></div>
+                <div><b>CNPJ/CPF:</b><span>{formatDoc(clientRecord?.document || order.client_document) || "—"}</span></div>
+                <div><b>Endereço:</b><span>{[clientRecord?.address || order.client_address, clientRecord?.address_number, clientRecord?.district].filter(Boolean).join(", ") || "—"}</span></div>
+                <div><b>CEP:</b><span>{clientRecord?.zip || "—"}</span></div>
+                <div><b>Cidade/UF:</b><span>{[clientRecord?.city, clientRecord?.state].filter(Boolean).join("/") || "—"}</span></div>
+                <div><b>Telefone:</b><span>{formatPhone(clientRecord?.phone || order.client_phone) || "—"}</span></div>
+                <div><b>E-mail:</b><span>{clientRecord?.email || order.client_email || "—"}</span></div>
+              </div>
+            </section>
+
+            <section className="ref-section">
+              <h2>EQUIPAMENTO</h2>
+              <div className="ref-grid ref-equipment-grid">
+                <div><b>Nome do equipamento</b><span>{order.equipment_name || "—"}</span></div>
+                <div><b>Marca</b><span>{order.equipment_brand || "—"}</span></div>
+                <div><b>Modelo</b><span>{order.equipment_model || "—"}</span></div>
+                <div><b>Série</b><span>{order.equipment_serial || "—"}</span></div>
+              </div>
+              <div className="ref-detail"><b>Condições</b><span>{order.equipment_condition || "—"}</span></div>
+              <div className="ref-detail"><b>Defeitos</b><span>{order.reported_issue || "—"}</span></div>
+              <div className="ref-detail"><b>Acessórios</b><span>{order.equipment_accessories || "—"}</span></div>
+              <div className="ref-detail"><b>Termos de garantia</b><span>{warrantyTerms}</span></div>
+            </section>
+
+            <section className="ref-section">
+              <h2>SERVIÇOS</h2>
+              <table className="ref-items">
+                <thead><tr><th>ITEM</th><th>NOME</th><th>QTD.</th><th>VR. UNIT.</th><th>SUBTOTAL</th></tr></thead>
+                <tbody>
+                  {items.map((item,index)=><tr key={index}><td>{index+1}</td><td>{item.description || "—"}</td><td>{item.qty}</td><td>{brl(item.unit_price)}</td><td>{brl((Number(item.qty)||0)*(Number(item.unit_price)||0))}</td></tr>)}
+                  {items.length===0&&<tr><td colSpan="5">Nenhum serviço lançado.</td></tr>}
+                </tbody>
                 <tfoot><tr><th colSpan="4">TOTAL</th><th>{brl(order.total)}</th></tr></tfoot>
               </table>
-              <div className="ref-totals"><div><span>Serviços:</span><strong>{brl(order.services_total)}</strong></div><div><span>Peças:</span><strong>{brl(order.parts_total)}</strong></div>
-                {Number(order.discount)>0&&<div><span>Desconto:</span><strong>− {brl(order.discount)}</strong></div>}{Number(order.surcharge)>0&&<div><span>Acréscimo:</span><strong>{brl(order.surcharge)}</strong></div>}
-                <div className="ref-total"><span>TOTAL:</span><strong>{brl(order.total)}</strong></div></div>
+              <div className="ref-totals">
+                {Number(order.services_total)>0&&<div><span>SERVIÇOS:</span><strong>{brl(order.services_total)}</strong></div>}
+                {Number(order.parts_total)>0&&<div><span>PEÇAS:</span><strong>{brl(order.parts_total)}</strong></div>}
+                {Number(order.discount)>0&&<div><span>DESCONTO:</span><strong>− {brl(order.discount)}</strong></div>}
+                {Number(order.surcharge)>0&&<div><span>ACRÉSCIMO:</span><strong>{brl(order.surcharge)}</strong></div>}
+                <div className="ref-total"><span>TOTAL:</span><strong>{brl(order.total)}</strong></div>
+              </div>
             </section>
-            <section className="ref-section"><h2>OBSERVAÇÕES</h2><div className="ref-observations">{order.notes || " "}</div></section>
-            <section className="ref-signatures"><div><span></span><small>Assinatura do cliente</small><b>{order.client_name || ""}</b></div><div><span></span><small>Assinatura do técnico</small><b>{order.technician || company?.tech_responsible || ""}</b></div></section>
-            <footer className="ref-footer">{company?.doc_footer || (company?.name || "") + (company?.phone ? " · " + formatPhone(company.phone) : "")}</footer>
+
+            <section className="ref-section">
+              <h2>OBSERVAÇÕES</h2>
+              <div className="ref-observations">{order.notes || " "}</div>
+            </section>
+
+            <section className="ref-signatures">
+              <div><span></span><small>Assinatura do cliente</small></div>
+              <div><span></span><small>Assinatura do técnico</small></div>
+            </section>
+            <footer className="ref-footer">{company?.doc_footer || ""}</footer>
           </div>
         ) : (
           <>
@@ -263,48 +319,47 @@ export default function OrdemImprimir() {
 
       <style>{`
 
-        .os-template-referencia { padding: 8mm !important; border-radius: 0 !important; font-family: Arial,Helvetica,sans-serif; font-size: 9px; color:#202938; }
-        .os-reference { display:flex; flex-direction:column; gap:7px; }
-        .ref-company { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:7px; border:1px solid #d5e2dd; }
-        .ref-brand { display:flex; align-items:center; gap:9px; min-width:0; }
-        .ref-logo { width:68px; height:68px; flex:0 0 68px; }
-        .ref-logo-fallback { display:grid; place-items:center; width:68px; height:68px; border-radius:50%; background:hsl(var(--primary)); color:white; font-weight:800; }
-        .ref-company-info,.ref-company-contact { display:flex; flex-direction:column; min-width:0; font-size:8px; line-height:1.35; }
-        .ref-company-info strong { font-size:12px; color:hsl(var(--primary)); }
+        .os-template-referencia { padding: 8mm !important; border-radius: 0 !important; font-family: Arial,Helvetica,sans-serif; font-size: 9px; color:#202020; }
+        .os-reference { display:flex; flex-direction:column; gap:6px; }
+        .ref-company { display:flex; justify-content:space-between; align-items:center; gap:10px; min-height:82px; padding:5px; border:1px solid #cbd5d1; }
+        .ref-brand { display:flex; align-items:center; gap:8px; min-width:0; }
+        .ref-logo { width:76px; height:76px; flex:0 0 76px; }
+        .ref-logo-fallback { display:grid; place-items:center; width:76px; height:76px; border-radius:50%; background:hsl(var(--primary)); color:white; font-weight:800; }
+        .ref-company-info,.ref-company-contact { display:flex; flex-direction:column; min-width:0; font-size:8px; line-height:1.3; }
+        .ref-company-info strong { font-size:12px; color:#202020; }
         .ref-company-contact { text-align:right; }
-        .ref-titlebar,.ref-section>h2 { background:hsl(var(--primary) / .12); color:hsl(var(--primary)); }
-        .ref-titlebar { display:flex; justify-content:space-between; padding:5px 7px; font-size:10px; }
-        .ref-section { border:1px solid #cfdad5; }
-        .ref-section>h2 { margin:0; padding:4px 6px; font-size:9px; font-weight:800; }
+        .ref-titlebar,.ref-section>h2 { background:hsl(var(--primary) / .13); color:#202020; }
+        .ref-titlebar { display:flex; justify-content:space-between; align-items:center; padding:4px 6px; font-size:10px; }
+        .ref-section { border:1px solid #c9d0cd; }
+        .ref-section>h2 { margin:0; padding:3px 5px; font-size:9px; font-weight:800; }
         .ref-grid { display:grid; }
         .ref-execution { grid-template-columns:1fr 1fr; }
-        .ref-grid>div { display:flex; gap:5px; min-width:0; padding:5px 6px; border-top:1px solid #dce5e1; }
+        .ref-grid>div { display:flex; align-items:flex-start; gap:5px; min-width:0; padding:4px 5px; border-top:1px solid #d4dad7; }
         .ref-grid b { flex:0 0 auto; }
-        .ref-grid span { overflow-wrap:anywhere; }
+        .ref-grid span { min-width:0; overflow-wrap:anywhere; }
         .ref-client-grid { grid-template-columns:1fr 1fr; }
-        .ref-wide { grid-column:1/-1; }
-        .ref-equipment-grid { grid-template-columns:2fr 1fr 1.5fr 1fr; }
-        .ref-equipment-grid>div { flex-direction:column; gap:1px; }
-        .ref-detail { display:flex; flex-direction:column; gap:1px; min-height:28px; padding:5px 7px; border-top:1px solid #dce5e1; }
+        .ref-equipment-grid { grid-template-columns:2fr .8fr 1.3fr .8fr; }
+        .ref-equipment-grid>div { flex-direction:column; gap:0; }
+        .ref-detail { display:flex; flex-direction:column; gap:0; min-height:28px; padding:4px 7px; border-top:1px solid #d4dad7; }
         .ref-detail span { white-space:pre-line; overflow-wrap:anywhere; }
         .ref-items { width:100%; border-collapse:collapse; font-size:8px; }
-        .ref-items th,.ref-items td { padding:5px 6px; border:1px solid #d4dfda; text-align:left; }
-        .ref-items th { background:hsl(var(--primary) / .09); color:hsl(var(--primary)); }
+        .ref-items th,.ref-items td { padding:4px 5px; border:1px solid #cbd2cf; text-align:left; }
+        .ref-items th { background:#f1f3f2; color:#202020; }
         .ref-items td:nth-child(n+3),.ref-items th:nth-child(n+3) { text-align:right; white-space:nowrap; }
-        .ref-items small { display:block; color:#68756f; }
-        .ref-items tfoot th { background:#e9efec; }
-        .ref-totals { display:flex; flex-direction:column; align-items:flex-end; gap:3px; padding:6px; background:#f5f8f6; }
+        .ref-items tfoot th { background:hsl(var(--primary) / .13); }
+        .ref-totals { display:flex; flex-direction:column; align-items:flex-end; gap:2px; padding:5px; background:hsl(var(--primary) / .08); }
         .ref-totals>div { display:flex; gap:8px; min-width:145px; justify-content:space-between; }
-        .ref-totals .ref-total { padding-top:4px; border-top:1px solid hsl(var(--primary) / .5); font-size:11px; font-weight:800; }
-        .ref-observations { min-height:26px; padding:6px; white-space:pre-line; }
-        .ref-signatures { display:grid; grid-template-columns:1fr 1fr; gap:35px; padding:18px 8px 10px; border:1px solid #cfdad5; }
+        .ref-totals .ref-total { padding-top:3px; border-top:1px solid #aebbb5; font-size:10px; font-weight:800; }
+        .ref-observations { min-height:26px; padding:5px; white-space:pre-line; }
+        .ref-signatures { display:grid; grid-template-columns:1fr 1fr; gap:35px; padding:17px 8px 9px; border:1px solid #333; }
         .ref-signatures>div { display:flex; flex-direction:column; align-items:center; text-align:center; }
-        .ref-signatures span { width:100%; height:18px; border-bottom:1px solid #65736c; }
-        .ref-signatures b,.ref-signatures small { font-size:8px; font-weight:400; }
-        .ref-footer { padding-top:3px; color:#6f7d76; font-size:7px; text-align:right; }
+        .ref-signatures span { width:100%; height:18px; border-bottom:1px solid #555; }
+        .ref-signatures small { font-size:8px; }
+        .ref-footer { padding-top:3px; color:#68736e; font-size:7px; text-align:right; }
         @media(max-width:600px) { .os-template-referencia { padding:12px !important; } .ref-company { align-items:flex-start; } .ref-logo,.ref-logo-fallback { width:48px;height:48px;flex-basis:48px; } .ref-company-contact { display:none; } .ref-equipment-grid { grid-template-columns:1fr 1fr; } }
         @media print { .os-template-referencia { padding:0 !important; font-size:8pt !important; } .os-template-referencia .ref-logo,.os-template-referencia .ref-logo-fallback { width:19mm;height:19mm;flex-basis:19mm; } .os-template-referencia .ref-company { padding:2mm; } .os-template-referencia .ref-section,.os-template-referencia .ref-signatures,.os-template-referencia .ref-titlebar { break-inside:avoid; } .os-template-referencia .ref-items tr { break-inside:avoid; } .os-template-referencia .ref-grid>div,.os-template-referencia .ref-detail { padding:1.5mm 2mm; } .os-template-referencia .ref-signatures { padding:5mm 2mm 3mm; } }
-\n        .os-sheet {
+
+        .os-sheet {
           box-sizing: border-box;
           padding: 30px 34px;
           border-radius: 12px;
