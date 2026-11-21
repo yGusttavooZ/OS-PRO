@@ -126,6 +126,17 @@ export default function Layout() {
 
         <div className="relative px-4 pb-4 pt-1">
           <div className="border-b border-white/10 px-1 pb-3">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <span className="text-[11px] font-semibold text-white/75">Conta e assinatura</span>
+              <span className={cn(
+                "rounded-full px-2 py-1 text-[9px] font-semibold",
+                account?.status === "active"
+                  ? "bg-emerald-400/15 text-emerald-300"
+                  : "bg-white/10 text-white/55"
+              )}>
+                {account?.status === "active" ? "Ativo" : account?.status === "trial" ? "Em teste" : "Inativo"}
+              </span>
+            </div>
             <div className="flex items-end justify-between gap-2">
               <div className="min-w-0">
                 <p className="text-[9px] font-medium uppercase tracking-[0.12em] text-white/40">Plano contratado</p>
