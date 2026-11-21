@@ -187,10 +187,11 @@ export default function Layout() {
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
           </div>
 
+          <div className="hidden items-center gap-2 sm:flex">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="relative hidden h-9 w-9 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:grid"
+                className="grid h-9 w-9 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 aria-label="Abrir notificações"
               >
                 <Bell className="h-[18px] w-[18px]" />
@@ -218,10 +219,11 @@ export default function Layout() {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="hidden max-w-[230px] rounded-xl border border-primary/15 bg-primary/[0.06] px-3.5 py-2 sm:block">
+          <div className="max-w-[230px] rounded-xl border border-primary/15 bg-primary/[0.06] px-3.5 py-2">
             <span className="block truncate text-[12px] font-bold text-foreground">
               {user?.full_name || "Usuário"}
             </span>
+          </div>
           </div>
 
 
