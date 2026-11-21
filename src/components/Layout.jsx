@@ -138,9 +138,9 @@ export default function Layout() {
         </div>
         )}
 
-        <div className="relative px-3 pb-4 pt-3">
+        <div className="relative px-3 pb-2 pt-3">
           <div className="rounded-2xl border border-white/10 bg-white/[0.055] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
-            <div className="mb-3 flex items-center justify-between px-0.5">
+            <div className="flex items-center justify-between px-0.5">
               <span className="text-[9px] font-bold uppercase tracking-[0.17em] text-white/40">Conta e assinatura</span>
               {role === "admin" && (
                 <span className={cn(
@@ -153,61 +153,35 @@ export default function Layout() {
                 </span>
               )}
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="group flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-white/[0.06]">
-                  <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-emerald-300/20 bg-gradient-to-br from-white/15 to-emerald-400/10 shadow-inner">
-                    <BrandMark className="h-7 w-7 text-emerald-200" />
-                    <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[hsl(var(--sidebar))] bg-[hsl(152_70%_52%)]" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12px] font-semibold text-white">{user?.full_name || "Usuário"}</span>
-                    <span className="mt-1 block truncate text-[10px] text-white/45">{role === "admin" ? "Administrador da empresa" : role === "technician" ? "Técnico" : role === "attendant" ? "Atendente" : "Conta OS PRO"}</span>
-                  </span>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-white/40 transition-transform group-data-[state=open]:rotate-180" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-[232px] rounded-xl">
-                <DropdownMenuLabel className="font-normal">
-                  <p className="truncate text-sm font-semibold">{user?.full_name || "Usuário"}</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {role === "admin" && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/configuracoes">Configurações da empresa</Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={() => logout(true)} className="text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" /> Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <div className="mt-3 border-t border-white/10 pt-3">
-              <div className="flex items-end justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-[9px] font-medium uppercase tracking-[0.12em] text-white/40">Plano contratado</p>
-                  <p className="mt-0.5 truncate font-heading text-[15px] font-bold text-white">{planLabel}</p>
-                </div>
-                {role === "admin" && account?.max_users != null && (
-                  <span className="shrink-0 text-[10px] tabular-nums text-white/50">
-                    {account?.reserved_users ?? 0} / {account.max_users} usuários
-                  </span>
-                )}
+          </div>
+        </div>
+
+        <div className="relative px-4 pb-4 pt-1">
+          <div className="border-b border-white/10 px-1 pb-3">
+            <div className="flex items-end justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[9px] font-medium uppercase tracking-[0.12em] text-white/40">Plano contratado</p>
+                <p className="mt-0.5 truncate font-heading text-[15px] font-bold text-white">{planLabel}</p>
               </div>
-              {role === "admin" && account?.max_users > 0 && (
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-all"
-                    style={{ width: `${Math.min(100, ((account?.reserved_users || 0) / account.max_users) * 100)}%` }}
-                  />
-                </div>
-              )}
-              {role === "admin" && (
-                <Link to="/configuracoes" className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-300 transition-colors hover:text-emerald-200">
-                  <Settings className="h-3 w-3" /> Gerenciar assinatura e conta
-                </Link>
+              {role === "admin" && account?.max_users != null && (
+                <span className="shrink-0 text-[10px] tabular-nums text-white/50">
+                  {account?.reserved_users ?? 0} / {account.max_users} usuários
+                </span>
               )}
             </div>
+            {role === "admin" && account?.max_users > 0 && (
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-all"
+                  style={{ width: `${Math.min(100, ((account?.reserved_users || 0) / account.max_users) * 100)}%` }}
+                />
+              </div>
+            )}
+            {role === "admin" && (
+              <Link to="/configuracoes" className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-300 transition-colors hover:text-emerald-200">
+                <Settings className="h-3 w-3" /> Gerenciar assinatura e conta
+              </Link>
+            )}
           </div>
         </div>
       </aside>
@@ -245,6 +219,10 @@ export default function Layout() {
             <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_62%_42%)]" />
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
           </div>
+
+          <span className="hidden max-w-[180px] truncate text-[12px] font-semibold text-foreground sm:inline">
+            {user?.full_name || "Usuário"}
+          </span>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
