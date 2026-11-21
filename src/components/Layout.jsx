@@ -106,7 +106,6 @@ export default function Layout() {
     setOpen(false);
   }, [location.pathname]);
 
-  const initials = (user?.full_name || user?.email || "U").slice(0, 1).toUpperCase();
   const planLabel = role === "admin"
     ? (account?.plan_name || (account?.status === "trial" ? "Período de teste" : "Sem plano ativo"))
     : "Acesso de equipe";
@@ -188,18 +187,6 @@ export default function Layout() {
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
           </div>
 
-          <div className="hidden max-w-[230px] items-center gap-2.5 rounded-xl border border-primary/15 bg-primary/[0.06] px-3 py-1.5 sm:flex">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary/15 text-[11px] font-bold uppercase text-primary">
-              {initials}
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Conectado como</span>
-              <span className="block truncate text-[12px] font-bold text-foreground">
-                {user?.full_name || "Usuário"}
-              </span>
-            </span>
-          </div>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -231,6 +218,12 @@ export default function Layout() {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
+          <div className="hidden max-w-[230px] rounded-xl border border-primary/15 bg-primary/[0.06] px-3.5 py-2 sm:block">
+            <span className="block truncate text-[12px] font-bold text-foreground">
+              {user?.full_name || "Usuário"}
+            </span>
+          </div>
+
 
         </header>
 
