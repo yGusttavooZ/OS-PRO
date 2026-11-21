@@ -122,21 +122,128 @@ export default function Layout() {
 
         <NavList role={role} isPlatformAdmin={isPlatformAdmin} />
 
-        {can.createOrders && (
-        <div className="relative px-4 pb-4">
-          <Button
-            asChild
-            className="h-11 w-full justify-start gap-3 rounded-xl border border-emerald-400/20 bg-emerald-500/15 text-[13px] font-semibold text-white shadow-none transition-colors hover:bg-emerald-500/25 hover:text-white active:bg-emerald-500/30"
-          >
-            <Link to="/ordens/nova">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-emerald-400/20 text-emerald-200">
-                <Plus className="h-4 w-4" />
-              </span>
-              <span className="flex-1 text-left">Nova ordem de serviço</span>
-            </Link>
-          </Button>
+
+
+        <div className="relative px-3 pb-2 pt-3">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.055] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+            <div className="px-0.5">
+              <span className="text-[9px] font-bold uppercase tracking-[0.17em] text-white/40">Conta</span>
+            </div>
+          </div>
         </div>
-        )}
+
+        <div className="relative px-4 pb-4 pt-1">
+          <div className="border-b border-white/10 px-1 pb-3">
+            <div className="flex items-end justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[9px] font-medium uppercase tracking-[0.12em] text-white/40">Plano contratado</p>
+                <p className="mt-0.5 truncate font-heading text-[15px] font-bold text-white">{planLabel}</p>
+              </div>
+              {role === "admin" && account?.max_users != null && (
+                <span className="shrink-0 text-[10px] tabular-nums text-white/50">
+                  {account?.reserved_users ?? 0} / {account.max_users} usuários
+                </span>
+              )}
+            </div>
+            {role === "admin" && account?.max_users > 0 && (
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-all"
+                  style={{ width: `${Math.min(100, ((account?.reserved_users || 0) / account.max_users) * 100)}%` }}
+                />
+              </div>
+            )}
+            {role === "admin" && (
+              <Link to="/configuracoes" className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-300 transition-colors hover:text-emerald-200">
+                <Settings className="h-3 w-3" /> Gerenciar assinatura e conta
+              </Link>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      <div className="flex min-h-screen flex-col lg:pl-[272px]">
+        <header className="no-print sticky top-0 z-30 flex h-[68px] items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <button
+                className="-ml-1 rounded-xl p-2 text-foreground transition-colors hover:bg-muted lg:hidden"
+                aria-label="Abrir menu"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sidebar-shell flex w-[284px] flex-col border-sidebar-border p-0 text-sidebar-foreground">
+              <div className="sidebar-grid pointer-events-none absolute inset-0" aria-hidden="true" />
+              <div className="relative px-5 pb-4 pt-6">
+                <Brand company={company} />
+              </div>
+              <NavList role={role} isPlatformAdmin={isPlatformAdmin} onNavigate={() => setOpen(false)} />
+            </SheetContent>
+          </Sheet>
+
+          <div className="flex-1 lg:hidden">
+            <Brand company={company} compact />
+          </div>
+
+          <div className="hidden min-w-0 flex-1 lg:block">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground/70">OS PRO</p>
+            <p className="truncate font-heading text-[13.5px] font-bold tracking-[-0.01em] text-foreground">{current}</p>
+          </div>
+
+          <div className="hidden items-center gap-2 rounded-full border border-border/70 bg-card px-3.5 py-1.5 text-[11.5px] text-muted-foreground xl:flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_62%_42%)]" />
+            {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
+          </div>
+
+          <span className="hidden max-w-[180px] truncate text-[12px] font-semibold text-foreground sm:inline">
+            {user?.full_name || "Usuário"}
+          </span>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="relative hidden h-9 w-9 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:grid"
+                aria-label="Abrir notificações"
+              >
+                <Bell className="h-[18px] w-[18px]" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={10} className="w-[min(360px,calc(100vw-2rem))] rounded-2xl border-border/80 p-0 shadow-xl">
+              <div className="flex items-center justify-between px-4 py-3.5">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Notificações</p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">Central de avisos do OS PRO</p>
+                </div>
+                <span className="rounded-full border border-border/70 bg-muted/60 px-2 py-1 text-[10px] font-medium text-muted-foreground">
+                  Em breve
+                </span>
+              </div>
+              <DropdownMenuSeparator />
+              <div className="flex flex-col items-center px-6 py-8 text-center">
+                <span className="mb-3 grid h-11 w-11 place-items-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
+                  <Bell className="h-5 w-5" />
+                </span>
+                <p className="text-[13px] font-semibold text-foreground">Nenhuma notificação por enquanto</p>
+                <p className="mt-1.5 max-w-[250px] text-[11.5px] leading-relaxed text-muted-foreground">
+                  A central está pronta. Os avisos automáticos do sistema serão conectados em uma próxima etapa.
+                </p>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+        </header>
+
+        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+          <div className="mx-auto w-full max-w-[1440px]">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
 
         <div className="relative px-3 pb-2 pt-3">
           <div className="rounded-2xl border border-white/10 bg-white/[0.055] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
