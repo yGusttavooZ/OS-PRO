@@ -182,137 +182,86 @@ export default function OrdemImprimir() {
           </div>
         ) : (
           <>
-        <header className="os-header">
-          <div className="os-company">
-            <CompanyLogo
-              company={company}
-              className="os-logo rounded-lg object-contain"
-              fallback={<span className="os-logo os-logo-fallback rounded-lg bg-primary text-primary-foreground grid place-items-center font-heading font-extrabold">OS</span>}
-            />
-            <div className="os-company-info">
-              <h1>{company?.name || "Assistência técnica"}</h1>
-              {company?.document && <p>CNPJ/CPF: {formatDoc(company.document)}</p>}
-              {address && <p>{address}</p>}
-              {(company?.phone || company?.email) && (
-                <p>
-                  {company?.phone ? formatPhone(company.phone) : ""}
-                  {company?.phone && company?.email ? " · " : ""}
-                  {company?.email || ""}
-                </p>
+            <header className="flex items-start justify-between gap-6 pb-6 border-b-2 border-primary">
+              <div className="flex items-start gap-3 min-w-0">
+                <CompanyLogo company={company} className="w-14 h-14 rounded-lg object-contain"
+                  fallback={<span className="w-14 h-14 rounded-lg bg-primary text-primary-foreground grid place-items-center font-heading font-extrabold">GO</span>} />
+                <div className="min-w-0">
+                  <h1 className="font-heading text-lg font-extrabold leading-tight">{company?.name}</h1>
+                  {company?.document && <p className="text-xs text-muted-foreground">CNPJ/CPF: {formatDoc(company.document)}</p>}
+                  {address && <p className="text-xs text-muted-foreground">{address}</p>}
+                  <p className="text-xs text-muted-foreground">{company?.phone && formatPhone(company.phone)}{company?.email ? ` · ${company.email}` : ""}</p>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-primary">{order.doc_type === "orcamento" ? "Orçamento" : "Ordem de serviço"}</p>
+                <p className="font-heading text-2xl font-extrabold leading-tight">{order.number_label}</p>
+                <p className="text-xs text-muted-foreground">Emitido em {shortDate(order.created_date)}</p>
+                <p className="text-xs font-semibold mt-1">Status: {order.status}</p>
+              </div>
+            </header>
+
+            <section className="grid sm:grid-cols-2 gap-6 py-6 border-b border-border">
+              <div>
+                <p className="field-label mb-1">Cliente</p>
+                <p className="font-semibold">{order.client_name || "—"}</p>
+                {order.client_document && <p className="text-xs text-muted-foreground">Documento: {formatDoc(order.client_document)}</p>}
+                {order.client_phone && <p className="text-xs text-muted-foreground">Telefone: {formatPhone(order.client_phone)}</p>}
+                {order.client_email && <p className="text-xs text-muted-foreground">{order.client_email}</p>}
+                {order.client_address && <p className="text-xs text-muted-foreground">{order.client_address}</p>}
+              </div>
+              <div>
+                <p className="field-label mb-1">Equipamento</p>
+                <p className="font-semibold">{order.equipment_name || "—"}</p>
+                <p className="text-xs text-muted-foreground">{[order.equipment_brand, order.equipment_model].filter(Boolean).join(" · ")}</p>
+                {order.equipment_serial && <p className="text-xs text-muted-foreground">Série: {order.equipment_serial}</p>}
+                {order.equipment_accessories && <p className="text-xs text-muted-foreground">Acessórios: {order.equipment_accessories}</p>}
+                {order.equipment_condition && <p className="text-xs text-muted-foreground">Estado: {order.equipment_condition}</p>}
+              </div>
+            </section>
+
+            <section className="py-6 border-b border-border space-y-4">
+              <div><p className="field-label mb-1">Defeito relatado</p><p className="text-sm whitespace-pre-line">{order.reported_issue || "—"}</p></div>
+              {order.diagnosis && <div><p className="field-label mb-1">Diagnóstico técnico</p><p className="text-sm whitespace-pre-line">{order.diagnosis}</p></div>}
+              {order.solution && <div><p className="field-label mb-1">Solução aplicada</p><p className="text-sm whitespace-pre-line">{order.solution}</p></div>}
+            </section>
+
+            <section className="py-6 border-b border-border">
+              <p className="field-label mb-3">Serviços e peças</p>
+              {items.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum item lançado.</p> : (
+                <table className="w-full text-sm">
+                  <thead><tr className="text-left text-[10px] uppercase tracking-wide text-muted-foreground border-b border-border">
+                    <th className="py-1.5 font-semibold">Descrição</th><th className="py-1.5 font-semibold text-center w-16">Qtd.</th><th className="py-1.5 font-semibold text-right w-24">Unit.</th><th className="py-1.5 font-semibold text-right w-28">Subtotal</th>
+                  </tr></thead>
+                  <tbody>{items.map((item,index)=><tr key={index} className="border-b border-border/50 last:border-0">
+                    <td className="py-2">{item.description}<span className="ml-1 text-[10px] uppercase text-muted-foreground">({item.kind === "part" ? "peça" : "serviço"})</span></td>
+                    <td className="py-2 text-center tabular-nums">{item.qty}</td><td className="py-2 text-right tabular-nums">{brl(item.unit_price)}</td>
+                    <td className="py-2 text-right tabular-nums">{brl((Number(item.qty)||0)*(Number(item.unit_price)||0))}</td>
+                  </tr>)}</tbody>
+                </table>
               )}
-            </div>
-          </div>
-          <div className="os-number">
-            <span className="os-kicker">{order.doc_type === "orcamento" ? "Orçamento" : "Ordem de serviço"}</span>
-            <strong>{order.number_label}</strong>
-            <span>Emitido em {shortDate(order.created_date)}</span>
-            <span className="os-status">{order.status}</span>
-          </div>
-        </header>
+              <div className="mt-4 ml-auto w-full sm:w-72 space-y-1.5 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">Serviços</span><span className="tabular-nums">{brl(order.services_total)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Peças</span><span className="tabular-nums">{brl(order.parts_total)}</span></div>
+                {Number(order.discount)>0&&<div className="flex justify-between"><span className="text-muted-foreground">Desconto</span><span className="tabular-nums">- {brl(order.discount)}</span></div>}
+                {Number(order.surcharge)>0&&<div className="flex justify-between"><span className="text-muted-foreground">Acréscimo</span><span className="tabular-nums">{brl(order.surcharge)}</span></div>}
+                <div className="flex justify-between pt-2 border-t border-border font-heading font-extrabold text-base"><span>Total</span><span className="tabular-nums">{brl(order.total)}</span></div>
+              </div>
+            </section>
 
-        <div className="os-two-columns">
-          <section className="os-panel">
-            <h2>Cliente</h2>
-            <p className="os-main-value">{order.client_name || "—"}</p>
-            {order.client_document && <p>Documento: {formatDoc(order.client_document)}</p>}
-            {order.client_phone && <p>Telefone: {formatPhone(order.client_phone)}</p>}
-            {order.client_email && <p>{order.client_email}</p>}
-            {order.client_address && <p>{order.client_address}</p>}
-          </section>
+            <section className="py-6">
+              <p className="field-label mb-1">Termos de garantia</p>
+              <p className="text-[11px] leading-relaxed text-muted-foreground whitespace-pre-line">{warrantyTerms}</p>
+            </section>
 
-          <section className="os-panel">
-            <h2>Equipamento</h2>
-            <p className="os-main-value">{order.equipment_name || "—"}</p>
-            {(order.equipment_brand || order.equipment_model) && (
-              <p>{[order.equipment_brand, order.equipment_model].filter(Boolean).join(" · ")}</p>
-            )}
-            {order.equipment_serial && <p>Série: {order.equipment_serial}</p>}
-            {order.equipment_accessories && <p>Acessórios: {order.equipment_accessories}</p>}
-            {order.equipment_condition && <p>Estado: {order.equipment_condition}</p>}
-          </section>
-        </div>
+            <section className="grid sm:grid-cols-2 gap-10 pt-10 pb-6">
+              <div className="text-center"><div className="border-t border-foreground/40 pt-2 text-xs">{order.client_name || "Cliente"}<span className="block text-[10px] text-muted-foreground">Assinatura do cliente</span></div></div>
+              <div className="text-center"><div className="border-t border-foreground/40 pt-2 text-xs">{order.technician || company?.tech_responsible || "Responsável técnico"}<span className="block text-[10px] text-muted-foreground">Responsável técnico</span></div></div>
+            </section>
 
-        <section className="os-technical">
-          <div className="os-tech-item">
-            <h2>Defeito relatado:</h2>
-            <p>{order.reported_issue || "—"}</p>
-          </div>
-          <div className="os-tech-item">
-            <h2>Diagnóstico técnico:</h2>
-            <p>{order.diagnosis || "—"}</p>
-          </div>
-          <div className="os-tech-item">
-            <h2>Solução aplicada:</h2>
-            <p>{order.solution || "—"}</p>
-          </div>
-        </section>
-
-        <section className="os-items-section">
-          <div className="os-section-heading">
-            <h2>Serviços e peças</h2>
-            <span>{items.length} {items.length === 1 ? "item" : "itens"}</span>
-          </div>
-          {items.length === 0 ? (
-            <p className="os-empty-items">Nenhum item lançado.</p>
-          ) : (
-            <table className="os-items-table">
-              <thead>
-                <tr>
-                  <th>Descrição</th>
-                  <th className="os-center">Qtd.</th>
-                  <th className="os-right">Unitário</th>
-                  <th className="os-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr key={index}>
-                    <td>
-                      <span>{item.description}</span>
-                      <small>{item.kind === "part" ? "Peça" : "Serviço"}</small>
-                    </td>
-                    <td className="os-center">{item.qty}</td>
-                    <td className="os-right">{brl(item.unit_price)}</td>
-                    <td className="os-right">{brl((Number(item.qty) || 0) * (Number(item.unit_price) || 0))}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
-
-        <section className="os-bottom-grid">
-          <div className="os-totals">
-            <div><span>Serviços</span><strong>{brl(order.services_total)}</strong></div>
-            <div><span>Peças</span><strong>{brl(order.parts_total)}</strong></div>
-            {Number(order.discount) > 0 && <div><span>Desconto</span><strong>− {brl(order.discount)}</strong></div>}
-            {Number(order.surcharge) > 0 && <div><span>Acréscimo</span><strong>{brl(order.surcharge)}</strong></div>}
-            <div className="os-grand-total"><span>Total</span><strong>{brl(order.total)}</strong></div>
-          </div>
-
-          <div className="os-warranty">
-            <div className="os-warranty-title">
-              <h2>Termos de garantia</h2>
-              <strong>{warrantyDays} dias</strong>
-            </div>
-            <p>{warrantyTerms}</p>
-          </div>
-        </section>
-
-        <section className="os-signatures">
-          <div>
-            <span className="os-signature-name">{order.client_name || "Cliente"}</span>
-            <span>Assinatura do cliente</span>
-          </div>
-          <div>
-            <span className="os-signature-name">{order.technician || company?.tech_responsible || "Responsável técnico"}</span>
-            <span>Responsável técnico</span>
-          </div>
-        </section>
-
-        <footer className="os-footer">
-          {company?.doc_footer || `${company?.name || ""}${company?.phone ? ` · ${formatPhone(company.phone)}` : ""}`}
-        </footer>
+            <footer className="pt-4 border-t border-border text-[10px] text-muted-foreground text-center">
+              {company?.doc_footer || `${company?.name || ""} · ${company?.phone ? formatPhone(company.phone) : ""}`}
+            </footer>
           </>
         )}
       </article>
