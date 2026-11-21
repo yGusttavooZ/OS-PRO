@@ -11,7 +11,6 @@ export default function OrdemImprimir() {
   const { id } = useParams();
   const { company } = useTenant();
   const [order, setOrder] = useState(null);
-  const [clientRecord, setClientRecord] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,15 +29,6 @@ export default function OrdemImprimir() {
     })();
     return () => { active = false; };
   }, [id, company?.id]);
-
-  useEffect(() => {
-    if (!order?.client_id || !company?.id) { setClientRecord(null); return; }
-    let active = true;
-    paged("Client", { id: order.client_id, company_id: company.id }, { limit: 1 })
-      .then((rows) => { if (active) setClientRecord(rows[0] || null); })
-      .catch((error) => { console.error("Falha ao carregar dados complementares do cliente", error); if (active) setClientRecord(null); });
-    return () => { active = false; };
-  }, [order?.client_id, company?.id]);
 
   useEffect(() => {
     if (!order) return;
@@ -75,7 +65,7 @@ export default function OrdemImprimir() {
   const warrantyTerms = (usesCompanyWarranty ? company?.warranty_terms : order.warranty_terms)
     || company?.warranty_terms
     || `Garantia de ${warrantyDays} dias sobre os serviços executados e peças substituídas.`;
-  const template = company?.os_template === "referencia" ? "referencia" : "profissional";
+  const template = ["profissional", "compacto", "premium"].includes(company?.os_template) ? company.os_template : "profissional";
 
   return (
     <div className="os-print-page min-h-screen bg-muted/40 py-6 print:bg-white print:py-0">
@@ -89,225 +79,140 @@ export default function OrdemImprimir() {
       </div>
 
       <article className={`os-sheet os-template-${template} max-w-[820px] mx-auto bg-card text-card-foreground shadow-sm border border-border`}>
-
-        {template === "referencia" ? (
-          <div className="os-reference">
-            <header className="ref-company">
-              <div className="ref-brand">
-                <CompanyLogo company={company} className="ref-logo object-contain" fallback={<span className="ref-logo-fallback">OS</span>} />
-                <div className="ref-company-info">
-                  <strong>{company?.name || "Assistência técnica"}</strong>
-                  {company?.document && <span>CNPJ: {formatDoc(company.document)}</span>}
-                  {address && <span>{address}{company?.zip ? " · CEP: " + company.zip : ""}</span>}
-                  {company?.email && <span>{company.email}</span>}
-                </div>
-              </div>
-              <div className="ref-company-contact">
-                {company?.phone && <span>{formatPhone(company.phone)}</span>}
-                {company?.whatsapp && <span>{formatPhone(company.whatsapp)}</span>}
-                {company?.tech_responsible && <span>Responsável: {company.tech_responsible}</span>}
-              </div>
-            </header>
-
-            <div className="ref-titlebar">
-              <strong>{order.doc_type === "orcamento" ? "ORÇAMENTO" : "ORDEM DE SERVIÇO"} Nº {order.number_label}</strong>
-              <span>{shortDate(order.created_date)}</span>
-            </div>
-
-            <section className="ref-section">
-              <h2>PERÍODO DE EXECUÇÃO</h2>
-              <div className="ref-grid ref-execution">
-                <div><b>Entrada:</b><span>{shortDate(order.created_date)}</span></div>
-                <div><b>Saída:</b><span>{order.completed_date ? shortDate(order.completed_date) : "____/____/______"}</span></div>
-              </div>
-            </section>
-
-            <section className="ref-section">
-              <h2>DADOS DO CLIENTE</h2>
-              <div className="ref-grid ref-client-grid">
-                <div><b>Razão social:</b><span>{clientRecord?.name || order.client_name || "—"}</span></div>
-                <div><b>Nome fantasia:</b><span>{clientRecord?.trade_name || "—"}</span></div>
-                <div><b>CNPJ/CPF:</b><span>{formatDoc(clientRecord?.document || order.client_document) || "—"}</span></div>
-                <div><b>Endereço:</b><span>{[clientRecord?.address || order.client_address, clientRecord?.address_number, clientRecord?.district].filter(Boolean).join(", ") || "—"}</span></div>
-                <div><b>CEP:</b><span>{clientRecord?.zip || "—"}</span></div>
-                <div><b>Cidade/UF:</b><span>{[clientRecord?.city, clientRecord?.state].filter(Boolean).join("/") || "—"}</span></div>
-                <div><b>Telefone:</b><span>{formatPhone(clientRecord?.phone || order.client_phone) || "—"}</span></div>
-                <div><b>E-mail:</b><span>{clientRecord?.email || order.client_email || "—"}</span></div>
-              </div>
-            </section>
-
-            <section className="ref-section">
-              <h2>EQUIPAMENTO</h2>
-              <div className="ref-grid ref-equipment-grid">
-                <div><b>Nome do equipamento</b><span>{order.equipment_name || "—"}</span></div>
-                <div><b>Marca</b><span>{order.equipment_brand || "—"}</span></div>
-                <div><b>Modelo</b><span>{order.equipment_model || "—"}</span></div>
-                <div><b>Série</b><span>{order.equipment_serial || "—"}</span></div>
-              </div>
-              <div className="ref-detail"><b>Condições</b><span>{order.equipment_condition || "—"}</span></div>
-              <div className="ref-detail"><b>Defeitos</b><span>{order.reported_issue || "—"}</span></div>
-              <div className="ref-detail"><b>Acessórios</b><span>{order.equipment_accessories || "—"}</span></div>
-              <div className="ref-detail"><b>Termos de garantia</b><span>{warrantyTerms}</span></div>
-            </section>
-
-            <section className="ref-section">
-              <h2>SERVIÇOS</h2>
-              <table className="ref-items">
-                <thead><tr><th>ITEM</th><th>NOME</th><th>QTD.</th><th>VR. UNIT.</th><th>SUBTOTAL</th></tr></thead>
-                <tbody>
-                  {items.map((item,index)=><tr key={index}><td>{index+1}</td><td>{item.description || "—"}</td><td>{item.qty}</td><td>{brl(item.unit_price)}</td><td>{brl((Number(item.qty)||0)*(Number(item.unit_price)||0))}</td></tr>)}
-                  {items.length===0&&<tr><td colSpan="5">Nenhum serviço lançado.</td></tr>}
-                </tbody>
-                <tfoot><tr><th colSpan="4">TOTAL</th><th>{brl(order.total)}</th></tr></tfoot>
-              </table>
-              <div className="ref-totals">
-                {Number(order.services_total)>0&&<div><span>SERVIÇOS:</span><strong>{brl(order.services_total)}</strong></div>}
-                {Number(order.parts_total)>0&&<div><span>PEÇAS:</span><strong>{brl(order.parts_total)}</strong></div>}
-                {Number(order.discount)>0&&<div><span>DESCONTO:</span><strong>− {brl(order.discount)}</strong></div>}
-                {Number(order.surcharge)>0&&<div><span>ACRÉSCIMO:</span><strong>{brl(order.surcharge)}</strong></div>}
-                <div className="ref-total"><span>TOTAL:</span><strong>{brl(order.total)}</strong></div>
-              </div>
-            </section>
-
-            <section className="ref-section">
-              <h2>OBSERVAÇÕES</h2>
-              <div className="ref-observations">{order.notes || " "}</div>
-            </section>
-
-            <section className="ref-signatures">
-              <div><span></span><small>Assinatura do cliente</small></div>
-              <div><span></span><small>Assinatura do técnico</small></div>
-            </section>
-            <footer className="ref-footer">{company?.doc_footer || ""}</footer>
-          </div>
-        ) : (
-          <>
-            <header className="flex items-start justify-between gap-6 pb-6 border-b-2 border-primary">
-              <div className="flex items-start gap-3 min-w-0">
-                <CompanyLogo company={company} className="w-14 h-14 rounded-lg object-contain"
-                  fallback={<span className="w-14 h-14 rounded-lg bg-primary text-primary-foreground grid place-items-center font-heading font-extrabold">GO</span>} />
-                <div className="min-w-0">
-                  <h1 className="font-heading text-lg font-extrabold leading-tight">{company?.name}</h1>
-                  {company?.document && <p className="text-xs text-muted-foreground">CNPJ/CPF: {formatDoc(company.document)}</p>}
-                  {address && <p className="text-xs text-muted-foreground">{address}</p>}
-                  <p className="text-xs text-muted-foreground">{company?.phone && formatPhone(company.phone)}{company?.email ? ` · ${company.email}` : ""}</p>
-                </div>
-              </div>
-              <div className="text-right shrink-0">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-primary">{order.doc_type === "orcamento" ? "Orçamento" : "Ordem de serviço"}</p>
-                <p className="font-heading text-2xl font-extrabold leading-tight">{order.number_label}</p>
-                <p className="text-xs text-muted-foreground">Emitido em {shortDate(order.created_date)}</p>
-                <p className="text-xs font-semibold mt-1">Status: {order.status}</p>
-              </div>
-            </header>
-
-            <section className="grid sm:grid-cols-2 gap-6 py-6 border-b border-border">
-              <div>
-                <p className="field-label mb-1">Cliente</p>
-                <p className="font-semibold">{order.client_name || "—"}</p>
-                {order.client_document && <p className="text-xs text-muted-foreground">Documento: {formatDoc(order.client_document)}</p>}
-                {order.client_phone && <p className="text-xs text-muted-foreground">Telefone: {formatPhone(order.client_phone)}</p>}
-                {order.client_email && <p className="text-xs text-muted-foreground">{order.client_email}</p>}
-                {order.client_address && <p className="text-xs text-muted-foreground">{order.client_address}</p>}
-              </div>
-              <div>
-                <p className="field-label mb-1">Equipamento</p>
-                <p className="font-semibold">{order.equipment_name || "—"}</p>
-                <p className="text-xs text-muted-foreground">{[order.equipment_brand, order.equipment_model].filter(Boolean).join(" · ")}</p>
-                {order.equipment_serial && <p className="text-xs text-muted-foreground">Série: {order.equipment_serial}</p>}
-                {order.equipment_accessories && <p className="text-xs text-muted-foreground">Acessórios: {order.equipment_accessories}</p>}
-                {order.equipment_condition && <p className="text-xs text-muted-foreground">Estado: {order.equipment_condition}</p>}
-              </div>
-            </section>
-
-            <section className="py-6 border-b border-border space-y-4">
-              <div><p className="field-label mb-1">Defeito relatado</p><p className="text-sm whitespace-pre-line">{order.reported_issue || "—"}</p></div>
-              {order.diagnosis && <div><p className="field-label mb-1">Diagnóstico técnico</p><p className="text-sm whitespace-pre-line">{order.diagnosis}</p></div>}
-              {order.solution && <div><p className="field-label mb-1">Solução aplicada</p><p className="text-sm whitespace-pre-line">{order.solution}</p></div>}
-            </section>
-
-            <section className="py-6 border-b border-border">
-              <p className="field-label mb-3">Serviços e peças</p>
-              {items.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum item lançado.</p> : (
-                <table className="w-full text-sm">
-                  <thead><tr className="text-left text-[10px] uppercase tracking-wide text-muted-foreground border-b border-border">
-                    <th className="py-1.5 font-semibold">Descrição</th><th className="py-1.5 font-semibold text-center w-16">Qtd.</th><th className="py-1.5 font-semibold text-right w-24">Unit.</th><th className="py-1.5 font-semibold text-right w-28">Subtotal</th>
-                  </tr></thead>
-                  <tbody>{items.map((item,index)=><tr key={index} className="border-b border-border/50 last:border-0">
-                    <td className="py-2">{item.description}<span className="ml-1 text-[10px] uppercase text-muted-foreground">({item.kind === "part" ? "peça" : "serviço"})</span></td>
-                    <td className="py-2 text-center tabular-nums">{item.qty}</td><td className="py-2 text-right tabular-nums">{brl(item.unit_price)}</td>
-                    <td className="py-2 text-right tabular-nums">{brl((Number(item.qty)||0)*(Number(item.unit_price)||0))}</td>
-                  </tr>)}</tbody>
-                </table>
+        <header className="os-header">
+          <div className="os-company">
+            <CompanyLogo
+              company={company}
+              className="os-logo rounded-lg object-contain"
+              fallback={<span className="os-logo os-logo-fallback rounded-lg bg-primary text-primary-foreground grid place-items-center font-heading font-extrabold">OS</span>}
+            />
+            <div className="os-company-info">
+              <h1>{company?.name || "Assistência técnica"}</h1>
+              {company?.document && <p>CNPJ/CPF: {formatDoc(company.document)}</p>}
+              {address && <p>{address}</p>}
+              {(company?.phone || company?.email) && (
+                <p>
+                  {company?.phone ? formatPhone(company.phone) : ""}
+                  {company?.phone && company?.email ? " · " : ""}
+                  {company?.email || ""}
+                </p>
               )}
-              <div className="mt-4 ml-auto w-full sm:w-72 space-y-1.5 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Serviços</span><span className="tabular-nums">{brl(order.services_total)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Peças</span><span className="tabular-nums">{brl(order.parts_total)}</span></div>
-                {Number(order.discount)>0&&<div className="flex justify-between"><span className="text-muted-foreground">Desconto</span><span className="tabular-nums">- {brl(order.discount)}</span></div>}
-                {Number(order.surcharge)>0&&<div className="flex justify-between"><span className="text-muted-foreground">Acréscimo</span><span className="tabular-nums">{brl(order.surcharge)}</span></div>}
-                <div className="flex justify-between pt-2 border-t border-border font-heading font-extrabold text-base"><span>Total</span><span className="tabular-nums">{brl(order.total)}</span></div>
-              </div>
-            </section>
+            </div>
+          </div>
+          <div className="os-number">
+            <span className="os-kicker">{order.doc_type === "orcamento" ? "Orçamento" : "Ordem de serviço"}</span>
+            <strong>{order.number_label}</strong>
+            <span>Emitido em {shortDate(order.created_date)}</span>
+            <span className="os-status">{order.status}</span>
+          </div>
+        </header>
 
-            <section className="py-6">
-              <p className="field-label mb-1">Termos de garantia</p>
-              <p className="text-[11px] leading-relaxed text-muted-foreground whitespace-pre-line">{warrantyTerms}</p>
-            </section>
+        <div className="os-two-columns">
+          <section className="os-panel">
+            <h2>Cliente</h2>
+            <p className="os-main-value">{order.client_name || "—"}</p>
+            {order.client_document && <p>Documento: {formatDoc(order.client_document)}</p>}
+            {order.client_phone && <p>Telefone: {formatPhone(order.client_phone)}</p>}
+            {order.client_email && <p>{order.client_email}</p>}
+            {order.client_address && <p>{order.client_address}</p>}
+          </section>
 
-            <section className="grid sm:grid-cols-2 gap-10 pt-10 pb-6">
-              <div className="text-center"><div className="border-t border-foreground/40 pt-2 text-xs">{order.client_name || "Cliente"}<span className="block text-[10px] text-muted-foreground">Assinatura do cliente</span></div></div>
-              <div className="text-center"><div className="border-t border-foreground/40 pt-2 text-xs">{order.technician || company?.tech_responsible || "Responsável técnico"}<span className="block text-[10px] text-muted-foreground">Responsável técnico</span></div></div>
-            </section>
+          <section className="os-panel">
+            <h2>Equipamento</h2>
+            <p className="os-main-value">{order.equipment_name || "—"}</p>
+            {(order.equipment_brand || order.equipment_model) && (
+              <p>{[order.equipment_brand, order.equipment_model].filter(Boolean).join(" · ")}</p>
+            )}
+            {order.equipment_serial && <p>Série: {order.equipment_serial}</p>}
+            {order.equipment_accessories && <p>Acessórios: {order.equipment_accessories}</p>}
+            {order.equipment_condition && <p>Estado: {order.equipment_condition}</p>}
+          </section>
+        </div>
 
-            <footer className="pt-4 border-t border-border text-[10px] text-muted-foreground text-center">
-              {company?.doc_footer || `${company?.name || ""} · ${company?.phone ? formatPhone(company.phone) : ""}`}
-            </footer>
-          </>
-        )}
+        <section className="os-technical">
+          <div className="os-tech-item">
+            <h2>Defeito relatado:</h2>
+            <p>{order.reported_issue || "—"}</p>
+          </div>
+          <div className="os-tech-item">
+            <h2>Diagnóstico técnico:</h2>
+            <p>{order.diagnosis || "—"}</p>
+          </div>
+          <div className="os-tech-item">
+            <h2>Solução aplicada:</h2>
+            <p>{order.solution || "—"}</p>
+          </div>
+        </section>
+
+        <section className="os-items-section">
+          <div className="os-section-heading">
+            <h2>Serviços e peças</h2>
+            <span>{items.length} {items.length === 1 ? "item" : "itens"}</span>
+          </div>
+          {items.length === 0 ? (
+            <p className="os-empty-items">Nenhum item lançado.</p>
+          ) : (
+            <table className="os-items-table">
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th className="os-center">Qtd.</th>
+                  <th className="os-right">Unitário</th>
+                  <th className="os-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item, index) => (
+                  <tr key={index}>
+                    <td>
+                      <span>{item.description}</span>
+                      <small>{item.kind === "part" ? "Peça" : "Serviço"}</small>
+                    </td>
+                    <td className="os-center">{item.qty}</td>
+                    <td className="os-right">{brl(item.unit_price)}</td>
+                    <td className="os-right">{brl((Number(item.qty) || 0) * (Number(item.unit_price) || 0))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+
+        <section className="os-bottom-grid">
+          <div className="os-totals">
+            <div><span>Serviços</span><strong>{brl(order.services_total)}</strong></div>
+            <div><span>Peças</span><strong>{brl(order.parts_total)}</strong></div>
+            {Number(order.discount) > 0 && <div><span>Desconto</span><strong>− {brl(order.discount)}</strong></div>}
+            {Number(order.surcharge) > 0 && <div><span>Acréscimo</span><strong>{brl(order.surcharge)}</strong></div>}
+            <div className="os-grand-total"><span>Total</span><strong>{brl(order.total)}</strong></div>
+          </div>
+
+          <div className="os-warranty">
+            <div className="os-warranty-title">
+              <h2>Termos de garantia</h2>
+              <strong>{warrantyDays} dias</strong>
+            </div>
+            <p>{warrantyTerms}</p>
+          </div>
+        </section>
+
+        <section className="os-signatures">
+          <div>
+            <span className="os-signature-name">{order.client_name || "Cliente"}</span>
+            <span>Assinatura do cliente</span>
+          </div>
+          <div>
+            <span className="os-signature-name">{order.technician || company?.tech_responsible || "Responsável técnico"}</span>
+            <span>Responsável técnico</span>
+          </div>
+        </section>
+
+        <footer className="os-footer">
+          {company?.doc_footer || `${company?.name || ""}${company?.phone ? ` · ${formatPhone(company.phone)}` : ""}`}
+        </footer>
       </article>
 
       <style>{`
-
-        .os-template-referencia { padding: 8mm !important; border-radius: 0 !important; font-family: Arial,Helvetica,sans-serif; font-size: 9px; color:#202020; }
-        .os-reference { display:flex; flex-direction:column; gap:6px; }
-        .ref-company { display:flex; justify-content:space-between; align-items:center; gap:10px; min-height:82px; padding:5px; border:1px solid #cbd5d1; }
-        .ref-brand { display:flex; align-items:center; gap:8px; min-width:0; }
-        .ref-logo { width:76px; height:76px; flex:0 0 76px; }
-        .ref-logo-fallback { display:grid; place-items:center; width:76px; height:76px; border-radius:50%; background:hsl(var(--primary)); color:white; font-weight:800; }
-        .ref-company-info,.ref-company-contact { display:flex; flex-direction:column; min-width:0; font-size:8px; line-height:1.3; }
-        .ref-company-info strong { font-size:12px; color:#202020; }
-        .ref-company-contact { text-align:right; }
-        .ref-titlebar,.ref-section>h2 { background:hsl(var(--primary) / .13); color:#202020; }
-        .ref-titlebar { display:flex; justify-content:space-between; align-items:center; padding:4px 6px; font-size:10px; }
-        .ref-section { border:1px solid #c9d0cd; }
-        .ref-section>h2 { margin:0; padding:3px 5px; font-size:9px; font-weight:800; }
-        .ref-grid { display:grid; }
-        .ref-execution { grid-template-columns:1fr 1fr; }
-        .ref-grid>div { display:flex; align-items:flex-start; gap:5px; min-width:0; padding:4px 5px; border-top:1px solid #d4dad7; }
-        .ref-grid b { flex:0 0 auto; }
-        .ref-grid span { min-width:0; overflow-wrap:anywhere; }
-        .ref-client-grid { grid-template-columns:1fr 1fr; }
-        .ref-equipment-grid { grid-template-columns:2fr .8fr 1.3fr .8fr; }
-        .ref-equipment-grid>div { flex-direction:column; gap:0; }
-        .ref-detail { display:flex; flex-direction:column; gap:0; min-height:28px; padding:4px 7px; border-top:1px solid #d4dad7; }
-        .ref-detail span { white-space:pre-line; overflow-wrap:anywhere; }
-        .ref-items { width:100%; border-collapse:collapse; font-size:8px; }
-        .ref-items th,.ref-items td { padding:4px 5px; border:1px solid #cbd2cf; text-align:left; }
-        .ref-items th { background:#f1f3f2; color:#202020; }
-        .ref-items td:nth-child(n+3),.ref-items th:nth-child(n+3) { text-align:right; white-space:nowrap; }
-        .ref-items tfoot th { background:hsl(var(--primary) / .13); }
-        .ref-totals { display:flex; flex-direction:column; align-items:flex-end; gap:2px; padding:5px; background:hsl(var(--primary) / .08); }
-        .ref-totals>div { display:flex; gap:8px; min-width:145px; justify-content:space-between; }
-        .ref-totals .ref-total { padding-top:3px; border-top:1px solid #aebbb5; font-size:10px; font-weight:800; }
-        .ref-observations { min-height:26px; padding:5px; white-space:pre-line; }
-        .ref-signatures { display:grid; grid-template-columns:1fr 1fr; gap:35px; padding:17px 8px 9px; border:1px solid #333; }
-        .ref-signatures>div { display:flex; flex-direction:column; align-items:center; text-align:center; }
-        .ref-signatures span { width:100%; height:18px; border-bottom:1px solid #555; }
-        .ref-signatures small { font-size:8px; }
-        .ref-footer { padding-top:3px; color:#68736e; font-size:7px; text-align:right; }
-        @media(max-width:600px) { .os-template-referencia { padding:12px !important; } .ref-company { align-items:flex-start; } .ref-logo,.ref-logo-fallback { width:48px;height:48px;flex-basis:48px; } .ref-company-contact { display:none; } .ref-equipment-grid { grid-template-columns:1fr 1fr; } }
-        @media print { .os-template-referencia { padding:0 !important; font-size:8pt !important; } .os-template-referencia .ref-logo,.os-template-referencia .ref-logo-fallback { width:19mm;height:19mm;flex-basis:19mm; } .os-template-referencia .ref-company { padding:2mm; } .os-template-referencia .ref-section,.os-template-referencia .ref-signatures,.os-template-referencia .ref-titlebar { break-inside:avoid; } .os-template-referencia .ref-items tr { break-inside:avoid; } .os-template-referencia .ref-grid>div,.os-template-referencia .ref-detail { padding:1.5mm 2mm; } .os-template-referencia .ref-signatures { padding:5mm 2mm 3mm; } }
-
         .os-sheet {
           box-sizing: border-box;
           padding: 30px 34px;
@@ -464,42 +369,6 @@ export default function OrdemImprimir() {
           .os-bottom-grid { grid-template-columns: 1fr; gap: 12px; }
           .os-totals { justify-content: flex-start; }
         }
-        /* Mantém a leitura do modelo de referência no mesmo padrão do documento original */
-        .os-template-referencia { font-size:12px; line-height:1.4; }
-        .os-template-referencia .ref-company-info,
-        .os-template-referencia .ref-company-contact { font-size:10px; line-height:1.4; }
-        .os-template-referencia .ref-company-info strong { font-size:15px; }
-        .os-template-referencia .ref-titlebar { font-size:12px; padding:6px 8px; }
-        .os-template-referencia .ref-section>h2 { font-size:11px; padding:5px 7px; }
-        .os-template-referencia .ref-grid,
-        .os-template-referencia .ref-detail,
-        .os-template-referencia .ref-observations { font-size:11px; }
-        .os-template-referencia .ref-items { font-size:11px; }
-        .os-template-referencia .ref-items th,
-        .os-template-referencia .ref-items td { padding:6px 7px; }
-        .os-template-referencia .ref-totals { font-size:12px; }
-        .os-template-referencia .ref-totals .ref-total { font-size:13px; }
-        .os-template-referencia .ref-signatures small { font-size:10px; }
-        .os-template-referencia .ref-footer { font-size:9px; }
-        @media print {
-          .os-template-referencia { font-size:10pt !important; line-height:1.35 !important; }
-          .os-template-referencia .ref-company-info,
-          .os-template-referencia .ref-company-contact { font-size:8.5pt !important; }
-          .os-template-referencia .ref-company-info strong { font-size:12pt !important; }
-          .os-template-referencia .ref-titlebar { font-size:10pt !important; padding:2mm 2.5mm !important; }
-          .os-template-referencia .ref-section>h2 { font-size:8.5pt !important; padding:1.5mm 2mm !important; }
-          .os-template-referencia .ref-grid,
-          .os-template-referencia .ref-detail,
-          .os-template-referencia .ref-observations { font-size:9pt !important; }
-          .os-template-referencia .ref-items { font-size:9pt !important; }
-          .os-template-referencia .ref-items th,
-          .os-template-referencia .ref-items td { padding:2mm 2.2mm !important; }
-          .os-template-referencia .ref-totals { font-size:9pt !important; }
-          .os-template-referencia .ref-totals .ref-total { font-size:10pt !important; }
-          .os-template-referencia .ref-signatures small { font-size:8.5pt !important; }
-          .os-template-referencia .ref-footer { font-size:8pt !important; }
-        }
-
         @page { size: A4 portrait; margin: 9mm; }
         @media print {
           html, body, #root { width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
