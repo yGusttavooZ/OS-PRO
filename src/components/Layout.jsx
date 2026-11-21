@@ -182,10 +182,7 @@ export default function Layout() {
             <p className="truncate font-heading text-[13.5px] font-bold tracking-[-0.01em] text-foreground">{current}</p>
           </div>
 
-          <div className="hidden items-center gap-2 rounded-full border border-border/70 bg-card px-3.5 py-1.5 text-[11.5px] text-muted-foreground xl:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_62%_42%)]" />
-            {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
-          </div>
+
 
           <div className="hidden items-center gap-2 sm:flex">
             <DropdownMenu>
@@ -219,13 +216,20 @@ export default function Layout() {
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
+
+          <div className="hidden items-center gap-2 rounded-full border border-border/70 bg-card px-3.5 py-1.5 text-[11.5px] text-muted-foreground xl:flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_62%_42%)]" />
+            {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
+          </div>
+
+          <div className="hidden items-center sm:flex">
             <div className="max-w-[230px] rounded-xl border border-primary/15 bg-primary/[0.06] px-3.5 py-2">
               <span className="block truncate text-[12px] font-bold text-foreground">
                 {user?.full_name || "Usuário"}
               </span>
             </div>
           </div>
-
 
         </header>
 
