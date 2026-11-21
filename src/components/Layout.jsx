@@ -187,11 +187,11 @@ export default function Layout() {
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
           </div>
 
-          <div className="hidden items-center gap-2.5 sm:flex">
+          <div className="hidden items-center gap-2 sm:flex">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-border/80 bg-card text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/[0.04] hover:text-primary"
+                  className="grid h-9 w-9 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="Abrir notificações"
                 >
                   <Bell className="h-[18px] w-[18px]" />
@@ -219,8 +219,8 @@ export default function Layout() {
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
-            <div className="flex h-10 max-w-[250px] items-center rounded-xl border border-border/80 bg-card px-4 shadow-sm">
-              <span className="truncate text-[12.5px] font-semibold tracking-[-0.01em] text-foreground">
+            <div className="max-w-[230px] rounded-xl border border-primary/15 bg-primary/[0.06] px-3.5 py-2">
+              <span className="block truncate text-[12px] font-bold text-foreground">
                 {user?.full_name || "Usuário"}
               </span>
             </div>
