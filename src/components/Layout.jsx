@@ -124,14 +124,6 @@ export default function Layout() {
 
 
 
-        <div className="relative px-3 pb-2 pt-3">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.055] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
-            <div className="px-0.5">
-              <span className="text-[9px] font-bold uppercase tracking-[0.17em] text-white/40">Conta</span>
-            </div>
-          </div>
-        </div>
-
         <div className="relative px-4 pb-4 pt-1">
           <div className="border-b border-white/10 px-1 pb-3">
             <div className="flex items-end justify-between gap-2">
