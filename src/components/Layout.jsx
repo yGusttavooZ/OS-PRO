@@ -218,13 +218,13 @@ export default function Layout() {
             </DropdownMenu>
           </div>
 
-          <div className="hidden items-center gap-2 rounded-full border border-border/70 bg-card px-3.5 py-1.5 text-[11.5px] text-muted-foreground xl:flex">
+          <div className="hidden h-9 items-center gap-2 rounded-full border border-border/70 bg-card px-3.5 text-[11.5px] text-muted-foreground xl:flex">
             <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_62%_42%)]" />
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
           </div>
 
           <div className="hidden items-center sm:flex">
-            <div className="max-w-[230px] rounded-xl border border-primary/15 bg-primary/[0.06] px-3.5 py-2">
+            <div className="flex h-9 max-w-[230px] items-center rounded-full border border-border/70 bg-card px-3.5">
               <span className="block truncate text-[12px] font-bold text-foreground">
                 {user?.full_name || "Usuário"}
               </span>
