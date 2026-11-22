@@ -65,7 +65,7 @@ export default function Plataforma() {
     setLoading(true);
     setLoadError("");
     const tasks = [
-      ["Empresas (companies)", () => paged("Company", {}, { sort: "-created_date", limit: 300 })],
+      ["Empresas (companies)", () => paged("Company", {}, { limit: 300 })],
       ["Assinaturas (companyAccounts)", () => paged("CompanyAccount", {}, { limit: 300 })],
       ["Membros (memberships)", () => paged("Membership", {}, { limit: 400 })],
       ["Solicitações (planRequests)", () => paged("PlanRequest", {}, { sort: "-created_date", limit: 100 })],
@@ -76,7 +76,21 @@ export default function Plataforma() {
     const setters = [setCompanies, setAccounts, setMembers, setRequests, setPlans, setAudit];
     const failures = [];
     results.forEach((result, index) => {
-      if (result.status === "fulfilled") setters[index](result.value);
+      if (result.status === "fulfilled") {
+        const rows = result.value;
+        if (index === 0) {
+          rows.sort((a, b) => {
+            const dateValue = (item) => item?.created_date || item?.created_at || item?.createdAt || 0;
+            const toTime = (value) => {
+              const normalized = value?.toDate ? value.toDate() : value;
+              const time = new Date(normalized).getTime();
+              return Number.isFinite(time) ? time : 0;
+            };
+            return toTime(dateValue(b)) - toTime(dateValue(a));
+          });
+        }
+        setters[index](rows);
+      }
       else failures.push(`${tasks[index][0]}: ${result.reason?.message || "permissão negada"}`);
     });
     if (failures.length) {
@@ -273,7 +287,7 @@ export default function Plataforma() {
                           </td>
                           <td className="px-5 py-3"><StatusPill status={account?.status} /></td>
                           <td className="px-5 py-3 text-muted-foreground tabular-nums">{memberCount[item.id] || 0}</td>
-                          <td className="px-5 py-3 text-muted-foreground whitespace-nowrap">{shortDate(item.created_date)}</td>
+                          <td className="px-5 py-3 text-muted-foreground whitespace-nowrap">{shortDate(item.created_date || item.created_at || item.createdAt)}</td>
                           <td className="px-2 py-3 text-right">
                             <div className="inline-flex items-center gap-1">
                               <Button
