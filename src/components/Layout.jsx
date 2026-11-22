@@ -170,6 +170,16 @@ export default function Layout() {
                 <Brand company={company} />
               </div>
               <NavList role={role} isPlatformAdmin={isPlatformAdmin} onNavigate={() => setOpen(false)} />
+              <div className="relative border-t border-white/10 p-4">
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[13px] font-semibold text-white/80 transition-colors hover:bg-white/[0.07] hover:text-white"
+                >
+                  <LogOut className="h-[18px] w-[18px] text-white/55" />
+                  Sair da conta
+                </button>
+              </div>
             </SheetContent>
           </Sheet>
 
@@ -219,11 +229,33 @@ export default function Layout() {
           </div>
 
           <div className="hidden items-center sm:flex">
-            <div className="flex h-9 max-w-[230px] items-center rounded-full border border-primary/25 bg-primary/[0.07] px-3.5 shadow-sm shadow-primary/5">
-              <span className="block truncate text-[12px] font-bold text-foreground">
-                {user?.full_name || "Usuário"}
-              </span>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex h-9 max-w-[230px] items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.07] px-3.5 shadow-sm shadow-primary/5 transition-colors hover:bg-primary/[0.12]"
+                  aria-label="Abrir opções da conta"
+                >
+                  <span className="block truncate text-[12px] font-bold text-foreground">
+                    {user?.full_name || "Usuário"}
+                  </span>
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={10} className="w-48 rounded-xl">
+                <DropdownMenuLabel className="max-w-full truncate text-xs font-normal text-muted-foreground">
+                  {user?.email || "Conta"}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => logout()}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sair da conta
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className="hidden h-9 items-center gap-2 rounded-full border border-border/70 bg-card px-3.5 text-[11.5px] text-muted-foreground xl:flex">
