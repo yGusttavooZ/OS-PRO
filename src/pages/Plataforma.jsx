@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Building2, Loader2, ShieldCheck, Users, Wallet, Plus, Pencil, LogOut, ArrowLeft, Inbox, Trash2,
+  Building2, Loader2, ShieldCheck, Users, Wallet, Plus, Pencil, LogOut, ArrowLeft, Inbox, Trash2, Search, RefreshCw, CreditCard, Clock3,
 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import BrandMark from "@/components/BrandMark";
@@ -60,6 +60,8 @@ export default function Plataforma() {
   const [deletingCompany, setDeletingCompany] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [deleteNotice, setDeleteNotice] = useState("");
+  const [companySearch, setCompanySearch] = useState("");
+  const [companyStatusFilter, setCompanyStatusFilter] = useState("all");
 
   const load = async () => {
     setLoading(true);
@@ -127,6 +129,17 @@ export default function Plataforma() {
       pending: requests.filter((item) => item.status === "pending").length,
     };
   }, [companies, accounts, requests]);
+
+  const filteredCompanies = useMemo(() => {
+    const term = companySearch.trim().toLocaleLowerCase("pt-BR");
+    return companies.filter((item) => {
+      const account = accounts.find((entry) => entry.company_id === item.id);
+      const matchesSearch = !term || [item.name, item.owner_email, item.email, account?.plan_name]
+        .some((value) => String(value || "").toLocaleLowerCase("pt-BR").includes(term));
+      const matchesStatus = companyStatusFilter === "all" || (account?.status || "unknown") === companyStatusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [companies, accounts, companySearch, companyStatusFilter]);
 
   const deleteCompany = async () => {
     if (!deleteDialog || deleteConfirmation.trim() !== deleteDialog.name?.trim()) return;
@@ -241,24 +254,69 @@ export default function Plataforma() {
           <div className="py-24 grid place-items-center text-muted-foreground"><Loader2 className="w-6 h-6 animate-spin" /></div>
         ) : (
           <>
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
-              {kpis.map((kpi) => (
-                <div key={kpi.label} className="surface p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">{kpi.label}</p>
-                    <kpi.icon className="w-3.5 h-3.5 text-muted-foreground" />
+            <section className="mb-5 rounded-2xl border border-border bg-gradient-to-br from-card via-card to-primary/[0.06] p-5 sm:p-6">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Central de administração</p>
+                  <h2 className="mt-1 font-heading text-xl font-extrabold tracking-tight">Visão geral da plataforma</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Acompanhe empresas, assinaturas e atividade comercial em um só lugar.</p>
+                </div>
+                <Button variant="outline" size="sm" className="mt-3 w-fit gap-2 sm:mt-0" onClick={load} disabled={loading}>
+                  <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Atualizar dados
+                </Button>
+              </div>
+            </section>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+              {kpis.map((kpi, index) => (
+                <div key={kpi.label} className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="max-w-[110px] text-[10px] font-bold uppercase leading-relaxed tracking-[0.08em] text-muted-foreground">{kpi.label}</p>
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-muted/70">
+                      <kpi.icon className="h-4 w-4 text-muted-foreground" />
+                    </span>
                   </div>
-                  <p className={`mt-2 font-heading text-lg font-extrabold tabular-nums ${kpi.tone}`}>{kpi.value}</p>
+                  <p className={`mt-3 font-heading text-xl font-extrabold tabular-nums tracking-tight ${kpi.tone}`}>{kpi.value}</p>
+                  <div className="absolute inset-x-0 bottom-0 h-0.5 bg-primary/15" />
                 </div>
               ))}
             </div>
 
-            <section className="surface mt-4 overflow-hidden">
-              <div className="p-5 pb-3">
-                <h2 className="font-heading font-bold text-[15px]">Empresas cadastradas</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Dados cadastrais e de cobrança. Clientes, ordens e valores são privados de cada empresa.
-                </p>
+            <section className="surface mt-5 overflow-hidden">
+              <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary"><Building2 className="h-4 w-4" /></span>
+                    <div>
+                      <h2 className="font-heading font-bold text-[15px]">Empresas cadastradas</h2>
+                      <p className="mt-0.5 text-xs text-muted-foreground">Dados cadastrais e de cobrança; informações operacionais permanecem privadas.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:w-[420px] sm:flex-row">
+                  <div className="relative flex-1">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input value={companySearch} onChange={(event) => setCompanySearch(event.target.value)} placeholder="Buscar empresa ou plano..." className="h-9 pl-9" />
+                  </div>
+                  <select
+                    aria-label="Filtrar empresas por situação"
+                    value={companyStatusFilter}
+                    onChange={(event) => setCompanyStatusFilter(event.target.value)}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="all">Todas as situações</option>
+                    <option value="active">Ativas</option>
+                    <option value="trial">Em teste</option>
+                    <option value="suspended">Suspensas</option>
+                    <option value="awaiting_payment">Aguardando</option>
+                    <option value="canceled">Canceladas</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-y border-border bg-muted/20 px-5 py-2">
+                <span className="text-xs text-muted-foreground">{filteredCompanies.length} de {companies.length} empresa(s)</span>
+                {(companySearch || companyStatusFilter !== "all") && (
+                  <button type="button" onClick={() => { setCompanySearch(""); setCompanyStatusFilter("all"); }} className="text-xs font-semibold text-primary hover:underline">Limpar filtros</button>
+                )}
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm min-w-[760px]">
@@ -273,10 +331,10 @@ export default function Plataforma() {
                     </tr>
                   </thead>
                   <tbody>
-                    {companies.map((item) => {
+                    {filteredCompanies.map((item) => {
                       const account = accountByCompany[item.id];
                       return (
-                        <tr key={item.id} className="border-b border-border/60 last:border-0">
+                        <tr key={item.id} className="border-b border-border/60 transition-colors hover:bg-muted/25 last:border-0">
                           <td className="px-5 py-3">
                             <span className="font-medium">{item.name}</span>
                             <span className="block text-[11px] text-muted-foreground">{item.owner_email || item.email}</span>
@@ -315,12 +373,21 @@ export default function Plataforma() {
                         </tr>
                       );
                     })}
+                    {filteredCompanies.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="px-5 py-12 text-center">
+                          <span className="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-full bg-muted"><Building2 className="h-5 w-5 text-muted-foreground" /></span>
+                          <p className="text-sm font-semibold">{companies.length === 0 ? "Nenhuma empresa encontrada" : "Nenhum resultado para esses filtros"}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">{companies.length === 0 ? "As empresas aparecerão aqui quando forem carregadas." : "Tente outro nome ou altere o filtro de situação."}</p>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
             </section>
 
-            <div className="grid lg:grid-cols-2 gap-4 mt-4">
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
               <section className="surface p-5">
                 <h2 className="font-heading font-bold text-[15px]">Solicitações de plano</h2>
                 <p className="text-xs text-muted-foreground mt-0.5 mb-4">
