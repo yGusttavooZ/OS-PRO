@@ -65,7 +65,6 @@ export default function OrdemImprimir() {
   const warrantyTerms = (usesCompanyWarranty ? company?.warranty_terms : order.warranty_terms)
     || company?.warranty_terms
     || `Garantia de ${warrantyDays} dias sobre os serviços executados e peças substituídas.`;
-  const template = ["profissional", "compacto", "premium"].includes(company?.os_template) ? company.os_template : "profissional";
 
   return (
     <div className="os-print-page min-h-screen bg-muted/40 py-6 print:bg-white print:py-0">
@@ -78,7 +77,7 @@ export default function OrdemImprimir() {
         </Button>
       </div>
 
-      <article className={`os-sheet os-template-${template} max-w-[820px] mx-auto bg-card text-card-foreground shadow-sm border border-border`}>
+      <article className="os-sheet max-w-[820px] mx-auto bg-card text-card-foreground shadow-sm border border-border">
         <header className="os-header">
           <div className="os-company">
             <CompanyLogo
@@ -223,84 +222,6 @@ export default function OrdemImprimir() {
           line-height: 1.4;
         }
         .os-sheet * { box-sizing: border-box; }
-        .os-template-compacto { padding: 22px 26px; font-size: 11px; }
-        .os-template-compacto .os-header { padding-bottom: 11px; }
-        .os-template-compacto .os-logo { width: 54px; height: 54px; flex-basis: 54px; }
-        .os-template-compacto .os-two-columns { padding: 9px 0; gap: 8px; }
-        .os-template-compacto .os-panel { padding: 8px 10px; }
-        .os-template-compacto .os-technical { padding: 6px 2px; }
-        .os-template-compacto .os-tech-item { padding: 3px 6px; }
-        .os-template-compacto .os-items-section { padding: 9px 0; }
-        .os-template-compacto .os-items-table th, .os-template-compacto .os-items-table td { padding-top: 4px; padding-bottom: 4px; }
-        .os-template-compacto .os-bottom-grid { padding: 8px 0; gap: 7px; }
-        .os-template-compacto .os-signatures { padding-top: 6mm; padding-bottom: 3mm; }
-        .os-template-premium { border-top: 5px solid hsl(var(--primary)); }
-        .os-template-premium .os-header { padding-bottom: 20px; }
-        .os-template-premium .os-number > strong { color: hsl(var(--primary)); }
-        .os-template-premium .os-panel { background: #f7faf9; border-color: #d7e7e2; }
-        .os-template-premium .os-section-heading { padding: 7px 9px; border-radius: 6px; background: hsl(var(--primary) / .08); }
-        .os-template-premium .os-grand-total { box-shadow: inset 0 0 0 1px hsl(var(--primary) / .16); }
-
-        /* Identidade visual distinta por modelo */
-        .os-template-compacto {
-          padding: 18px 22px;
-          border-radius: 4px;
-          font-size: 10px;
-        }
-        .os-template-compacto .os-header {
-          align-items: center;
-          padding-bottom: 10px;
-          border-bottom: 1px solid #cbd5e1;
-        }
-        .os-template-compacto .os-logo { width: 46px; height: 46px; flex-basis: 46px; }
-        .os-template-compacto .os-company-info h1 { font-size: 14px; }
-        .os-template-compacto .os-number > strong { font-size: 19px; }
-        .os-template-compacto .os-panel { border-radius: 4px; background: #fff; }
-        .os-template-compacto .os-items-table th { background: #e9edf2; color: #344054; }
-        .os-template-compacto .os-tech-item { border-bottom-style: dotted; }
-        .os-template-compacto .os-signatures { gap: 28px; }
-
-        .os-template-premium {
-          border: 1px solid #b7d7cc;
-          border-top: 7px solid #16785f;
-          border-radius: 3px;
-          background: #fff;
-        }
-        .os-template-premium .os-header {
-          padding: 4px 0 22px;
-          border-bottom: 3px solid #16785f;
-        }
-        .os-template-premium .os-company-info h1 { color: #124b3d; font-size: 19px; }
-        .os-template-premium .os-number > strong { color: #16785f; font-size: 27px; }
-        .os-template-premium .os-kicker { color: #16785f; }
-        .os-template-premium .os-status { background: #e2f2ec; color: #12634e; }
-        .os-template-premium .os-panel {
-          border: 1px solid #c9e1d8;
-          border-radius: 3px;
-          background: #f4faf7;
-          padding: 14px;
-        }
-        .os-template-premium .os-sheet h2 { color: #12634e; }
-        .os-template-premium .os-tech-item { padding: 8px 10px; }
-        .os-template-premium .os-items-table th {
-          background: #176b56;
-          color: #fff;
-          padding-top: 9px;
-          padding-bottom: 9px;
-        }
-        .os-template-premium .os-items-table td { border-bottom-color: #dcece5; }
-        .os-template-premium .os-grand-total {
-          background: #e5f3ed;
-          padding: 8px 12px;
-        }
-        .os-template-premium .os-grand-total strong { color: #12634e; }
-        .os-template-premium .os-warranty {
-          padding: 12px;
-          border: 1px solid #c9e1d8;
-          background: #f4faf7;
-        }
-        .os-template-premium .os-signatures > div { border-top: 1px solid #16785f; }
-
         .os-header {
           display: flex;
           justify-content: space-between;
