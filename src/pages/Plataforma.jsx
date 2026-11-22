@@ -1,16 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Building2, Loader2, ShieldCheck, Users, Wallet, Plus, Pencil, LogOut, ArrowLeft, Inbox,
+  Building2, Loader2, ShieldCheck, Users, Wallet, Plus, Pencil, LogOut, ArrowLeft, Inbox, Trash2,
 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import BrandMark from "@/components/BrandMark";
 import CompanyAccountDialog from "@/components/platform/CompanyAccountDialog";
 import PlanDialog from "@/components/platform/PlanDialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
 import { useAuth } from "@/lib/AuthContext";
+import { auth } from "@/lib/firebase";
 import { activatePlanRequest, paged } from "@/lib/tenant";
 import { brl, dateTime, shortDate } from "@/lib/format";
 
@@ -52,6 +55,11 @@ export default function Plataforma() {
   const [requestActionError, setRequestActionError] = useState("");
   const [accountDialog, setAccountDialog] = useState({ open: false, company: null, account: null });
   const [planDialog, setPlanDialog] = useState({ open: false, plan: null });
+  const [deleteDialog, setDeleteDialog] = useState(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deletingCompany, setDeletingCompany] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteNotice, setDeleteNotice] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -105,6 +113,46 @@ export default function Plataforma() {
       pending: requests.filter((item) => item.status === "pending").length,
     };
   }, [companies, accounts, requests]);
+
+  const deleteCompany = async () => {
+    if (!deleteDialog || deleteConfirmation.trim() !== deleteDialog.name?.trim()) return;
+    setDeletingCompany(true);
+    setDeleteError("");
+    setDeleteNotice("");
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) throw new Error("Sua sessão expirou. Entre novamente.");
+      const response = await fetch("/api/admin/delete-company", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          companyId: deleteDialog.id,
+          confirmationName: deleteConfirmation.trim(),
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Não foi possível excluir a empresa.");
+
+      setCompanies((current) => current.filter((item) => item.id !== deleteDialog.id));
+      setAccounts((current) => current.filter((item) => item.company_id !== deleteDialog.id));
+      setMembers((current) => current.filter((item) => item.company_id !== deleteDialog.id));
+      setDeleteDialog(null);
+      setDeleteConfirmation("");
+      setDeleteNotice(
+        result.authDeletionFailures?.length
+          ? `A empresa foi removida do Firestore, mas ${result.authDeletionFailures.length} conta(s) do Firebase Authentication precisam de verificação.`
+          : `A empresa "${result.companyName}" e seus dados vinculados foram excluídos.`
+      );
+      await load();
+    } catch (error) {
+      setDeleteError(error?.message || "Falha ao excluir a empresa.");
+    } finally {
+      setDeletingCompany(false);
+    }
+  };
 
   const setRequestStatus = async (request, status) => {
     setRequestActionError("");
@@ -166,6 +214,9 @@ export default function Plataforma() {
           }
         />
 
+        {deleteNotice && (
+          <div role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">{deleteNotice}</div>
+        )}
         {loadError && (
           <div role="alert" className="mb-4 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             Não foi possível carregar todos os dados: {loadError}
@@ -224,14 +275,28 @@ export default function Plataforma() {
                           <td className="px-5 py-3 text-muted-foreground tabular-nums">{memberCount[item.id] || 0}</td>
                           <td className="px-5 py-3 text-muted-foreground whitespace-nowrap">{shortDate(item.created_date)}</td>
                           <td className="px-2 py-3 text-right">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="gap-1.5"
-                              onClick={() => setAccountDialog({ open: true, company: item, account })}
-                            >
-                              <Pencil className="w-3.5 h-3.5" /> Gerenciar
-                            </Button>
+                            <div className="inline-flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="gap-1.5"
+                                onClick={() => setAccountDialog({ open: true, company: item, account })}
+                              >
+                                <Pencil className="w-3.5 h-3.5" /> Gerenciar
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="gap-1.5 text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  setDeleteConfirmation("");
+                                  setDeleteError("");
+                                  setDeleteDialog({ id: item.id, name: item.name });
+                                }}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Excluir
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -344,6 +409,51 @@ export default function Plataforma() {
         plans={plans}
         onSaved={load}
       />
+      <AlertDialog
+        open={Boolean(deleteDialog)}
+        onOpenChange={(open) => {
+          if (!open && !deletingCompany) {
+            setDeleteDialog(null);
+            setDeleteConfirmation("");
+            setDeleteError("");
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" /> Excluir empresa definitivamente?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é permanente. Serão removidos os dados da empresa no Firestore, incluindo clientes, equipamentos, ordens de serviço, financeiro, assinatura, convites e vínculos. As contas de acesso exclusivas dessa empresa também serão excluídas do Firebase Authentication. Usuários compartilhados com outra empresa serão preservados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-foreground">Digite exatamente o nome: {deleteDialog?.name}</p>
+            <Input
+              autoComplete="off"
+              value={deleteConfirmation}
+              onChange={(event) => setDeleteConfirmation(event.target.value)}
+              placeholder="Nome da empresa"
+              disabled={deletingCompany}
+            />
+            {deleteError && <p role="alert" className="text-sm text-destructive">{deleteError}</p>}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingCompany}>Cancelar</AlertDialogCancel>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={deleteCompany}
+              disabled={deletingCompany || deleteConfirmation.trim() !== deleteDialog?.name?.trim()}
+              className="gap-2"
+            >
+              {deletingCompany && <Loader2 className="h-4 w-4 animate-spin" />}
+              {deletingCompany ? "Excluindo..." : "Excluir definitivamente"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <PlanDialog
         open={planDialog.open}
         onOpenChange={(open) => setPlanDialog((prev) => ({ ...prev, open }))}
