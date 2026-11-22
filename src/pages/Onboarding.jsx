@@ -13,6 +13,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+function formatTaxId(value) {
+  const digits = String(value || "").replace(/\\D/g, "").slice(0, 14);
+  if (digits.length <= 11) {
+    return digits
+      .replace(/^(\\d{3})(\\d)/, "$1.$2")
+      .replace(/^(\\d{3})\\.(\\d{3})(\\d)/, "$1.$2.$3")
+      .replace(/(\\d{3})(\\d{1,2})$/, "$1-$2");
+  }
+  return digits
+    .replace(/^(\\d{2})(\\d)/, "$1.$2")
+    .replace(/^(\\d{2})\\.(\\d{3})(\\d)/, "$1.$2.$3")
+    .replace(/(\\d{3})(\\d)/, "$1/$2")
+    .replace(/(\\d{4})(\\d{1,2})$/, "$1-$2");
+}
+
 const FIELDS = [
   { name: "name", label: "Nome da empresa", placeholder: "Ex.: Informática Silva", required: true, span: 2, icon: Building2 },
   { name: "document", label: "CNPJ ou CPF", placeholder: "00.000.000/0001-00", icon: FileText },
@@ -58,7 +73,10 @@ export default function Onboarding() {
     if (!accessRevoked && (company || myCompanyId(user))) navigate("/", { replace: true });
   }, [company, user, navigate, accessRevoked]);
 
-  const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+  const update = (key, value) => setForm((prev) => ({
+    ...prev,
+    [key]: key === "document" ? formatTaxId(value) : value,
+  }));
 
   const acceptInvite = async () => {
     if (!invite) return;
