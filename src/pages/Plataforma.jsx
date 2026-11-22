@@ -388,11 +388,14 @@ export default function Plataforma() {
             </section>
 
             <div className="mt-5 grid gap-4 lg:grid-cols-2">
-              <section className="surface p-5">
-                <h2 className="font-heading font-bold text-[15px]">Solicitações de plano</h2>
-                <p className="text-xs text-muted-foreground mt-0.5 mb-4">
-                  Pedidos feitos pelas empresas. A ativação acontece após a confirmação do pagamento.
-                </p>
+              <section className="surface overflow-hidden p-5">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-amber-500/10 text-amber-600"><Inbox className="h-4 w-4" /></span>
+                  <div>
+                    <h2 className="font-heading font-bold text-[15px]">Solicitações de plano</h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Acompanhe os pedidos comerciais e suas ativações.</p>
+                  </div>
+                </div>
                 {requestActionError && (
                   <p role="alert" className="mb-3 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
                     {requestActionError}
@@ -434,9 +437,14 @@ export default function Plataforma() {
                 )}
               </section>
 
-              <section className="surface p-5">
-                <h2 className="font-heading font-bold text-[15px]">Planos</h2>
-                <p className="text-xs text-muted-foreground mt-0.5 mb-4">Valores e limites exibidos na contratação.</p>
+              <section className="surface overflow-hidden p-5">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary"><CreditCard className="h-4 w-4" /></span>
+                  <div>
+                    <h2 className="font-heading font-bold text-[15px]">Planos</h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Preços e limites disponíveis para contratação.</p>
+                  </div>
+                </div>
                 <ul className="space-y-2">
                   {plans.map((plan) => (
                     <li key={plan.id} className="flex items-center justify-between gap-3 rounded-xl border border-border px-3 py-2.5">
@@ -458,11 +466,14 @@ export default function Plataforma() {
               </section>
             </div>
 
-            <section className="surface p-5 mt-4">
-              <h2 className="font-heading font-bold text-[15px]">Auditoria recente</h2>
-              <p className="text-xs text-muted-foreground mt-0.5 mb-3">
-                Ações administrativas registradas pelas empresas e pela plataforma.
-              </p>
+            <section className="surface mt-5 overflow-hidden p-5">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="grid h-9 w-9 place-items-center rounded-lg bg-muted text-muted-foreground"><Clock3 className="h-4 w-4" /></span>
+                <div>
+                  <h2 className="font-heading font-bold text-[15px]">Auditoria recente</h2>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Histórico das ações administrativas da plataforma.</p>
+                </div>
+              </div>
               {audit.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Nenhum registro ainda.</p>
               ) : (
