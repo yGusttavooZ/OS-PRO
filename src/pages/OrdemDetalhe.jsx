@@ -250,7 +250,7 @@ export default function OrdemDetalhe() {
               <MonitorSmartphone className="w-4 h-4 text-muted-foreground" /> Equipamento
             </h2>
             <p className="font-semibold">{order.equipment_name || "—"}</p>
-            <div className="mt-2 grid sm:grid-cols-2 gap-x-6">
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <InfoRow label="Marca" value={order.equipment_brand} />
               <InfoRow label="Modelo" value={order.equipment_model} />
               <InfoRow label="Nº de série" value={order.equipment_serial} />
