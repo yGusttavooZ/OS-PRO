@@ -6,18 +6,9 @@
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="108" fill="url(#bg)"/>
-  <g fill="none" stroke="#e9fff4" stroke-width="19" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M256 76 412 166V346L256 436 100 346V166L256 76Z"/>
-    <path d="M256 256V76M256 256 412 166M256 256 412 346M256 256V436M256 256 100 346M256 256 100 166"/>
+  <g stroke="#35d66f" stroke-width="54" stroke-linecap="round">
+    <path d="M256 62V116M256 396V450M62 256H116M396 256H450M119 119 157 157M355 355 393 393M393 119 355 157M157 355 119 393"/>
   </g>
-  <g fill="#35d66f" stroke="#10231f" stroke-width="8">
-    <circle cx="256" cy="76" r="22"/>
-    <circle cx="412" cy="166" r="22"/>
-    <circle cx="412" cy="346" r="22"/>
-    <circle cx="256" cy="436" r="22"/>
-    <circle cx="100" cy="346" r="22"/>
-    <circle cx="100" cy="166" r="22"/>
-  </g>
-  <circle cx="256" cy="256" r="34" fill="#35d66f" stroke="#e9fff4" stroke-width="12"/>
-  <circle cx="256" cy="256" r="11" fill="#10231f"/>
+  <circle cx="256" cy="256" r="158" fill="#35d66f"/>
+  <circle cx="256" cy="256" r="65" fill="#10231f"/>
 </svg>
