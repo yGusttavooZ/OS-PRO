@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FileText, Clock3, Wrench, PackageCheck, TrendingUp, TrendingDown, Wallet, Plus, Sparkles, Building2 } from "lucide-react";
+import { FileText, Clock3, Wrench, PackageCheck, TrendingUp, TrendingDown, Wallet, Plus, Sparkles } from "lucide-react";
 import StatCard from "@/components/dashboard/StatCard";
 import FinanceChart from "@/components/dashboard/FinanceChart";
 import StatusBreakdown from "@/components/dashboard/StatusBreakdown";
@@ -157,31 +157,28 @@ export default function Dashboard() {
 
   return (
     <div>
-      <section className="hero-panel relative mb-5 overflow-hidden rounded-[26px] px-5 py-6 text-white sm:px-8 sm:py-8">
+      <section className="hero-panel relative mb-5 overflow-hidden rounded-[26px] px-6 py-7 text-white sm:px-8 sm:py-8">
         <div className="auth-grid pointer-events-none absolute inset-0 opacity-70" aria-hidden="true" />
         <div
           className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full bg-[hsl(152_70%_48%_/_0.18)] blur-[90px]"
           aria-hidden="true"
         />
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5">
-              <Building2 className="h-3.5 w-3.5 shrink-0 text-emerald-300" />
-              <span className="truncate text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">
-                {company?.trade_name || company?.name || "Sua empresa"}
-              </span>
-            </div>
-            <h1 className="mt-4 font-heading text-[28px] font-extrabold leading-tight tracking-[-0.04em] sm:text-[36px]">
-              Olá, {firstName}!
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
+              {company?.trade_name || company?.name || "Sua empresa"}
+            </p>
+            <h1 className="mt-2 font-heading text-[27px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[33px]">
+              Olá, {firstName}
             </h1>
-            <p className="mt-2 max-w-xl text-[13.5px] leading-relaxed text-white/75">
+            <p className="mt-2 max-w-none text-[12.5px] leading-relaxed text-white/55 lg:whitespace-nowrap">
               {role === "technician"
-                ? "Veja as ordens de serviço atribuídas a você e acompanhe cada atendimento."
-                : "Acompanhe suas ordens de serviço, a rotina da bancada e os resultados da empresa em um só lugar."}
+                ? "Acompanhe as ordens de serviço atribuídas a você."
+                : "Visão geral da operação — ordens em andamento, faturamento e status da bancada."}
             </p>
 
             {trialDays !== null && trialDays >= 0 && (
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/[0.08] px-3 py-1.5 text-[11px] text-white/75 ring-1 ring-white/[0.14] backdrop-blur">
+              <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/[0.08] px-3 py-1.5 text-[11px] text-white/75 ring-1 ring-white/[0.14] backdrop-blur">
                 <Sparkles className="h-3 w-3 text-[hsl(152_72%_64%)]" />
                 Teste · {trialDays} dia(s) restantes
                 <Link to="/configuracoes?tab=plano" className="font-semibold text-white underline-offset-2 hover:underline">
@@ -191,9 +188,9 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row sm:items-center">
+          <div className="flex flex-wrap items-center gap-2.5">
             <Select value={period} onValueChange={setPeriod}>
-              <SelectTrigger className="h-11 w-full rounded-xl border-white/15 bg-white/[0.08] text-[12.5px] font-medium text-white backdrop-blur hover:bg-white/[0.12] focus:ring-white/25 sm:w-[164px]">
+              <SelectTrigger className="h-10 w-[168px] rounded-xl border-white/15 bg-white/[0.08] text-[12.5px] font-medium text-white backdrop-blur hover:bg-white/[0.12] focus:ring-white/25">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -205,7 +202,7 @@ export default function Dashboard() {
             {can.createOrders && (
               <Button
                 asChild
-                className="h-11 w-full gap-2 rounded-xl bg-white px-5 text-[12.5px] font-bold text-primary shadow-[0_14px_30px_-18px_rgba(0,0,0,0.9)] hover:bg-white/95 sm:w-auto"
+                className="h-10 gap-2 rounded-xl bg-white px-4 text-[12.5px] font-semibold text-primary shadow-[0_14px_30px_-18px_rgba(0,0,0,0.9)] hover:bg-white/95"
               >
                 <Link to="/ordens/nova"><Plus className="h-4 w-4" /> Nova OS</Link>
               </Button>
