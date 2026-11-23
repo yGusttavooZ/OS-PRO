@@ -15,7 +15,7 @@
       "purpose": "any"
     },
     {
-      "src": "/os-pro-icon.svg",
+      "src": "/os-pro-icon-maskable.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
