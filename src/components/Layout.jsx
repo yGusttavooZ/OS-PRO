@@ -27,9 +27,7 @@ const NAV = [
 function Brand({ company, compact = false }) {
   return (
     <Link to="/" className="group flex items-center gap-2.5">
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-white/25 to-white/[0.06] font-heading text-[11px] font-extrabold tracking-[0.08em] text-white ring-1 ring-white/20 backdrop-blur">
-        <BrandMark className="h-7 w-7 text-white" />
-      </span>
+      <BrandMark className="h-10 w-10 shrink-0 text-white" />
       {!compact && (
         <span className="min-w-0 leading-tight">
           <span className="block font-heading text-[15px] font-extrabold tracking-[-0.02em] text-white">OS PRO</span>
