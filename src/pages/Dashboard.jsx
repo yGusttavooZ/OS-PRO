@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FileText, Clock3, Wrench, PackageCheck, TrendingUp, TrendingDown, Wallet, Plus, Sparkles } from "lucide-react";
+import { FileText, Clock3, Wrench, PackageCheck, TrendingUp, TrendingDown, Wallet, Plus, Sparkles, Building2 } from "lucide-react";
 import StatCard from "@/components/dashboard/StatCard";
 import FinanceChart from "@/components/dashboard/FinanceChart";
 import StatusBreakdown from "@/components/dashboard/StatusBreakdown";
@@ -165,9 +165,14 @@ export default function Dashboard() {
         />
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
-              {company?.trade_name || company?.name || "Sua empresa"}
-            </p>
+            <div className="flex items-center gap-2.5">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/[0.09] text-[hsl(152_72%_64%)] ring-1 ring-white/[0.13]">
+                <Building2 className="h-[17px] w-[17px]" />
+              </span>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/65">
+                {company?.trade_name || company?.name || "Sua empresa"}
+              </p>
+            </div>
             <h1 className="mt-2 font-heading text-[27px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[33px]">
               Olá, {firstName}
             </h1>
