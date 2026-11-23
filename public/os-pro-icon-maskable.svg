@@ -1,6 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#238f78"/>
-  <rect x="132" y="145" width="248" height="258" rx="30" fill="none" stroke="#ffffff" stroke-width="24" stroke-linejoin="round"/>
-  <path d="M205 145v-18a27 27 0 0 1 27-27h48a27 27 0 0 1 27 27v18" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
-  <path d="m190 273 48 48 91-98" fill="none" stroke="#ffffff" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect width="512" height="512" fill="#10231f"/>
+  <path d="M197 112h-17a26 26 0 0 0-26 26v214a24 24 0 0 0 24 24h118" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
+  <path d="M210 94h74a20 20 0 0 1 20 20v23H190v-23a20 20 0 0 1 20-20Z" fill="#fff"/>
+  <path d="m178 218 23 23 42-47m-65 101 23 23 42-47" fill="none" stroke="#35d66f" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M270 218h27m-27 77h20" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+  <path d="M125 365c57 58 163 58 236 5" fill="none" stroke="#35d66f" stroke-width="20" stroke-linecap="round"/>
+  <path d="M345 176a78 78 0 0 0-14 98l-45 45a20 20 0 0 0 28 28l45-45a78 78 0 0 0 98-14l-45 20-33-33 20-45a78 78 0 0 0-54-54Z" fill="#35d66f" stroke="#fff" stroke-width="11" stroke-linejoin="round"/>
 </svg>
