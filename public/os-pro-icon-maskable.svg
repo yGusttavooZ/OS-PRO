@@ -1,6 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#238f78"/>
-  <rect x="132" y="145" width="248" height="258" rx="30" fill="none" stroke="#ffffff" stroke-width="24" stroke-linejoin="round"/>
-  <path d="M205 145v-18a27 27 0 0 1 27-27h48a27 27 0 0 1 27 27v18" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
-  <path d="m190 273 48 48 91-98" fill="none" stroke="#ffffff" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect width="512" height="512" fill="#0B3029"/>
+  <g fill="none" stroke="#F5FFFB" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="205" cy="190" r="78" opacity=".9"/>
+    <circle cx="205" cy="190" r="40" stroke="#55D6A4" stroke-width="20"/>
+    <path d="M205 88v22M205 270v22M103 190h22M285 190h22M133 118l16 16M261 246l16 16M277 118l-16 16M149 246l-16 16" opacity=".9"/>
+    <rect x="166" y="194" width="204" height="153" rx="21" fill="#0B3029"/>
+    <path d="M189 218h158v93H189z" stroke-width="20"/>
+    <path d="m229 239 78 58M307 239l-78 58" stroke="#55D6A4" stroke-width="21"/>
+    <path d="M146 366h244l-22 29H168z" fill="#F5FFFB" fill-opacity=".12"/>
+    <path d="M146 366h244" stroke-width="20"/>
+  </g>
 </svg>
