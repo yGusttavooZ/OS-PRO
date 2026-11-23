@@ -1,10 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" role="img" aria-labelledby="title desc">
   <title id="title">OS-PRO</title>
-  <desc id="desc">Identidade minimalista do OS-PRO, sistema de gestão de ordens de serviço.</desc>
-  <g fill="none" stroke="#fff" stroke-width="6">
-    <rect x="8" y="12" width="92" height="92" rx="22"/>
+  <desc id="desc">Logo minimalista OS-PRO com prancheta moderna e check de ordem concluída.</desc>
+  <g fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M43 17H29a9 9 0 0 0-9 9v67a9 9 0 0 0 9 9h46a9 9 0 0 0 9-9V26a9 9 0 0 0-9-9H61"/>
+    <path d="M39 12h18a7 7 0 0 1 7 7v8H32v-8a7 7 0 0 1 7-7Z" fill="#fff" stroke="#fff"/>
+    <path d="M35 48h33M35 61h18" opacity=".75"/>
+    <path d="m48 78 9 9 18-21" stroke-width="7"/>
   </g>
-  <text x="54" y="76" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="43" font-weight="800" text-anchor="middle" letter-spacing="-3">OS</text>
-  <path d="M121 22v76" stroke="#fff" stroke-width="2" opacity=".45"/>
-  <text x="145" y="78" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" letter-spacing="-2">OS-PRO</text>
+  <path d="M112 22v76" stroke="#fff" stroke-width="2" opacity=".45"/>
+  <text x="140" y="78" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" letter-spacing="-2">OS-PRO</text>
 </svg>
