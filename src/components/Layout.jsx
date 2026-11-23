@@ -32,7 +32,7 @@ function Brand({ company, compact = false }) {
       </span>
       {!compact && (
         <span className="min-w-0 leading-tight">
-          <span className="block font-heading text-[15px] font-extrabold tracking-[-0.02em] text-white">OS PRO</span>
+          <span className="block font-heading text-[15px] font-extrabold tracking-[-0.02em] text-white">OS-PRO</span>
           <span className="mt-0.5 block max-w-[160px] truncate text-[10.5px] text-white/45">
             {company?.trade_name || company?.name || "Assistência técnica"}
           </span>
