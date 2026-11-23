@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from "@/api/base44Client";
 import { useTenant } from "@/lib/TenantContext";
-import { paged } from "@/lib/tenant";
+import { ORDER_STATUSES, paged } from "@/lib/tenant";
 import { brl, monthLabel, num, periodRange } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -20,12 +20,17 @@ const PERIODS = [
   { value: "year", label: "Este ano" },
 ];
 
-const STATUS_DEFS = [
-  { label: "Em execução", color: "bg-indigo-500" },
-  { label: "Aguardando peça", color: "bg-purple-500" },
-  { label: "Aguardando aprovação", color: "bg-amber-500" },
-  { label: "Aguardando retirada", color: "bg-teal-500" },
-];
+const STATUS_COLORS = {
+  "Aguardando aprovação": "bg-amber-500",
+  "Aprovado": "bg-sky-500",
+  "Aguardando equipamento": "bg-orange-500",
+  "Em execução": "bg-indigo-500",
+  "Aguardando peça": "bg-purple-500",
+  "Concluído": "bg-emerald-500",
+  "Aguardando retirada": "bg-teal-500",
+  "Entregue": "bg-green-600",
+  "Cancelado": "bg-slate-400",
+};
 
 export default function Dashboard() {
   const { user, company, account, role, can } = useTenant();
@@ -47,9 +52,9 @@ export default function Dashboard() {
           orderQuery.doc_type = "ordem";
         }
         const [orderRows, txRows, clientCount] = await Promise.all([
-          paged("ServiceOrder", orderQuery, { sort: "-created_date", limit: 300 }),
+          paged("ServiceOrder", orderQuery, { sort: "-created_date" }),
           can.finance
-            ? paged("Transaction", { company_id: company.id }, { sort: "-reference_date", limit: 300 })
+            ? paged("Transaction", { company_id: company.id }, { sort: "-reference_date" })
             : Promise.resolve([]),
           can.viewClients
             ? base44.entities.Client.count({ company_id: company.id })
@@ -70,19 +75,27 @@ export default function Dashboard() {
 
   const { from, to } = periodRange(period);
 
-  const periodOrders = useMemo(
-    () => orders.filter((order) => order.created_date && order.created_date >= from && order.created_date <= to),
+  const periodDocuments = useMemo(
+    () => orders.filter((order) => {
+      const created = String(order.created_date || "");
+      return created >= from && created <= to;
+    }),
     [orders, from, to]
+  );
+
+  const periodOrders = useMemo(
+    () => periodDocuments.filter((order) => order.doc_type === "ordem"),
+    [periodDocuments]
   );
 
   const counts = useMemo(
     () => ({
       total: periodOrders.length,
-      awaiting: periodOrders.filter((o) => o.status === "Aguardando aprovação").length,
-      running: periodOrders.filter((o) => ["Em execução", "Aguardando peça"].includes(o.status)).length,
-      delivered: periodOrders.filter((o) => o.status === "Entregue").length,
+      awaiting: periodDocuments.filter((o) => o.status === "Aguardando aprovação").length,
+      running: periodOrders.filter((o) => ["Aprovado", "Aguardando equipamento", "Em execução", "Aguardando peça", "Aguardando retirada"].includes(o.status)).length,
+      delivered: periodOrders.filter((o) => ["Concluído", "Entregue"].includes(o.status)).length,
     }),
-    [periodOrders]
+    [periodDocuments, periodOrders]
   );
 
   const money = useMemo(() => {
@@ -94,7 +107,7 @@ export default function Dashboard() {
       const amount = Number(tx.amount) || 0;
       if (tx.type === "income" && tx.status === "received" && ref >= from && ref <= to) revenue += amount;
       if (tx.type === "expense" && tx.status === "paid" && ref >= from && ref <= to) expenses += amount;
-      if (tx.type === "income" && tx.status === "pending") pending += amount;
+      if (tx.type === "income" && tx.status === "pending" && ref >= from && ref <= to) pending += amount;
     }
     return { revenue, expenses, balance: revenue - expenses, pending };
   }, [transactions, from, to]);
@@ -126,8 +139,14 @@ export default function Dashboard() {
 
   const statusRows = useMemo(() => {
     const map = {};
-    for (const order of orders) map[order.status] = (map[order.status] || 0) + 1;
-    return STATUS_DEFS.map((def) => ({ ...def, value: map[def.label] || 0 })).filter((row) => row.value > 0);
+    for (const order of orders) {
+      if (order.doc_type !== "ordem") continue;
+      map[order.status] = (map[order.status] || 0) + 1;
+    }
+    return ORDER_STATUSES
+      .filter((status) => status !== "Orçamento")
+      .map((label) => ({ label, color: STATUS_COLORS[label] || "bg-slate-400", value: map[label] || 0 }))
+      .filter((row) => row.value > 0);
   }, [orders]);
 
   const recent = orders.slice(0, 5);
@@ -193,10 +212,10 @@ export default function Dashboard() {
       </section>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <StatCard label="Ordens no período" value={loading ? "—" : num(counts.total)} hint="Documentos emitidos" icon={FileText} delay={0} />
-        <StatCard label="Aguardando aprovação" value={loading ? "—" : num(counts.awaiting)} hint="Orçamentos com o cliente" icon={Clock3} tone="warning" delay={60} />
-        <StatCard label="Em execução" value={loading ? "—" : num(counts.running)} hint="Na bancada agora" icon={Wrench} tone="info" delay={120} />
-        <StatCard label="Entregues" value={loading ? "—" : num(counts.delivered)} hint="Finalizadas no período" icon={PackageCheck} tone="success" delay={180} />
+        <StatCard label="OS emitidas" value={loading ? "—" : num(counts.total)} hint="Ordens criadas no período" icon={FileText} delay={0} />
+        <StatCard label="Aguardando aprovação" value={loading ? "—" : num(counts.awaiting)} hint="Orçamentos aguardando retorno" icon={Clock3} tone="warning" delay={60} />
+        <StatCard label="Em execução" value={loading ? "—" : num(counts.running)} hint="OS em fluxo de atendimento" icon={Wrench} tone="info" delay={120} />
+        <StatCard label="Entregues" value={loading ? "—" : num(counts.delivered)} hint="Concluídas ou entregues no período" icon={PackageCheck} tone="success" delay={180} />
       </div>
 
       {can.finance && (
