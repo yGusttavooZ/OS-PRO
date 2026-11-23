@@ -9,51 +9,26 @@ export default function BrandMark({ className = "" }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path
-          d="M17 32H47"
+        <g
           stroke="currentColor"
-          strokeWidth="5"
-          strokeLinecap="round"
-          opacity=".72"
-        />
-        <rect
-          x="5.5"
-          y="23.5"
-          width="17"
-          height="17"
-          rx="5"
-          transform="rotate(-45 5.5 23.5)"
-          stroke="currentColor"
-          strokeWidth="3.5"
-        />
-        <rect
-          x="41.5"
-          y="23.5"
-          width="17"
-          height="17"
-          rx="5"
-          transform="rotate(-45 41.5 23.5)"
-          stroke="currentColor"
-          strokeWidth="3.5"
-        />
-        <rect
-          x="23"
-          y="23"
-          width="18"
-          height="18"
-          rx="5.5"
-          transform="rotate(-45 23 23)"
-          fill="#35D66F"
-        />
-        <path
-          d="m28.5 32 2.5 2.5 5-5"
-          stroke="#10231F"
-          strokeWidth="2.8"
+          strokeWidth="3.2"
           strokeLinecap="round"
           strokeLinejoin="round"
-        />
-        <circle cx="13.5" cy="32" r="2.2" fill="#35D66F" />
-        <circle cx="50.5" cy="32" r="2.2" fill="#35D66F" />
+          opacity=".9"
+        >
+          <path d="M32 9 50 19.5V44.5L32 55 14 44.5V19.5L32 9Z" />
+          <path d="M32 32 32 9M32 32 50 19.5M32 32 50 44.5M32 32 32 55M32 32 14 44.5M32 32 14 19.5" />
+        </g>
+        <g fill="#35D66F" stroke="#10231F" strokeWidth="1.5">
+          <circle cx="32" cy="9" r="4.2" />
+          <circle cx="50" cy="19.5" r="4.2" />
+          <circle cx="50" cy="44.5" r="4.2" />
+          <circle cx="32" cy="55" r="4.2" />
+          <circle cx="14" cy="44.5" r="4.2" />
+          <circle cx="14" cy="19.5" r="4.2" />
+        </g>
+        <circle cx="32" cy="32" r="7" fill="#35D66F" stroke="currentColor" strokeWidth="2.5" />
+        <circle cx="32" cy="32" r="2.2" fill="#10231F" />
       </svg>
     </span>
   );
