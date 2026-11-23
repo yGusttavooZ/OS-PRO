@@ -3,13 +3,57 @@ import React from "react";
 export default function BrandMark({ className = "" }) {
   return (
     <span className={className} aria-hidden="true">
-      <svg viewBox="0 0 64 64" className="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22 10H17.5A5.5 5.5 0 0 0 12 15.5V49a5 5 0 0 0 5 5h21" stroke="currentColor" strokeWidth="3.6" strokeLinecap="round" />
-        <path d="M24 7h13a4 4 0 0 1 4 4v5H20v-5a4 4 0 0 1 4-4Z" fill="currentColor" />
-        <path d="m19 27 4 4 7-8M19 39l4 4 7-8" stroke="#35D66F" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M35 27h7M35 39h4" stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity=".8" />
-        <path d="M7 48c8 10 26 10 38 1" stroke="#35D66F" strokeWidth="3.2" strokeLinecap="round" />
-        <path d="M44 21.5a12.5 12.5 0 0 0-2.2 15.7l-7.2 7.2a3.2 3.2 0 0 0 4.5 4.5l7.2-7.2A12.5 12.5 0 0 0 62 31.4l-7.1 3.1-5.2-5.2 3.1-7.1a12.4 12.4 0 0 0-8.8-.7Z" fill="#35D66F" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <svg
+        viewBox="0 0 64 64"
+        className="h-full w-full"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17 32H47"
+          stroke="currentColor"
+          strokeWidth="5"
+          strokeLinecap="round"
+          opacity=".72"
+        />
+        <rect
+          x="5.5"
+          y="23.5"
+          width="17"
+          height="17"
+          rx="5"
+          transform="rotate(-45 5.5 23.5)"
+          stroke="currentColor"
+          strokeWidth="3.5"
+        />
+        <rect
+          x="41.5"
+          y="23.5"
+          width="17"
+          height="17"
+          rx="5"
+          transform="rotate(-45 41.5 23.5)"
+          stroke="currentColor"
+          strokeWidth="3.5"
+        />
+        <rect
+          x="23"
+          y="23"
+          width="18"
+          height="18"
+          rx="5.5"
+          transform="rotate(-45 23 23)"
+          fill="#35D66F"
+        />
+        <path
+          d="m28.5 32 2.5 2.5 5-5"
+          stroke="#10231F"
+          strokeWidth="2.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="13.5" cy="32" r="2.2" fill="#35D66F" />
+        <circle cx="50.5" cy="32" r="2.2" fill="#35D66F" />
       </svg>
     </span>
   );
