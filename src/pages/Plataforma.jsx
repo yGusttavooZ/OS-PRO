@@ -210,9 +210,7 @@ export default function Plataforma() {
     <div className="min-h-screen bg-background">
       <header className="no-print sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center gap-3">
-          <span className="w-9 h-9 rounded-xl bg-primary text-primary-foreground grid place-items-center">
-            <BrandMark className="h-6 w-6 text-primary-foreground" />
-          </span>
+          <BrandMark className="h-10 w-10 shrink-0 text-primary" />
           <span className="leading-tight">
             <span className="block font-heading font-extrabold text-[15px]">OS PRO</span>
             <span className="block text-[11px] text-muted-foreground">Painel da plataforma</span>
