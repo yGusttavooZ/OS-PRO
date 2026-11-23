@@ -174,10 +174,10 @@ export default function Dashboard() {
             <h1 className="mt-4 font-heading text-[28px] font-extrabold leading-tight tracking-[-0.04em] sm:text-[36px]">
               Olá, {firstName}!
             </h1>
-            <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-white/60">
+            <p className="mt-2 max-w-xl text-[13.5px] leading-relaxed text-white/75">
               {role === "technician"
-                ? "Aqui estão as ordens de serviço atribuídas a você."
-                : "Acompanhe os atendimentos, a movimentação da bancada e os resultados da sua empresa."}
+                ? "Veja as ordens de serviço atribuídas a você e acompanhe cada atendimento."
+                : "Acompanhe suas ordens de serviço, a rotina da bancada e os resultados da empresa em um só lugar."}
             </p>
 
             {trialDays !== null && trialDays >= 0 && (
