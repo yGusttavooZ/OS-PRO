@@ -29,16 +29,16 @@ export const dateTime = (value) => {
 export const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export const formatDoc = (value) => {
-  const digits = String(value || "").replace(/\\D/g, "");
-  if (digits.length === 11) return digits.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/, "$1.$2.$3-$4");
-  if (digits.length === 14) return digits.replace(/(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})/, "$1.$2.$3/$4-$5");
+  const digits = String(value || "").replace(/\D/g, "");
+  if (digits.length === 11) return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  if (digits.length === 14) return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
   return value || "—";
 };
 
 export const formatPhone = (value) => {
-  const d = String(value || "").replace(/\\D/g, "");
-  if (d.length === 11) return d.replace(/(\\d{2})(\\d{5})(\\d{4})/, "($1) $2-$3");
-  if (d.length === 10) return d.replace(/(\\d{2})(\\d{4})(\\d{4})/, "($1) $2-$3");
+  const d = String(value || "").replace(/\D/g, "");
+  if (d.length === 11) return d.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  if (d.length === 10) return d.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
   return value || "—";
 };
 
