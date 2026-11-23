@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 190" role="img" aria-labelledby="title desc">
+  <title id="title">OS-PRO</title>
+  <desc id="desc">Logo OS-PRO para gestão de assistência técnica, com engrenagem, notebook e ferramentas.</desc>
+  <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke-width="10">
+      <path d="M88 23v18M88 149v18M25 86h18M133 86h18M43 41l13 13M120 128l13 13M133 41l-13 13M56 128l-13 13"/>
+      <circle cx="88" cy="86" r="54"/>
+      <circle cx="88" cy="86" r="38" stroke-width="7"/>
+      <rect x="39" y="66" width="98" height="68" rx="7" fill="#fff" stroke-width="8"/>
+      <path d="M28 145h120l-10 13H38z" fill="#fff" stroke-width="5"/>
+      <path d="m69 88 39 31M108 88 69 119" stroke="#163f35" stroke-width="9"/>
+      <circle cx="69" cy="88" r="5" fill="#163f35" stroke="none"/>
+      <circle cx="108" cy="88" r="5" fill="#163f35" stroke="none"/>
+      <circle cx="69" cy="119" r="5" fill="#163f35" stroke="none"/>
+      <circle cx="108" cy="119" r="5" fill="#163f35" stroke="none"/>
+    </g>
+    <path d="M180 35v120" stroke-width="3" opacity=".65"/>
+  </g>
+  <g fill="#fff" font-family="Arial, Helvetica, sans-serif" font-weight="800">
+    <text x="215" y="111" font-size="88" letter-spacing="-4">OS-PRO</text>
+    <text x="220" y="151" font-size="22" font-weight="500" letter-spacing=".5">Gestão inteligente de assistência técnica</text>
+  </g>
+</svg>
