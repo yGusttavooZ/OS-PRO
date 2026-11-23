@@ -1,35 +1,44 @@
+const asDate = (value) => {
+  if (!value) return null;
+  const normalized = typeof value?.toDate === "function"
+    ? value.toDate()
+    : value instanceof Date
+      ? value
+      : typeof value === "object" && typeof (value.seconds ?? value._seconds) === "number"
+        ? new Date((value.seconds ?? value._seconds) * 1000)
+        : new Date(value);
+  return normalized instanceof Date && !Number.isNaN(normalized.getTime()) ? normalized : null;
+};
+
 export const brl = (value) =>
   (Number(value) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const num = (value) => (Number(value) || 0).toLocaleString("pt-BR");
 
 export const shortDate = (value) => {
-  if (!value) return "—";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString("pt-BR");
+  const d = asDate(value);
+  return d ? d.toLocaleDateString("pt-BR") : "—";
 };
 
 export const dateTime = (value) => {
-  if (!value) return "—";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "—";
+  const d = asDate(value);
+  if (!d) return "—";
   return `${d.toLocaleDateString("pt-BR")} às ${d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
 };
 
 export const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export const formatDoc = (value) => {
-  const digits = String(value || "").replace(/\D/g, "");
-  if (digits.length === 11) return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  if (digits.length === 14) return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+  const digits = String(value || "").replace(/\\D/g, "");
+  if (digits.length === 11) return digits.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/, "$1.$2.$3-$4");
+  if (digits.length === 14) return digits.replace(/(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})/, "$1.$2.$3/$4-$5");
   return value || "—";
 };
 
 export const formatPhone = (value) => {
-  const d = String(value || "").replace(/\D/g, "");
-  if (d.length === 11) return d.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-  if (d.length === 10) return d.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  const d = String(value || "").replace(/\\D/g, "");
+  if (d.length === 11) return d.replace(/(\\d{2})(\\d{5})(\\d{4})/, "($1) $2-$3");
+  if (d.length === 10) return d.replace(/(\\d{2})(\\d{4})(\\d{4})/, "($1) $2-$3");
   return value || "—";
 };
 
