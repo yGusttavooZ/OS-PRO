@@ -31,11 +31,12 @@ export default function AuthLayout({
   panelSubtitle = "Ordens de serviço, orçamentos, clientes e financeiro em um só lugar — com os dados da sua empresa totalmente isolados.",
   compact = false,
   cardTitle,
+  loginMode = false,
 }) {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-        <aside className="auth-panel relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-14">
+    <div className={`min-h-screen ${loginMode ? "bg-[#f3f7f5]" : "bg-background"}`}>
+      <div className={`grid min-h-screen ${loginMode ? "lg:grid-cols-[1.12fr_0.88fr]" : "lg:grid-cols-[1.05fr_1fr]"}`}>
+        <aside className={`auth-panel relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex ${loginMode ? "xl:p-16" : "xl:p-14"}`}>
           <div className="auth-grid pointer-events-none absolute inset-0" aria-hidden="true" />
           <div
             className="animate-float pointer-events-none absolute -right-24 top-24 h-[22rem] w-[22rem] rounded-full bg-[hsl(152_70%_45%_/_0.14)] blur-[110px]"
@@ -110,13 +111,13 @@ export default function AuthLayout({
           </div>
         </aside>
 
-        <main className={`relative flex items-center justify-center px-5 sm:px-8 ${compact ? "py-4 lg:py-3" : "py-10"}`}>
+        <main className={`relative flex items-center justify-center px-5 sm:px-8 ${loginMode ? "bg-[#f6f9f7] py-10 lg:px-10" : ""} ${compact ? "py-4 lg:py-3" : "py-10"}`}>
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
             <div className="absolute -top-28 right-0 h-80 w-80 rounded-full bg-primary/[0.08] blur-[110px]" />
             <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-chart-3/[0.09] blur-[110px]" />
           </div>
 
-          <div className={`relative w-full max-w-[440px] animate-rise ${compact ? "max-lg:py-2" : ""}`}>
+          <div className={`relative w-full ${loginMode ? "max-w-[410px]" : "max-w-[440px]"} animate-rise ${compact ? "max-lg:py-2" : ""}`}>
             <div className={`${compact ? "mb-5" : "mb-8"} flex items-center justify-center gap-2.5 lg:hidden`}>
               <BrandMark className="h-10 w-10 shrink-0 text-primary" />
               <span className="font-heading text-lg font-extrabold tracking-[-0.02em]">OS PRO</span>
@@ -132,7 +133,7 @@ export default function AuthLayout({
               {subtitle && <p className="mx-auto mt-2 max-w-[330px] text-[13.5px] leading-relaxed text-muted-foreground">{subtitle}</p>}
             </div>}
 
-            <div className={`auth-card relative overflow-hidden rounded-[28px] border border-border/70 bg-card shadow-[0_24px_80px_-38px_hsl(var(--foreground)/0.22)] ${compact ? "p-5 sm:p-6 lg:p-6" : "p-6 sm:p-8 lg:p-9"}`}>
+            <div className={`auth-card relative overflow-hidden ${loginMode ? "rounded-[30px] border border-[#e0eae4] bg-white shadow-[0_28px_90px_-42px_rgba(20,70,45,0.28)]" : "rounded-[28px] border border-border/70 bg-card shadow-[0_24px_80px_-38px_hsl(var(--foreground)/0.22)]"} ${compact ? "p-5 sm:p-6 lg:p-6" : "p-6 sm:p-8 lg:p-9"}`}>
               <span className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" aria-hidden="true" />
               {cardTitle && <h1 className="mb-5 text-center font-heading text-[27px] font-extrabold tracking-[-0.03em] text-foreground sm:text-[30px]">{cardTitle}</h1>}
               {children}
