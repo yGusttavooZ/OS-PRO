@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, ShieldCheck, Sparkles, ArrowUpRight } from "lucide-react";
+import { Check, ShieldCheck, Sparkles } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
 
 const BENEFITS = [
@@ -10,9 +10,9 @@ const BENEFITS = [
 ];
 
 const METRICS = [
-  { value: "OS", label: "numeradas" },
+  { value: "OS", label: "organizadas" },
   { value: "PDF", label: "com sua marca" },
-  { value: "14 dias", label: "de teste grátis" },
+  { value: "360°", label: "da operação" },
 ];
 
 const PREVIEW_ROWS = [
@@ -49,9 +49,6 @@ export default function AuthLayout({
               <p className="font-heading text-[17px] font-extrabold tracking-[-0.02em]">OS PRO</p>
               <p className="text-[9.5px] uppercase tracking-[0.3em] text-white/40">Gestão de ordem de serviço</p>
             </div>
-            <span className="ml-auto hidden items-center gap-1.5 rounded-full bg-white/[0.08] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/70 ring-1 ring-white/15 xl:inline-flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_72%_56%)]" /> Sistema online
-            </span>
           </div>
 
           <div className="relative max-w-lg animate-rise">
@@ -76,10 +73,8 @@ export default function AuthLayout({
 
             <div className="mt-9 rounded-2xl bg-white/[0.05] p-4 ring-1 ring-white/[0.09] backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">Visão da operação</p>
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[hsl(152_72%_72%)]">
-                  ao vivo <ArrowUpRight className="h-3 w-3" />
-                </span>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">Exemplo de acompanhamento</p>
+                <span className="text-[10px] font-semibold text-white/45">PRÉVIA ILUSTRATIVA</span>
               </div>
               <div className="mt-4 space-y-3">
                 {PREVIEW_ROWS.map((row) => (
@@ -121,7 +116,7 @@ export default function AuthLayout({
             <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-chart-3/[0.09] blur-[110px]" />
           </div>
 
-          <div className={`relative w-full max-w-[430px] animate-rise ${compact ? "max-lg:py-2" : ""}`}>
+          <div className={`relative w-full max-w-[440px] animate-rise ${compact ? "max-lg:py-2" : ""}`}>
             <div className={`${compact ? "mb-5" : "mb-8"} flex items-center justify-center gap-2.5 lg:hidden`}>
               <BrandMark className="h-10 w-10 shrink-0 text-primary" />
               <span className="font-heading text-lg font-extrabold tracking-[-0.02em]">OS PRO</span>
@@ -137,7 +132,7 @@ export default function AuthLayout({
               {subtitle && <p className="mx-auto mt-2 max-w-[330px] text-[13.5px] leading-relaxed text-muted-foreground">{subtitle}</p>}
             </div>}
 
-            <div className={`auth-card relative overflow-hidden rounded-[26px] border border-border/70 bg-card ${compact ? "p-5 sm:p-6 lg:p-6" : "p-6 sm:p-8"}`}>
+            <div className={`auth-card relative overflow-hidden rounded-[28px] border border-border/70 bg-card shadow-[0_24px_80px_-38px_hsl(var(--foreground)/0.22)] ${compact ? "p-5 sm:p-6 lg:p-6" : "p-6 sm:p-8 lg:p-9"}`}>
               <span className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" aria-hidden="true" />
               {cardTitle && <h1 className="mb-5 text-center font-heading text-[27px] font-extrabold tracking-[-0.03em] text-foreground sm:text-[30px]">{cardTitle}</h1>}
               {children}
