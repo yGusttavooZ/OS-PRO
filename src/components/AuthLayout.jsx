@@ -31,6 +31,7 @@ export default function AuthLayout({
   panelSubtitle = "Ordens de serviço, orçamentos, clientes e financeiro em um só lugar — com os dados da sua empresa totalmente isolados.",
   compact = false,
   cardTitle,
+  loginMode = false,
 }) {
   return (
     <div className="min-h-screen bg-background">
@@ -110,13 +111,13 @@ export default function AuthLayout({
           </div>
         </aside>
 
-        <main className={`relative flex items-center justify-center px-5 sm:px-8 ${compact ? "py-4 lg:py-3" : "py-10"}`}>
+        <main className={`relative flex items-center justify-center px-5 sm:px-8 ${loginMode ? "bg-[#f2f7f4] py-10 lg:px-12" : ""} ${compact ? "py-4 lg:py-3" : "py-10"}`}>
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
             <div className="absolute -top-28 right-0 h-80 w-80 rounded-full bg-primary/[0.08] blur-[110px]" />
             <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-chart-3/[0.09] blur-[110px]" />
           </div>
 
-          <div className={`relative w-full max-w-[430px] animate-rise ${compact ? "max-lg:py-2" : ""}`}>
+          <div className={`relative w-full ${loginMode ? "max-w-[470px]" : "max-w-[430px]"} animate-rise ${compact ? "max-lg:py-2" : ""}`}>
             <div className={`${compact ? "mb-5" : "mb-8"} flex items-center justify-center gap-2.5 lg:hidden`}>
               <BrandMark className="h-10 w-10 shrink-0 text-primary" />
               <span className="font-heading text-lg font-extrabold tracking-[-0.02em]">OS PRO</span>
@@ -132,7 +133,7 @@ export default function AuthLayout({
               {subtitle && <p className="mx-auto mt-2 max-w-[330px] text-[13.5px] leading-relaxed text-muted-foreground">{subtitle}</p>}
             </div>}
 
-            <div className={`auth-card relative overflow-hidden rounded-[26px] border border-border/70 bg-card ${compact ? "p-5 sm:p-6 lg:p-6" : "p-6 sm:p-8"}`}>
+            <div className={`auth-card relative overflow-hidden ${loginMode ? "rounded-[30px] border border-[#d8e8de] bg-white p-7 shadow-[0_28px_80px_-34px_rgba(22,101,52,0.32)] sm:p-10" : "rounded-[26px] border border-border/70 bg-card"} ${compact ? "p-5 sm:p-6 lg:p-6" : ""} ${!compact && !loginMode ? "p-6 sm:p-8" : ""}`}>
               <span className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" aria-hidden="true" />
               {cardTitle && <h1 className="mb-5 text-center font-heading text-[27px] font-extrabold tracking-[-0.03em] text-foreground sm:text-[30px]">{cardTitle}</h1>}
               {children}
