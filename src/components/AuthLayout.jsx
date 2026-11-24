@@ -118,9 +118,14 @@ export default function AuthLayout({
           </div>
 
           <div className={`relative w-full ${loginMode ? "max-w-[470px]" : "max-w-[430px]"} animate-rise ${compact ? "max-lg:py-2" : ""}`}>
-            <div className={`${compact ? "mb-5" : "mb-8"} flex items-center justify-center gap-2.5 lg:hidden`}>
-              <BrandMark className="h-10 w-10 shrink-0 text-primary" />
-              <span className="font-heading text-lg font-extrabold tracking-[-0.02em]">OS PRO</span>
+            <div className={`${compact ? "mb-5" : "mb-8"} flex items-center justify-center gap-3 lg:hidden`}>
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-[#cfe5d7] bg-white shadow-[0_6px_18px_-10px_rgba(22,101,52,0.45)]">
+                <BrandMark className="h-9 w-9" />
+              </span>
+              <span className="text-left leading-none">
+                <span className="block font-heading text-[20px] font-extrabold tracking-[-0.035em] text-[#123b2a]">OS PRO</span>
+                <span className="mt-1.5 block text-[9px] font-semibold uppercase tracking-[0.19em] text-[#54816a]">Gestão de assistência</span>
+              </span>
             </div>
 
             {(title || subtitle) && <div className={`${compact ? "mb-4 lg:mb-5" : "mb-7"} text-center`}>
