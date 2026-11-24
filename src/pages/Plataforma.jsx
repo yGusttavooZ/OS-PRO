@@ -207,9 +207,9 @@ export default function Plataforma() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="no-print sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center gap-3">
+    <div className="min-h-screen bg-[#f4f7f5]">
+      <header className="no-print sticky top-0 z-30 border-b border-[#e1eae4] bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-[72px] max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:px-8">
           <BrandMark className="h-10 w-10 shrink-0 text-primary" />
           <span className="leading-tight">
             <span className="block font-heading font-extrabold text-[15px]">OS PRO</span>
@@ -228,16 +228,19 @@ export default function Plataforma() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-6 sm:py-8">
-        <PageHeader
-          title="Gestão da plataforma"
-          subtitle="Empresas assinantes, planos e solicitações comerciais do OS PRO."
-          actions={
-            <Button variant="outline" className="h-10 gap-2" onClick={() => setPlanDialog({ open: true, plan: null })}>
-              <Plus className="w-4 h-4" /> Novo plano
-            </Button>
-          }
-        />
+      <main className="mx-auto max-w-[1440px] px-4 py-7 sm:px-6 sm:py-9 lg:px-8">
+        <div className="mb-7 flex flex-col gap-4 border-b border-[#dfe9e2] pb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#238f78]">
+              <span className="h-2 w-2 rounded-full bg-[#238f78]" /> Administração geral
+            </div>
+            <h1 className="font-heading text-2xl font-extrabold tracking-tight text-[#152b20] sm:text-3xl">Painel da plataforma</h1>
+            <p className="mt-1.5 max-w-2xl text-sm text-[#6b7c71]">Visão central das empresas, assinaturas, planos e movimentações do OS PRO.</p>
+          </div>
+          <Button className="h-10 gap-2 bg-[#18785f] text-white shadow-sm hover:bg-[#12634e]" onClick={() => setPlanDialog({ open: true, plan: null })}>
+            <Plus className="h-4 w-4" /> Novo plano
+          </Button>
+        </div>
 
         {deleteNotice && (
           <div role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">{deleteNotice}</div>
@@ -266,20 +269,20 @@ export default function Plataforma() {
             </section>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
               {kpis.map((kpi, index) => (
-                <div key={kpi.label} className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+                <div key={kpi.label} className="group relative overflow-hidden rounded-2xl border border-[#e0e9e3] bg-white p-4 shadow-[0_5px_22px_-18px_rgba(20,70,48,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-md sm:p-5">
                   <div className="flex items-start justify-between gap-2">
                     <p className="max-w-[110px] text-[10px] font-bold uppercase leading-relaxed tracking-[0.08em] text-muted-foreground">{kpi.label}</p>
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-muted/70">
-                      <kpi.icon className="h-4 w-4 text-muted-foreground" />
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#eff6f1]">
+                      <kpi.icon className="h-4 w-4 text-[#238f78]" />
                     </span>
                   </div>
                   <p className={`mt-3 font-heading text-xl font-extrabold tabular-nums tracking-tight ${kpi.tone}`}>{kpi.value}</p>
-                  <div className="absolute inset-x-0 bottom-0 h-0.5 bg-primary/15" />
+                  <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-[#238f78]/50 to-transparent" />
                 </div>
               ))}
             </div>
 
-            <section className="surface mt-5 overflow-hidden">
+            <section className="mt-6 overflow-hidden rounded-2xl border border-[#e0e9e3] bg-white shadow-[0_8px_30px_-24px_rgba(20,70,48,0.35)]">
               <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <div className="flex items-center gap-2">
@@ -386,7 +389,7 @@ export default function Plataforma() {
             </section>
 
             <div className="mt-5 grid gap-4 lg:grid-cols-2">
-              <section className="surface overflow-hidden p-5">
+              <section className="overflow-hidden rounded-2xl border border-[#e0e9e3] bg-white p-5 shadow-[0_8px_30px_-24px_rgba(20,70,48,0.35)]">
                 <div className="mb-4 flex items-center gap-2">
                   <span className="grid h-9 w-9 place-items-center rounded-lg bg-amber-500/10 text-amber-600"><Inbox className="h-4 w-4" /></span>
                   <div>
@@ -464,7 +467,7 @@ export default function Plataforma() {
               </section>
             </div>
 
-            <section className="surface mt-5 overflow-hidden p-5">
+            <section className="mt-6 overflow-hidden rounded-2xl border border-[#e0e9e3] bg-white p-5 shadow-[0_8px_30px_-24px_rgba(20,70,48,0.35)]">
               <div className="mb-4 flex items-center gap-2">
                 <span className="grid h-9 w-9 place-items-center rounded-lg bg-muted text-muted-foreground"><Clock3 className="h-4 w-4" /></span>
                 <div>
