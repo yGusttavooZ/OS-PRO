@@ -45,15 +45,16 @@ export default function Login() {
 
   return (
     <AuthLayout
+      loginMode
       cardTitle={undefined}
       panelTitle="Bem-vindo de volta ao seu painel"
       panelSubtitle="Retome suas ordens de serviço, orçamentos e lançamentos financeiros exatamente de onde parou."
       footer={<span>Ainda não tem conta? <Link to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")} className="font-semibold text-primary underline-offset-4 hover:underline">Cadastrar minha empresa</Link></span>}
     >
       <div className="mb-6">
-        <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Acesso à plataforma</p>
+        <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-[#16734b]">ÁREA DO CLIENTE</p>
         <div className="flex items-center gap-3.5">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/15 via-primary/[0.08] to-chart-3/10 text-primary shadow-inner shadow-primary/10">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#e8f4ed] text-[#16734b] ring-1 ring-[#d6e9dd]">
             <LockKeyhole className="h-5 w-5" strokeWidth={1.8} />
           </span>
           <div className="min-w-0">
