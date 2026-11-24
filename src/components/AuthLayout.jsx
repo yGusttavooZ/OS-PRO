@@ -58,25 +58,26 @@ export default function AuthLayout({
               <div className="relative my-12 max-w-[700px]">
                 <p className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_14px_#34d399]" />
-                  Organização para crescer
+                  CONHEÇA O OS-PRO · GESTÃO PARA ASSISTÊNCIAS
                 </p>
                 <h2 className="max-w-[680px] font-heading text-[44px] font-extrabold leading-[1.02] tracking-[-0.055em] xl:text-[58px]">
-                  Sua assistência técnica.
-                  <span className="block bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">No controle. De ponta a ponta.</span>
+                  Tudo o que sua assistência precisa.
+                  <span className="block bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">Em uma única plataforma.</span>
                 </h2>
                 <p className="mt-6 max-w-[520px] text-[15px] leading-7 text-slate-300/75">
-                  Gerencie ordens de serviço, clientes, equipamentos e financeiro em uma experiência simples, profissional e conectada.
+                  Do primeiro atendimento à entrega do equipamento: centralize sua operação, acompanhe cada serviço e tenha mais clareza sobre o dia a dia da sua empresa.
                 </p>
 
                 <div className="mt-9 grid max-w-[590px] grid-cols-3 gap-3">
                   {[
-                    { value: "01", label: "Ordens de serviço" },
-                    { value: "02", label: "Gestão financeira" },
-                    { value: "03", label: "Equipe organizada" },
+                    { value: "01", label: "Ordens de serviço", detail: "Acompanhe cada etapa" },
+                    { value: "02", label: "Clientes e equipamentos", detail: "Tudo bem registrado" },
+                    { value: "03", label: "Financeiro", detail: "Receitas e despesas" },
                   ].map((item) => (
                     <div key={item.value} className="rounded-2xl border border-white/10 bg-white/[0.045] px-4 py-3 backdrop-blur">
                       <p className="text-[10px] font-bold tracking-[0.18em] text-emerald-300">{item.value}</p>
                       <p className="mt-2 text-[11px] font-semibold text-white/85">{item.label}</p>
+                      <p className="mt-1 text-[9px] text-slate-400">{item.detail}</p>
                     </div>
                   ))}
                 </div>
@@ -87,17 +88,17 @@ export default function AuthLayout({
                   <div className="flex items-center gap-2.5">
                     <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-400/15 text-emerald-300"><ShieldCheck className="h-4 w-4" /></span>
                     <div>
-                      <p className="text-[11px] font-bold text-white">Visão geral</p>
-                      <p className="text-[9px] text-slate-400">Prévia ilustrativa do painel</p>
+                      <p className="text-[11px] font-bold text-white">Um painel para sua operação</p>
+                      <p className="text-[9px] text-slate-400">Veja como as informações ficam organizadas</p>
                     </div>
                   </div>
                   <span className="rounded-full bg-emerald-400/10 px-2.5 py-1 text-[9px] font-semibold text-emerald-300">Tudo em um só lugar</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2.5 py-4">
                   {[
-                    { label: "Ordens abertas", value: "24", hint: "Acompanhe cada etapa" },
+                    { label: "Ordens abertas", value: "24", hint: "Visão das pendências" },
                     { label: "Em execução", value: "08", hint: "Serviços em andamento" },
-                    { label: "Concluídas", value: "56", hint: "Histórico organizado" },
+                    { label: "Concluídas", value: "56", hint: "Ordens finalizadas" },
                   ].map((item) => (
                     <div key={item.label} className="rounded-2xl border border-white/[0.08] bg-white/[0.045] p-3">
                       <p className="text-[9px] font-medium text-slate-400">{item.label}</p>
