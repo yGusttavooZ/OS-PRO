@@ -36,95 +36,96 @@ export default function AuthLayout({
   return (
     <div className={`min-h-screen ${loginMode ? "bg-[#f3f7f5]" : "bg-background"}`}>
       <div className={`grid min-h-screen ${loginMode ? "lg:grid-cols-[1.12fr_0.88fr]" : "lg:grid-cols-[1.05fr_1fr]"}`}>
-        <aside className={`relative hidden min-h-screen flex-col justify-between overflow-hidden bg-[#071b16] p-10 text-white lg:flex ${loginMode ? "xl:p-14" : "auth-panel"}`}>
+        <aside className={`relative hidden min-h-screen flex-col justify-between overflow-hidden p-10 lg:flex ${loginMode ? "bg-[#eef5f0] text-[#142d21] xl:p-14" : "bg-[#071b16] text-white auth-panel"}`}>
           {loginMode ? (
             <>
               <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-                <div className="absolute inset-0 opacity-[0.12]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.16) 1px, transparent 1px)", backgroundSize: "46px 46px" }} />
-                <div className="absolute -left-40 top-20 h-[34rem] w-[34rem] rounded-full bg-emerald-500/20 blur-[120px]" />
-                <div className="absolute -bottom-40 right-0 h-[30rem] w-[30rem] rounded-full bg-teal-400/15 blur-[120px]" />
+                <div className="absolute -right-28 -top-28 h-[34rem] w-[34rem] rounded-full bg-emerald-200/50 blur-[100px]" />
+                <div className="absolute -bottom-40 -left-24 h-[30rem] w-[30rem] rounded-full bg-teal-100/80 blur-[100px]" />
+                <div className="absolute inset-0 opacity-[0.28]" style={{ backgroundImage: "radial-gradient(#789989 0.7px, transparent 0.7px)", backgroundSize: "18px 18px" }} />
               </div>
+
               <div className="relative flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <BrandMark className="h-12 w-12 shrink-0 text-white" />
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#123d2c] shadow-lg shadow-emerald-950/10">
+                    <BrandMark className="h-8 w-8 text-white" />
+                  </span>
                   <div className="leading-tight">
-                    <p className="font-heading text-[18px] font-extrabold tracking-[-0.03em]">OS PRO</p>
-                    <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.28em] text-emerald-100/50">Gestão inteligente</p>
+                    <p className="font-heading text-[19px] font-extrabold tracking-[-0.04em] text-[#153b2b]">OS PRO</p>
+                    <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-[#668273]">Gestão para assistências</p>
                   </div>
                 </div>
-                <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-emerald-100/70">Plataforma completa</span>
+                <span className="rounded-full border border-[#cbded2] bg-white/70 px-3.5 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#3c7056] shadow-sm">Conheça a plataforma</span>
               </div>
 
-              <div className="relative my-12 max-w-[700px]">
-                <p className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_14px_#34d399]" />
-                  CONHEÇA O OS-PRO · GESTÃO PARA ASSISTÊNCIAS
+              <div className="relative my-10 max-w-[700px]">
+                <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#c9dfd1] bg-white/70 px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#367452] shadow-sm">
+                  <Sparkles className="h-3.5 w-3.5" /> Sua rotina, mais simples
                 </p>
-                <h2 className="max-w-[680px] font-heading text-[44px] font-extrabold leading-[1.02] tracking-[-0.055em] xl:text-[58px]">
-                  Tudo o que sua assistência precisa.
-                  <span className="block bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">Em uma única plataforma.</span>
+                <h2 className="max-w-[650px] font-heading text-[43px] font-extrabold leading-[1.04] tracking-[-0.06em] text-[#142d21] xl:text-[58px]">
+                  Menos tarefas espalhadas.
+                  <span className="mt-1 block text-[#26845e]">Mais controle do seu negócio.</span>
                 </h2>
-                <p className="mt-6 max-w-[520px] text-[15px] leading-7 text-slate-300/75">
-                  Do primeiro atendimento à entrega do equipamento: centralize sua operação, acompanhe cada serviço e tenha mais clareza sobre o dia a dia da sua empresa.
+                <p className="mt-6 max-w-[530px] text-[15px] leading-7 text-[#587064]">
+                  O OS-PRO reúne as principais ferramentas da sua assistência técnica para você organizar serviços, atender clientes e acompanhar os resultados em um só lugar.
                 </p>
 
-                <div className="mt-9 grid max-w-[590px] grid-cols-3 gap-3">
-                  {[
-                    { value: "01", label: "Ordens de serviço", detail: "Acompanhe cada etapa" },
-                    { value: "02", label: "Clientes e equipamentos", detail: "Tudo bem registrado" },
-                    { value: "03", label: "Financeiro", detail: "Receitas e despesas" },
-                  ].map((item) => (
-                    <div key={item.value} className="rounded-2xl border border-white/10 bg-white/[0.045] px-4 py-3 backdrop-blur">
-                      <p className="text-[10px] font-bold tracking-[0.18em] text-emerald-300">{item.value}</p>
-                      <p className="mt-2 text-[11px] font-semibold text-white/85">{item.label}</p>
-                      <p className="mt-1 text-[9px] text-slate-400">{item.detail}</p>
-                    </div>
+                <div className="mt-8 flex flex-wrap gap-2">
+                  {["Ordens de serviço", "Clientes e equipamentos", "Orçamentos", "Financeiro"].map((item) => (
+                    <span key={item} className="inline-flex items-center gap-2 rounded-xl border border-[#d5e4da] bg-white/80 px-3 py-2.5 text-[11px] font-semibold text-[#315c46] shadow-[0_5px_18px_-14px_rgba(20,60,40,.35)]">
+                      <Check className="h-3.5 w-3.5 text-[#299366]" /> {item}
+                    </span>
                   ))}
                 </div>
               </div>
 
-              <div className="relative max-w-[690px] rounded-[26px] border border-white/15 bg-[#102820]/90 p-4 shadow-[0_35px_100px_-35px_rgba(0,0,0,.85)] backdrop-blur-xl xl:p-5">
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div className="flex items-center gap-2.5">
-                    <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-400/15 text-emerald-300"><ShieldCheck className="h-4 w-4" /></span>
-                    <div>
-                      <p className="text-[11px] font-bold text-white">Um painel para sua operação</p>
-                      <p className="text-[9px] text-slate-400">Veja como as informações ficam organizadas</p>
-                    </div>
+              <div className="relative max-w-[700px] rounded-[26px] border border-white bg-white/90 p-4 shadow-[0_30px_80px_-38px_rgba(31,75,51,.30)] ring-1 ring-[#dce9df] backdrop-blur-xl xl:p-5">
+                <div className="flex items-center justify-between border-b border-[#edf2ee] pb-4">
+                  <div>
+                    <p className="text-[12px] font-bold text-[#1c3829]">Visão geral da assistência</p>
+                    <p className="mt-1 text-[9px] text-[#82958a]">Exemplo ilustrativo de organização</p>
                   </div>
-                  <span className="rounded-full bg-emerald-400/10 px-2.5 py-1 text-[9px] font-semibold text-emerald-300">Tudo em um só lugar</span>
+                  <span className="rounded-full bg-[#eaf6ee] px-3 py-1.5 text-[9px] font-bold text-[#34805a]">PAINEL OS-PRO</span>
                 </div>
+
                 <div className="grid grid-cols-3 gap-2.5 py-4">
                   {[
-                    { label: "Ordens abertas", value: "24", hint: "Visão das pendências" },
-                    { label: "Em execução", value: "08", hint: "Serviços em andamento" },
-                    { label: "Concluídas", value: "56", hint: "Ordens finalizadas" },
-                  ].map((item) => (
-                    <div key={item.label} className="rounded-2xl border border-white/[0.08] bg-white/[0.045] p-3">
-                      <p className="text-[9px] font-medium text-slate-400">{item.label}</p>
-                      <p className="mt-1.5 font-heading text-[25px] font-extrabold tracking-tight text-white">{item.value}</p>
-                      <p className="mt-1 text-[8px] text-slate-500">{item.hint}</p>
+                    { label: "Ordens abertas", value: "24", note: "Acompanhe serviços" },
+                    { label: "Em andamento", value: "08", note: "Veja cada etapa" },
+                    { label: "Finalizadas", value: "56", note: "Histórico acessível" },
+                  ].map((item, index) => (
+                    <div key={item.label} className="rounded-2xl border border-[#e8f0ea] bg-[#fbfdfb] p-3">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className={`h-2 w-2 rounded-full ${index === 0 ? "bg-amber-400" : index === 1 ? "bg-sky-400" : "bg-emerald-500"}`} />
+                        <span className="text-[8px] font-semibold uppercase tracking-wide text-[#9aaba0]">OS</span>
+                      </div>
+                      <p className="font-heading text-[25px] font-extrabold tracking-tight text-[#1d3d2c]">{item.value}</p>
+                      <p className="mt-1 text-[9px] font-bold text-[#526d5d]">{item.label}</p>
+                      <p className="mt-1 text-[8px] text-[#9aaba0]">{item.note}</p>
                     </div>
                   ))}
                 </div>
-                <div className="rounded-2xl border border-white/[0.08] bg-[#091e18] p-3.5">
+
+                <div className="rounded-2xl bg-[#f4f8f5] p-3.5">
                   <div className="mb-3 flex items-center justify-between">
-                    <p className="text-[10px] font-semibold text-white/80">Fluxo de serviços</p>
-                    <p className="text-[9px] text-slate-500">Acompanhamento visual</p>
+                    <p className="text-[10px] font-bold text-[#365443]">Etapas de uma ordem de serviço</p>
+                    <p className="text-[8px] text-[#91a399]">Fluxo de trabalho</p>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    {["Recebido", "Em análise", "Em execução", "Entregue"].map((step, index) => (
-                      <div key={step} className="min-w-0 flex-1">
-                        <div className={`h-1.5 rounded-full ${index < 3 ? "bg-gradient-to-r from-emerald-400 to-teal-300" : "bg-white/10"}`} />
-                        <p className="mt-2 truncate text-[8px] text-slate-400">{step}</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {["Recebimento", "Avaliação", "Execução", "Entrega"].map((step, index) => (
+                      <div key={step}>
+                        <div className={`h-1.5 rounded-full ${index < 3 ? "bg-[#55a77a]" : "bg-[#dce8df]"}`} />
+                        <p className="mt-2 truncate text-[8px] font-medium text-[#718779]">{step}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-              <p className="relative mt-7 flex items-center gap-2 text-[10px] text-slate-400">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-300" /> Acesso protegido e dados separados por empresa
-              </p>
+
+              <div className="relative mt-6 flex items-center gap-2 text-[10px] font-medium text-[#668273]">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#39865d]" />
+                Acesso protegido · Informações separadas por empresa
+              </div>
             </>
           ) : (
             <>
