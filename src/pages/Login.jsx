@@ -46,6 +46,7 @@ export default function Login() {
   return (
     <AuthLayout
       cardTitle={undefined}
+      loginMode
       panelTitle="Bem-vindo de volta ao seu painel"
       panelSubtitle="Retome suas ordens de serviço, orçamentos e lançamentos financeiros exatamente de onde parou."
       footer={<span>Ainda não tem conta? <Link to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")} className="font-semibold text-primary underline-offset-4 hover:underline">Cadastrar minha empresa</Link></span>}
@@ -56,7 +57,7 @@ export default function Login() {
             <LockKeyhole className="h-5 w-5" strokeWidth={1.8} />
           </span>
           <div className="min-w-0">
-            <h1 className="font-heading text-[22px] font-extrabold tracking-[-0.03em] text-foreground sm:text-[24px]">Bem-vindo de volta</h1>
+            <div className="mb-1 inline-flex items-center rounded-full bg-[#e9f5ed] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.17em] text-[#23764a]">Acesso à plataforma</div><h1 className="font-heading text-[25px] font-extrabold tracking-[-0.035em] text-foreground sm:text-[28px]">Acesse sua conta</h1>
             <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">Acesse sua conta para continuar.</p>
           </div>
         </div>
