@@ -119,8 +119,6 @@ export default function Layout() {
 
         <NavList role={role} isPlatformAdmin={isPlatformAdmin} />
 
-
-
         <div className="relative px-4 pb-4 pt-1">
           <div className="border-b border-white/10 px-1 pb-3">
             <div className="flex items-end justify-between gap-2">
@@ -186,11 +184,12 @@ export default function Layout() {
           </div>
 
           <div className="hidden min-w-0 flex-1 lg:block">
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground/70">OS PRO</p>
+            <div className="flex items-center gap-2">
+              <BrandMark className="h-6 w-6 shrink-0" />
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground/70">OS PRO</p>
+            </div>
             <p className="truncate font-heading text-[13.5px] font-bold tracking-[-0.01em] text-foreground">{current}</p>
           </div>
-
-
 
           <div className="hidden items-center gap-2 sm:flex">
             <DropdownMenu>
@@ -260,7 +259,6 @@ export default function Layout() {
             <span className="h-1.5 w-1.5 rounded-full bg-[hsl(152_62%_42%)]" />
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
           </div>
-
         </header>
 
         <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
