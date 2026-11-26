@@ -21,6 +21,7 @@ const STATUS_STYLES = {
   trial: "bg-sky-50 text-sky-700 ring-sky-200",
   awaiting_payment: "bg-amber-50 text-amber-700 ring-amber-200",
   active: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  past_due: "bg-orange-50 text-orange-700 ring-orange-200",
   suspended: "bg-rose-50 text-rose-700 ring-rose-200",
   canceled: "bg-muted text-muted-foreground ring-border",
 };
@@ -29,6 +30,7 @@ const STATUS_LABELS = {
   trial: "Teste",
   awaiting_payment: "Aguardando",
   active: "Ativo",
+  past_due: "Pagamento atrasado",
   suspended: "Suspenso",
   canceled: "Cancelado",
 };
@@ -111,6 +113,13 @@ export default function Plataforma() {
     for (const account of accounts) map[account.company_id] = account;
     return map;
   }, [accounts]);
+
+  const subscriptionRows = useMemo(() => {
+    return accounts.map((account) => {
+      const companyItem = companies.find((item) => item.id === account.company_id);
+      return { ...account, display_company: companyItem?.name || account.company_name || "Empresa não identificada" };
+    }).sort((a, b) => String(a.display_company).localeCompare(String(b.display_company), "pt-BR"));
+  }, [accounts, companies]);
 
   const memberCount = useMemo(() => {
     const map = {};
@@ -386,6 +395,54 @@ export default function Plataforma() {
                   </tbody>
                 </table>
               </div>
+            </section>
+
+            <section className="mt-6 overflow-hidden rounded-2xl border border-[#e0e9e3] bg-white shadow-[0_8px_30px_-24px_rgba(20,70,48,0.35)]">
+              <div className="flex flex-col gap-2 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary"><CreditCard className="h-4 w-4" /></span>
+                  <div>
+                    <h2 className="font-heading font-bold text-[15px]">Acompanhamento de assinaturas</h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Situação atual, plano e período de cada empresa.</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">{metrics.active} ativas</span>
+                  <span className="rounded-full bg-orange-50 px-2.5 py-1 font-semibold text-orange-700">{accounts.filter((item) => item.status === "past_due").length} atrasadas</span>
+                  <span className="rounded-full bg-amber-50 px-2.5 py-1 font-semibold text-amber-700">{metrics.pending} solicitações pendentes</span>
+                </div>
+              </div>
+              {subscriptionRows.length === 0 ? (
+                <p className="p-5 text-sm text-muted-foreground">Nenhuma assinatura cadastrada.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[680px] text-sm">
+                    <thead>
+                      <tr className="border-b border-border bg-muted/30 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
+                        <th className="px-5 py-3 font-semibold">Empresa</th>
+                        <th className="px-5 py-3 font-semibold">Plano</th>
+                        <th className="px-5 py-3 font-semibold">Valor mensal</th>
+                        <th className="px-5 py-3 font-semibold">Situação</th>
+                        <th className="px-5 py-3 font-semibold">Período até</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subscriptionRows.map((account) => (
+                        <tr key={account.id || account.company_id} className="border-b border-border/60 last:border-0">
+                          <td className="px-5 py-3 font-medium">{account.display_company}</td>
+                          <td className="px-5 py-3 text-muted-foreground">{account.plan_name || "—"}</td>
+                          <td className="px-5 py-3 tabular-nums">{brl(account.price || 0)}</td>
+                          <td className="px-5 py-3"><StatusPill status={account.status} /></td>
+                          <td className="px-5 py-3 whitespace-nowrap text-muted-foreground">{shortDate(account.current_period_end || account.trial_ends_at)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <p className="border-t border-border bg-muted/20 px-5 py-3 text-[11px] leading-relaxed text-muted-foreground">
+                Dados de acompanhamento do cadastro atual. Ainda não representam confirmação automática de pagamento nem histórico financeiro do provedor.
+              </p>
             </section>
 
             <div className="mt-5 grid gap-4 lg:grid-cols-2">
