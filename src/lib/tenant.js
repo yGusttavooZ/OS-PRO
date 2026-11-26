@@ -237,7 +237,9 @@ export async function saveCompanySubscriptionAccount({ companyId, accountId, pay
     const changed = !accountSnap.exists()
       || previous.status !== nextStatus
       || previous.plan_id !== (payload.plan_id || "")
+      || previous.plan_name !== (payload.plan_name || "")
       || Number(previous.price || 0) !== Number(payload.price || 0)
+      || previous.trial_ends_at !== (payload.trial_ends_at || "")
       || previous.current_period_end !== (payload.current_period_end || "");
 
     transaction.set(accountRef, {
@@ -263,7 +265,12 @@ export async function saveCompanySubscriptionAccount({ companyId, accountId, pay
           previous_plan_name: previous.plan_name || null,
           new_plan_id: payload.plan_id || null,
           plan_name: payload.plan_name || previous.plan_name || "",
+          previous_amount: Number(previous.price) || 0,
           amount: Number(payload.price) || 0,
+          previous_trial_ends_at: previous.trial_ends_at || null,
+          trial_ends_at: payload.trial_ends_at || null,
+          previous_period_end: previous.current_period_end || null,
+          current_period_end: payload.current_period_end || null,
           payment_provider: null,
           payment_confirmed_by_provider: false,
         },
