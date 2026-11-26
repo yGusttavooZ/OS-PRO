@@ -11,6 +11,7 @@ const STATUS_LABELS = {
   awaiting_payment: "Aguardando pagamento",
   active: "Ativo",
   past_due: "Pagamento atrasado",
+  suspended: "Suspenso",
   canceled: "Cancelado",
 };
 
