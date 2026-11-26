@@ -49,9 +49,8 @@ export function normalizeSubscriptionStatus(status) {
 }
 
 /**
- * Formato padronizado para um futuro histórico de assinatura.
- * O chamador deve fornecer o timestamp; a persistência será integrada
- * depois que as regras de acesso do Firestore forem revisadas.
+ * Formato padronizado para eventos do histórico de assinatura.
+ * A persistência é feita pelas funções transacionais de tenant.js.
  */
 export function buildSubscriptionEvent({
   type,
