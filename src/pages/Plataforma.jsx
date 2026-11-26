@@ -468,8 +468,15 @@ export default function Plataforma() {
                         <p className="text-[11px] text-muted-foreground">
                           {event.metadata?.plan_name || "Plano não informado"} · {event.metadata?.amount != null ? brl(event.metadata.amount) : "Valor não informado"}
                         </p>
+                        {(event.metadata?.previous_status || event.metadata?.previous_amount != null) && (
+                          <p className="text-[11px] text-muted-foreground">
+                            Antes: {event.metadata?.previous_status && event.metadata.previous_status !== "not_created" ? (SUBSCRIPTION_STATUS_LABELS[event.metadata.previous_status] || event.metadata.previous_status) : "Sem assinatura"}
+                            {event.metadata?.previous_amount != null ? ` · ${brl(event.metadata.previous_amount)}` : ""}
+                            {event.metadata?.previous_plan_name ? ` · ${event.metadata.previous_plan_name}` : ""}
+                          </p>
+                        )}
                         {event.metadata?.payment_confirmed_by_provider === false && (
-                          <p className="text-[11px] text-amber-700">Ativação administrativa; sem confirmação automática do provedor.</p>
+                          <p className="text-[11px] text-amber-700">Registro administrativo; não representa confirmação automática de pagamento.</p>
                         )}
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
