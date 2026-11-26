@@ -4,6 +4,7 @@ import {
   updateDoc, where,
 } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import { buildSubscriptionEvent } from "@/lib/subscriptions";
 import { onAuthStateChanged } from "firebase/auth";
 
 export const ORDER_STATUSES = [
@@ -52,6 +53,7 @@ const COLLECTIONS = {
   Counter: "counters",
   Plan: "plans",
   PlanRequest: "planRequests",
+  SubscriptionEvent: "subscriptionEvents",
 };
 
 const READ_TTL = 12000;
@@ -228,6 +230,7 @@ export async function activatePlanRequest(request) {
   const requestRef = doc(db, "planRequests", request.id);
   const planRef = doc(db, "plans", request.plan_id);
   const accountRef = doc(db, "companyAccounts", request.company_id);
+  const eventRef = doc(collection(db, "subscriptionEvents"));
   const now = new Date();
   const periodEnd = new Date(now);
   periodEnd.setMonth(periodEnd.getMonth() + 1);
@@ -251,6 +254,26 @@ export async function activatePlanRequest(request) {
       throw new Error("Uma solicitação cancelada não pode ativar uma assinatura.");
     }
 
+    const previousAccount = accountSnap.exists() ? accountSnap.data() : {};
+    const event = buildSubscriptionEvent({
+      type: "admin_activation",
+      status: "active",
+      description: "Assinatura ativada manualmente pelo painel administrativo.",
+      source: "platform_admin",
+      actorUid: auth.currentUser?.uid || null,
+      occurredAt: now.toISOString(),
+      metadata: {
+        request_id: request.id,
+        previous_status: previousAccount.status || "not_created",
+        previous_plan_id: previousAccount.plan_id || null,
+        new_plan_id: planSnap.id,
+        plan_name: plan.name || currentRequest.plan_name || "",
+        amount: Number(plan.price_monthly) || 0,
+        payment_provider: null,
+        payment_confirmed_by_provider: false,
+      },
+    });
+
     transaction.set(accountRef, {
       company_id: request.company_id,
       company_name: currentRequest.company_name || request.company_name || "",
@@ -269,6 +292,14 @@ export async function activatePlanRequest(request) {
       ...(accountSnap.exists() ? {} : { created_at: serverTimestamp() }),
     }, { merge: true });
 
+    transaction.set(eventRef, {
+      ...event,
+      company_id: request.company_id,
+      company_name: currentRequest.company_name || request.company_name || "",
+      created_date: now.toISOString(),
+      created_at: serverTimestamp(),
+    });
+
     transaction.update(requestRef, {
       status: "done",
       updated_date: now.toISOString(),
@@ -276,7 +307,7 @@ export async function activatePlanRequest(request) {
     });
   });
 
-  invalidateTenantCache("CompanyAccount", "PlanRequest");
+  invalidateTenantCache("CompanyAccount", "PlanRequest", "SubscriptionEvent");
 }
 
 export async function deleteRecord(entityName, id) {
