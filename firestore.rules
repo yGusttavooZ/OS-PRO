@@ -496,7 +496,8 @@ service cloud.firestore {
         && request.resource.data.status is string
         && request.resource.data.source == 'platform_admin'
         && request.resource.data.actor_uid == request.auth.uid
-        && request.resource.data.payment_confirmed_by_provider != true;
+        && request.resource.data.metadata is map
+        && request.resource.data.metadata.payment_confirmed_by_provider == false;
       allow update, delete: if false;
     }
 
