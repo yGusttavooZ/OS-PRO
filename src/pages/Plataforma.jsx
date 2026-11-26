@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { auth } from "@/lib/firebase";
 import { activatePlanRequest, paged } from "@/lib/tenant";
 import { brl, dateTime, shortDate } from "@/lib/format";
+import { SUBSCRIPTION_STATUS_LABELS } from "@/lib/subscriptions";
 
 const STATUS_STYLES = {
   trial: "bg-sky-50 text-sky-700 ring-sky-200",
@@ -52,6 +53,7 @@ export default function Plataforma() {
   const [requests, setRequests] = useState([]);
   const [plans, setPlans] = useState([]);
   const [audit, setAudit] = useState([]);
+  const [subscriptionEvents, setSubscriptionEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [requestActionError, setRequestActionError] = useState("");
@@ -75,9 +77,10 @@ export default function Plataforma() {
       ["Solicitações (planRequests)", () => paged("PlanRequest", {}, { sort: "-created_date", limit: 100 })],
       ["Planos (plans)", () => paged("Plan", {}, { sort: "sort_order", limit: 50 })],
       ["Auditoria (auditLogs)", () => paged("AuditLog", {}, { sort: "-at", limit: 40 })],
+      ["Histórico de assinaturas", () => paged("SubscriptionEvent", {}, { sort: "-occurred_at", limit: 30 })],
     ];
     const results = await Promise.allSettled(tasks.map(([, run]) => run()));
-    const setters = [setCompanies, setAccounts, setMembers, setRequests, setPlans, setAudit];
+    const setters = [setCompanies, setAccounts, setMembers, setRequests, setPlans, setAudit, setSubscriptionEvents];
     const failures = [];
     results.forEach((result, index) => {
       if (result.status === "fulfilled") {
@@ -443,6 +446,40 @@ export default function Plataforma() {
               <p className="border-t border-border bg-muted/20 px-5 py-3 text-[11px] leading-relaxed text-muted-foreground">
                 Dados de acompanhamento do cadastro atual. Ainda não representam confirmação automática de pagamento nem histórico financeiro do provedor.
               </p>
+            </section>
+
+            <section className="mt-6 overflow-hidden rounded-2xl border border-[#e0e9e3] bg-white p-5 shadow-[0_8px_30px_-24px_rgba(20,70,48,0.35)]">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="grid h-9 w-9 place-items-center rounded-lg bg-sky-500/10 text-sky-700"><Clock3 className="h-4 w-4" /></span>
+                <div>
+                  <h2 className="font-heading font-bold text-[15px]">Histórico de assinaturas</h2>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Eventos registrados durante as ações administrativas.</p>
+                </div>
+              </div>
+              {subscriptionEvents.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nenhum evento de assinatura registrado ainda. As próximas ativações administrativas aparecerão aqui.</p>
+              ) : (
+                <ul className="divide-y divide-border/70">
+                  {subscriptionEvents.map((event) => (
+                    <li key={event.id} className="flex flex-col gap-1 py-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold">{event.company_name || "Empresa"}</p>
+                        <p className="text-xs text-muted-foreground">{event.description || "Evento de assinatura"}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {event.metadata?.plan_name || "Plano não informado"} · {event.metadata?.amount != null ? brl(event.metadata.amount) : "Valor não informado"}
+                        </p>
+                        {event.metadata?.payment_confirmed_by_provider === false && (
+                          <p className="text-[11px] text-amber-700">Ativação administrativa; sem confirmação automática do provedor.</p>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">{SUBSCRIPTION_STATUS_LABELS[event.status] || event.status}</span>
+                        <span className="text-[11px] text-muted-foreground">{dateTime(event.occurred_at)}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
 
             <div className="mt-5 grid gap-4 lg:grid-cols-2">
