@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { base44 } from "@/api/base44Client";
+import { saveCompanySubscriptionAccount } from "@/lib/tenant";
 
 const STATUSES = [
   { value: "trial", label: "Período de teste" },
   { value: "awaiting_payment", label: "Aguardando pagamento" },
   { value: "active", label: "Ativo" },
+  { value: "past_due", label: "Pagamento atrasado" },
   { value: "suspended", label: "Suspenso" },
   { value: "canceled", label: "Cancelado" },
 ];
@@ -63,8 +64,11 @@ export default function CompanyAccountDialog({ open, onOpenChange, company, acco
         current_period_end: form.current_period_end ? new Date(form.current_period_end).toISOString() : "",
         notes: form.notes,
       };
-      if (account?.id) await base44.entities.CompanyAccount.update(account.id, payload);
-      else await base44.entities.CompanyAccount.create(payload);
+      await saveCompanySubscriptionAccount({
+        companyId: company.id,
+        accountId: account?.id || company.id,
+        payload,
+      });
       onSaved?.();
       onOpenChange(false);
     } catch (err) {
