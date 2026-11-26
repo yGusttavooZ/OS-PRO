@@ -222,6 +222,65 @@ export async function updateRecord(entityName, id, payload) {
 }
 
 /** Confirma a contratação e ativa a assinatura junto com a conclusão da solicitação. */
+
+/** Salva alterações administrativas e registra o evento no mesmo commit Firestore. */
+export async function saveCompanySubscriptionAccount({ companyId, accountId, payload }) {
+  if (!companyId || !payload) throw new Error("Empresa ou dados da assinatura não informados.");
+  const accountRef = doc(db, "companyAccounts", accountId || companyId);
+  const eventRef = doc(collection(db, "subscriptionEvents"));
+  const now = new Date();
+
+  await runTransaction(db, async (transaction) => {
+    const accountSnap = await transaction.get(accountRef);
+    const previous = accountSnap.exists() ? accountSnap.data() : {};
+    const nextStatus = payload.status || previous.status || "trial";
+    const changed = !accountSnap.exists()
+      || previous.status !== nextStatus
+      || previous.plan_id !== (payload.plan_id || "")
+      || Number(previous.price || 0) !== Number(payload.price || 0)
+      || previous.current_period_end !== (payload.current_period_end || "");
+
+    transaction.set(accountRef, {
+      ...payload,
+      company_id: companyId,
+      updated_at: serverTimestamp(),
+      ...(accountSnap.exists() ? {} : { created_at: serverTimestamp() }),
+    }, { merge: true });
+
+    if (changed) {
+      const event = buildSubscriptionEvent({
+        type: accountSnap.exists() ? "admin_update" : "admin_created",
+        status: nextStatus,
+        description: accountSnap.exists()
+          ? "Assinatura atualizada manualmente pelo painel administrativo."
+          : "Cadastro de assinatura criado manualmente pelo painel administrativo.",
+        source: "platform_admin",
+        actorUid: auth.currentUser?.uid || null,
+        occurredAt: now.toISOString(),
+        metadata: {
+          previous_status: previous.status || "not_created",
+          previous_plan_id: previous.plan_id || null,
+          previous_plan_name: previous.plan_name || null,
+          new_plan_id: payload.plan_id || null,
+          plan_name: payload.plan_name || previous.plan_name || "",
+          amount: Number(payload.price) || 0,
+          payment_provider: null,
+          payment_confirmed_by_provider: false,
+        },
+      });
+      transaction.set(eventRef, {
+        ...event,
+        company_id: companyId,
+        company_name: payload.company_name || previous.company_name || "",
+        created_date: now.toISOString(),
+        created_at: serverTimestamp(),
+      });
+    }
+  });
+
+  invalidateTenantCache("CompanyAccount", "SubscriptionEvent");
+}
+
 export async function activatePlanRequest(request) {
   if (!request?.id || !request?.company_id || !request?.plan_id) {
     throw new Error("A solicitação não contém empresa ou plano válido.");
