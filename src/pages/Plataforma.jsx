@@ -510,6 +510,7 @@ export default function Plataforma() {
                     <p className="mt-0.5 text-xs text-muted-foreground">Acompanhe os pedidos comerciais e os registros administrativos de ativação.</p>
                   </div>
                 </div>
+                <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">Esta ação apenas registra uma ativação manual no OS PRO. Ela não consulta o Mercado Pago nem confirma o recebimento de pagamento.</p>
                 {requestActionError && (
                   <p role="alert" className="mb-3 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
                     {requestActionError}
