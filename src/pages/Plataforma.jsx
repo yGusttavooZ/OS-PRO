@@ -31,6 +31,11 @@ const EVENT_TYPE_LABELS = {
   admin_created: "Cadastro administrativo",
   admin_update: "Alteração administrativa",
   admin_activation: "Ativação administrativa",
+  payment_pending: "Pagamento pendente (simulação)",
+  payment_approved: "Pagamento aprovado (simulação)",
+  payment_rejected: "Pagamento recusado (simulação)",
+  payment_canceled: "Pagamento cancelado (simulação)",
+  payment_refunded: "Estorno (simulação)",
 };
 
 const STATUS_LABELS = {
@@ -471,6 +476,8 @@ export default function Plataforma() {
                       <div className="min-w-0">
                         <p className="text-sm font-semibold">{event.company_name || "Empresa"}</p>
                         <p className="text-xs text-muted-foreground">{EVENT_TYPE_LABELS[event.type] || "Evento de assinatura"} · {event.description || "Sem descrição adicional"}</p>
+                        {event.source === "demo" && <p className="text-[11px] font-semibold text-sky-700">Simulação técnica — não representa cobrança nem pagamento real.</p>}
+                        {event.metadata?.payment_confirmed_by_provider === false && event.source !== "demo" && <p className="text-[11px] text-amber-700">Registro administrativo; não representa confirmação automática de pagamento.</p>}
                         <p className="text-[11px] text-muted-foreground">
                           {event.metadata?.plan_name || "Plano não informado"} · {event.metadata?.amount != null ? brl(event.metadata.amount) : "Valor não informado"}
                         </p>
@@ -487,9 +494,7 @@ export default function Plataforma() {
                           </p>
                         )}
                         )}
-                        {event.metadata?.payment_confirmed_by_provider === false && (
-                          <p className="text-[11px] text-amber-700">Registro administrativo; não representa confirmação automática de pagamento.</p>
-                        )}
+
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
                         <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">{SUBSCRIPTION_STATUS_LABELS[event.status] || event.status}</span>
