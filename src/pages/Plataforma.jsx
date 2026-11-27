@@ -27,6 +27,12 @@ const STATUS_STYLES = {
   canceled: "bg-muted text-muted-foreground ring-border",
 };
 
+const EVENT_TYPE_LABELS = {
+  admin_created: "Cadastro administrativo",
+  admin_update: "Alteração administrativa",
+  admin_activation: "Ativação administrativa",
+};
+
 const STATUS_LABELS = {
   trial: "Teste",
   awaiting_payment: "Aguardando",
@@ -464,7 +470,7 @@ export default function Plataforma() {
                     <li key={event.id} className="flex flex-col gap-1 py-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <p className="text-sm font-semibold">{event.company_name || "Empresa"}</p>
-                        <p className="text-xs text-muted-foreground">{event.description || "Evento de assinatura"}</p>
+                        <p className="text-xs text-muted-foreground">{EVENT_TYPE_LABELS[event.type] || "Evento de assinatura"} · {event.description || "Sem descrição adicional"}</p>
                         <p className="text-[11px] text-muted-foreground">
                           {event.metadata?.plan_name || "Plano não informado"} · {event.metadata?.amount != null ? brl(event.metadata.amount) : "Valor não informado"}
                         </p>
@@ -474,6 +480,12 @@ export default function Plataforma() {
                             {event.metadata?.previous_amount != null ? ` · ${brl(event.metadata.previous_amount)}` : ""}
                             {event.metadata?.previous_plan_name ? ` · ${event.metadata.previous_plan_name}` : ""}
                           </p>
+                        {(event.metadata?.trial_ends_at || event.metadata?.previous_trial_ends_at || event.metadata?.current_period_end || event.metadata?.previous_period_end) && (
+                          <p className="text-[11px] text-muted-foreground">
+                            Período: {event.metadata?.previous_period_end ? `antes ${shortDate(event.metadata.previous_period_end)}` : event.metadata?.previous_trial_ends_at ? `teste anterior ${shortDate(event.metadata.previous_trial_ends_at)}` : "—"}
+                            {event.metadata?.current_period_end ? ` · agora ${shortDate(event.metadata.current_period_end)}` : event.metadata?.trial_ends_at ? ` · teste até ${shortDate(event.metadata.trial_ends_at)}` : ""}
+                          </p>
+                        )}
                         )}
                         {event.metadata?.payment_confirmed_by_provider === false && (
                           <p className="text-[11px] text-amber-700">Registro administrativo; não representa confirmação automática de pagamento.</p>
@@ -495,7 +507,7 @@ export default function Plataforma() {
                   <span className="grid h-9 w-9 place-items-center rounded-lg bg-amber-500/10 text-amber-600"><Inbox className="h-4 w-4" /></span>
                   <div>
                     <h2 className="font-heading font-bold text-[15px]">Solicitações de plano</h2>
-                    <p className="mt-0.5 text-xs text-muted-foreground">Acompanhe os pedidos comerciais e suas ativações.</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Acompanhe os pedidos comerciais e os registros administrativos de ativação.</p>
                   </div>
                 </div>
                 {requestActionError && (
@@ -529,7 +541,7 @@ export default function Plataforma() {
                               <Button size="sm" variant="outline" onClick={() => setRequestStatus(request, "contacted")}>Marcar contato</Button>
                             )}
                             <Button size="sm" onClick={() => setRequestStatus(request, "done")}>
-                              {request.status === "done" ? "Ativar plano" : "Confirmar pagamento e ativar"}
+                              {request.status === "done" ? "Registrar ativação administrativa" : "Registrar ativação administrativa"}
                             </Button>
                           </div>
                         )}
